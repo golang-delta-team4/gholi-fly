@@ -7,7 +7,7 @@
 # Output directories
 bin/
 out/
-build/
+# build/
 
 # Test binary, coverage files, and logs
 *.test
@@ -18,7 +18,7 @@ build/
 vendor/
 
 # Go modules
-go.sum
+# go.sum
 
 # IDE/editor files
 .vscode/
@@ -40,11 +40,11 @@ docker-compose.override.yml
 *.env
 
 # YAML configuration files
-*.yaml
-*.yml
+# *.yaml
+# *.yml
 
 # JSON configuration files
-*.json
+config.json
 
 # Go workspace files
 *.code-workspace
