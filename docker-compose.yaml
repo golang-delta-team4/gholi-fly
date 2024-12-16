@@ -1,0 +1,57 @@
+
+services:
+
+  gholi-hotels-api:
+    container_name: gholi-hotels-api
+    build:
+      context: ./micro-services/hotel/.
+      dockerfile: build/Dockerfile
+    ports:
+      - "${API_HOTELS_PORT:-8080}:${API_HOTELS_PORT:-8080}"
+    volumes:
+      - ./micro-services/hotel/config.json:/etc/config.json
+    depends_on:
+      - gholi-db
+      - gholi-redis
+
+  gholi-redis:
+    image: redis/redis-stack:7.2.0-v3
+    container_name: gholi-redis
+    ports:
+      - "8003:8001"
+      - "6380:6379"
+    volumes:
+      - gholi-redis-volume:/data
+
+  gholi-db:
+    image: postgres:14.8
+    container_name: gholi-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${PG_NAME}
+      POSTGRES_USER: ${PG_USERNAME}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+    ports:
+      - "8765:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - gholi-db-volume:/var/lib/postgresql/data
+
+  gholi-nginx:
+    image: nginx:1.25.2
+    container_name: gholi-nginx
+    restart: always
+    ports:
+      - "80:80"
+      # - "443:443" # HTTPS
+    volumes:
+      - ./nginx-config.conf:/etc/nginx/conf.d/default.conf
+
+volumes:
+  gholi-db-volume:
+  gholi-redis-volume:
+
