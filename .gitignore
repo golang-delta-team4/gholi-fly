@@ -44,7 +44,11 @@ docker-compose.override.yml
 # *.yml
 
 # JSON configuration files
-config.json
+config*.json
 
 # Go workspace files
 *.code-workspace
+
+# Air
+.air.toml
+tmp/

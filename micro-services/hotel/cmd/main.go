@@ -2,8 +2,11 @@ package main
 
 import (
 	"flag"
+	"log"
 	"os"
 
+	"gholi-fly-hotel/api/handlers/http"
+	"gholi-fly-hotel/app"
 	"gholi-fly-hotel/config"
 )
 
@@ -18,6 +21,8 @@ func main() {
 
 	c := config.MustReadConfig(*configPath)
 
-	_ = c
+	appContainer := app.NewMustApp(c)
+
+	log.Fatal(http.Run(appContainer, c.Server))
 
 }

@@ -1,11 +1,14 @@
 services:
   gholi-hotels-api:
-    container_name: gholi-hotels-api
+    container_name: gholi-hotels-api-dev
     build:
-      context: ./micro-services/hotel/
+      context: ./micro-services/hotel
       dockerfile: build/Dockerfile
+      target: dev
     volumes:
-      - ./micro-services/hotel/config.json:/etc/config.json:ro 
+      - ./micro-services/hotel:/gholi-fly
+    ports:
+      - "8080:8080"
     depends_on:
       gholi-db:
         condition: service_healthy
@@ -20,7 +23,7 @@ services:
 
   gholi-redis:
     image: redis/redis-stack:7.2.0-v3
-    container_name: gholi-redis
+    container_name: gholi-redis-dev
     volumes:
       - gholi-redis-volume:/data
     healthcheck:
@@ -32,7 +35,7 @@ services:
 
   gholi-db:
     image: postgres:14.8
-    container_name: gholi-db
+    container_name: gholi-db-dev
     restart: always
     environment:
       POSTGRES_DB: ${PG_NAME}
@@ -44,16 +47,16 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - gholi-db-volume:/var/lib/postgresql/data:rw 
+      - gholi-db-volume:/var/lib/postgresql/data:rw
 
   gholi-nginx:
     image: nginx:1.25.2
-    container_name: gholi-nginx
+    container_name: gholi-nginx-dev
     restart: always
     ports:
-      - "80:80"
+      - "8888:80"
     volumes:
-      - ./nginx-config.conf:/etc/nginx/conf.d/default.conf:ro 
+      - ./nginx-config-dev.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       gholi-hotels-api:
         condition: service_healthy
