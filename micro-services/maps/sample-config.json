@@ -1,0 +1,19 @@
+{
+    "db": {
+        "host": "",
+        "port": 5432,
+        "database": "",
+        "user": "",
+        "password": ""
+    },
+    "server": {
+        "httpPort": 8080,
+        "secret": "",
+        "authExpMin": 0,
+        "authExpRefreshMin": 0
+    },
+    "reids": {
+        "host": "",
+        "port": 0
+    }
+}
