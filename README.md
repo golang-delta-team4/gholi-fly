@@ -1,6 +1,6 @@
 # Gholi Fly Project
 
-Welcome to **Gholi Fly**, a multi-service Go application orchestrated with Docker Compose and NGINX. This project contains two primary microservices:
+Welcome to **Gholi Fly**, a multi-service Go application orchestrated with Docker Compose and NGINX. This project contains multiple primary microservices:
 
 1. **Bank Service** – located in `micro-services/bank`
 2. **Hotel Service** – located in `micro-services/hotel`
@@ -44,7 +44,11 @@ docker-compose -f docker-compose-dev.yaml up --build
 ```
 2. Access the services:
 - **Bank Service**: `http://localhost:8080`  
-- **Hotel Service**: `http://localhost:8081`  
+- **Hotel Service**: `http://localhost:8081`
+- **Terminal Route Service**: `http://localhost:8082`
+- **User**: `http://localhost:8083` 
+- **Transportation**: `http://localhost:8084`
+
 - **NGINX (Proxy)**: `http://localhost:8888`  
 
 ---
