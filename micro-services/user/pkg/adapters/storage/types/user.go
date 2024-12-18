@@ -7,10 +7,11 @@ import (
 
 type User struct {
 	gorm.Model
-	UUID       uuid.UUID
-	FirstName  string
-	LastName   string
-	Email      string
-	Password   string
-	IsVerified bool
+	UUID         uuid.UUID
+	FirstName    string
+	LastName     string
+	Email        string
+	Password     string
+	IsVerified   bool
+	RefreshToken string
 }

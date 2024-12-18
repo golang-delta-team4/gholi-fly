@@ -7,6 +7,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type UserSignInRequest struct {
+	Email     string    `json:"email"`
+	Password  string    `json:"password"`
+}
+
 type User struct {
 	UUID      uuid.UUID `json:"uuid"`
 	FirstName string    `json:"firstName"`
@@ -23,4 +28,9 @@ func HashPassword(password string) (string, error) {
 		return "", err
 	}
 	return string(hash), nil
+}
+
+func HashVerify(hashedPassword, password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	return err == nil
 }
