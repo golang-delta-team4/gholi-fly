@@ -2,6 +2,9 @@ package app
 
 import (
 	"user-service/config"
+	"user-service/internal/user"
+	userPort "user-service/internal/user/port"
+	"user-service/pkg/adapters/storage"
 	"user-service/pkg/adapters/storage/types"
 	"user-service/pkg/postgres"
 
@@ -9,8 +12,9 @@ import (
 )
 
 type app struct {
-	db  *gorm.DB
-	cfg config.Config
+	db          *gorm.DB
+	cfg         config.Config
+	userService userPort.Service
 }
 
 func (a *app) DB() *gorm.DB {
@@ -58,6 +62,7 @@ func NewApp(cfg config.Config) (App, error) {
 	if err := a.setDB(); err != nil {
 		return nil, err
 	}
+	a.userService = user.NewService(storage.NewUserRepo(a.db))
 	return a, nil
 }
 
@@ -67,4 +72,8 @@ func NewMustApp(cfg config.Config) App {
 		panic(err)
 	}
 	return app
+}
+
+func (a *app) UserService() userPort.Service {
+	return a.userService
 }

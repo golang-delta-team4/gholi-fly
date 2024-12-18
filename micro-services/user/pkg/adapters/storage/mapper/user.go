@@ -8,19 +8,17 @@ import (
 func Domain2Storage(user domain.User) *types.User {
 	return &types.User{
 		FirstName: user.FirstName,
-		LastName: user.LastName,
-		Email: user.Email,
-		Password: user.Password,
+		LastName:  user.LastName,
+		Email:     user.Email,
 	}
 }
 
 func Storage2Domain(user types.User) *domain.User {
 	return &domain.User{
-		UUID: user.UUID,
+		UUID:      user.UUID,
 		FirstName: user.FirstName,
-		LastName: user.LastName,
-		Email: user.Email,
-		Password: user.Password,
+		LastName:  user.LastName,
+		Email:     user.Email,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 	}
