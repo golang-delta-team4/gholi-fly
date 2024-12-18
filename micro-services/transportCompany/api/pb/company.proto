@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "github.com/golang-delta-team4/gholi-fly/transportCompany/api/pb";
+
+
+message CreateCompanyRequest {
+    string name = 1 [json_name = "name"];
+    string description = 2 [json_name = "description"];
+    string ownerId = 3 [json_name = "ownerId"];
+}	
+
+message CreateCompanyResponse {
+    int64 id = 1 [json_name = "id"];
+    string message = 2 [json_name = "message"];
+}
