@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/config"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company"
@@ -60,8 +61,10 @@ func (a *app) setDB() error {
 		Schema: a.cfg.DB.Schema,
 	})
 
-	db.AutoMigrate(&types.Company{}, &types.Invoice{}, &types.TechnicalTeam{}, &types.TechnicalTeamMemeber{}, &types.Ticket{}, &types.Ticket{}, &types.Trip{}, &types.VehicleRequest{})
-
+	migrateErr := db.AutoMigrate(&types.Company{}, &types.Ticket{}, &types.Invoice{}, &types.TechnicalTeam{}, &types.TechnicalTeamMemeber{}, &types.Trip{}, &types.VehicleRequest{})
+	if migrateErr != nil {
+		log.Fatalf("Failed to migrate : %v", migrateErr)
+	}
 	if err != nil {
 		return err
 	}
