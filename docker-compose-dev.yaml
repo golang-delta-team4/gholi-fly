@@ -1,0 +1,77 @@
+services:
+  gholi-hotels-api:
+    container_name: gholi-hotels-api-dev
+    build:
+      context: ./micro-services/hotel
+      dockerfile: build/Dockerfile
+      target: dev
+    volumes:
+      - ./micro-services/hotel:/gholi-fly
+    ports:
+      - "8081:8080"
+    depends_on:
+      gholi-db:
+        condition: service_healthy
+      gholi-redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  gholi-db:
+    image: postgres:14.8
+    container_name: gholi-db-dev
+    restart: always
+    environment:
+      POSTGRES_USER: ${PG_USERNAME}        
+      POSTGRES_PASSWORD: ${PG_PASSWORD}    
+      POSTGRES_MULTIPLE_DATABASES: ${PG_MULTIPLE_DATABASES}  
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USERNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - gholi-db-volume:/var/lib/postgresql/data:rw
+      - ./scripts/create-multiple-postgresql-databases.sh:/docker-entrypoint-initdb.d/create-multiple-postgresql-databases.sh:ro
+
+  gholi-redis:
+      image: redis/redis-stack:7.2.0-v3
+      container_name: gholi-redis-dev
+      volumes:
+        - gholi-redis-volume:/data
+      ports:
+        - "6380:6379"
+        - "8020:8001"
+      healthcheck:
+        test: ["CMD", "redis-cli", "ping"]
+        interval: 5s
+        timeout: 3s
+        retries: 5
+      restart: always
+
+  gholi-nginx:
+    image: nginx:1.25.2
+    container_name: gholi-nginx-dev
+    restart: always
+    ports:
+      - "8888:80"
+    volumes:
+      - ./nginx-config-dev.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      gholi-hotels-api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/v1/hotel/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  gholi-db-volume:
+  gholi-redis-volume:
