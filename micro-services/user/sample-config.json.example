@@ -1,0 +1,15 @@
+{
+    "db": {
+        "host": "",
+        "port": 0,
+        "database": "",
+        "user": "",
+        "password": ""
+    },
+    "server": {
+        "HttpHost":"",
+        "HttpPort": 8083,
+        "authExpMin": 1440,
+        "authExpRefreshMin": 3
+    }
+}
