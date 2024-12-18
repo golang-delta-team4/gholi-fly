@@ -2,14 +2,15 @@ package app
 
 import (
 	"user-service/config"
+	"user-service/pkg/adapters/storage/types"
 	"user-service/pkg/postgres"
 
 	"gorm.io/gorm"
 )
 
 type app struct {
-	db          *gorm.DB
-	cfg         config.Config
+	db  *gorm.DB
+	cfg config.Config
 }
 
 func (a *app) DB() *gorm.DB {
@@ -35,7 +36,18 @@ func (a *app) setDB() error {
 	}
 
 	a.db = db
+
+	err = autoMigrate(db)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func autoMigrate(db *gorm.DB) error {
+	return db.AutoMigrate(&types.User{})
 }
 
 func NewApp(cfg config.Config) (App, error) {
