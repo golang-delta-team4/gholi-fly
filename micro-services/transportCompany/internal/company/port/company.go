@@ -4,8 +4,9 @@ import (
 	"context"
 
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company/domain"
+	"github.com/google/uuid"
 )
 
 type Repo interface {
-	Create(ctx context.Context, company domain.Company) (domain.CompanyId, error)
+	Create(ctx context.Context, company domain.Company) (uuid.UUID, error)
 }

@@ -1,18 +1,23 @@
 package types
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 type VehicleRequest struct {
-	gorm.Model
-	TripID                uint
-	VehicleType           string `gorm:"type:varchar(50);not null"`
+	Id                    uuid.UUID `gorm:"type:uuid;primaryKey"`
+	TripID                uuid.UUID `gorm:"type:uuid;not null;"`
+	VehicleType           string    `gorm:"type:varchar(50);not null"`
 	MinCapacity           int
-	ProductionYearMin     int
-	Status                string `gorm:"type:varchar(20);default:'pending'"`
-	MatchedVehicleID      uint
-	VehicleReservationFee float64
+	Status                string    `gorm:"type:varchar(20);default:'pending'"`
+	MatchedVehicleID      uuid.UUID `gorm:"type:uuid;not null;"`
 	VehicleProductionYear int
 	VehicleName           string
-	MatchVehicleSpeed     float64
-	MinCost               float64
+	Cost                  float64
+	CreatedAt             time.Time
+	UpdatedAt             time.Time
+	DeletedAt             gorm.DeletedAt `gorm:"index"`
 }

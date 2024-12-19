@@ -7,6 +7,7 @@ import (
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/storage/mapper"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/cache"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -26,7 +27,7 @@ func NewCompanyRepo(db *gorm.DB, cached bool, provider cache.Provider) port.Repo
 	}
 }
 
-func (r *companyRepo) Create(ctx context.Context, companyDomain domain.Company) (domain.CompanyId, error) {
+func (r *companyRepo) Create(ctx context.Context, companyDomain domain.Company) (uuid.UUID, error) {
 	company := mapper.CompanyDomain2Storage(companyDomain)
-	return domain.CompanyId(company.ID), r.db.Table("companies").WithContext(ctx).Create(company).Error
+	return company.Id, r.db.Table("companies").WithContext(ctx).Create(company).Error
 }
