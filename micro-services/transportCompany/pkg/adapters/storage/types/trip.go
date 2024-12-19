@@ -3,14 +3,15 @@ package types
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type Trip struct {
-	gorm.Model
-	CompanyID        uint     `gorm:"not null"`
-	Company          *Company `gorm:"foreignKey:CompanyID; constraint:OnDelete:CASCADE;"`
-	TripType         string   `gorm:"type:varchar(20);not null"`
+	Id               uuid.UUID `gorm:"type:uuid;primaryKey"`
+	CompanyID        uint      `gorm:"not null"`
+	Company          *Company  `gorm:"foreignKey:CompanyID; constraint:OnDelete:CASCADE;"`
+	TripType         string    `gorm:"type:varchar(20);not null"`
 	UserReleaseDate  time.Time
 	TourReleaseDate  time.Time
 	UserPrice        float64
@@ -41,4 +42,7 @@ type Trip struct {
 	StartDate        *time.Time `gorm:"not null;"`
 	EndDate          *time.Time
 	Profit           float64 `gorm:"default:0"`
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
+	DeletedAt        gorm.DeletedAt `gorm:"index"`
 }

@@ -3,11 +3,11 @@ package storage
 import (
 	"context"
 	"log"
-	"strconv"
 
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company/domain"
 	companyPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/cache"
+	"github.com/google/uuid"
 )
 
 type companyCashedRepo struct {
@@ -15,10 +15,10 @@ type companyCashedRepo struct {
 	provider cache.Provider
 }
 
-func (r *companyCashedRepo) Create(ctx context.Context, companyDomain domain.Company) (domain.CompanyId, error) {
+func (r *companyCashedRepo) Create(ctx context.Context, companyDomain domain.Company) (uuid.UUID, error) {
 	uId, err := r.repo.Create(ctx, companyDomain)
 	if err != nil {
-		return 0, err
+		return uuid.Nil, err
 	}
 	companyDomain.Id = uId
 
@@ -33,5 +33,5 @@ func (r *companyCashedRepo) Create(ctx context.Context, companyDomain domain.Com
 }
 
 func (r *companyCashedRepo) companyFilterKey(filter *domain.CompanyFilter) string {
-	return "companies." + strconv.FormatUint(uint64(filter.Id), 10) + "." + filter.Name
+	return "companies." + filter.Id.String() + "." + filter.Name
 }

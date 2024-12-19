@@ -7,9 +7,12 @@ message CreateCompanyRequest {
     string name = 1 [json_name = "name"];
     string description = 2 [json_name = "description"];
     string ownerId = 3 [json_name = "ownerId"];
+    string address =4 [json_name = "address"];
+	string phone =5 [json_name = "phone"];
+	string email =6 [json_name = "email"];
 }	
 
 message CreateCompanyResponse {
-    int64 id = 1 [json_name = "id"];
+    string id = 1 [json_name = "id"];
     string message = 2 [json_name = "message"];
 }

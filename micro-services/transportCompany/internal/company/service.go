@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company/domain"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company/port"
+	"github.com/google/uuid"
 )
 
 var (
@@ -25,13 +26,14 @@ func NewService(repo port.Repo) port.Service {
 	}
 }
 
-func (s *service) CreateCompany(ctx context.Context, company domain.Company) (domain.CompanyId, error) {
+func (s *service) CreateCompany(ctx context.Context, company domain.Company) (uuid.UUID, error) {
 	if err := company.Validate(); err != nil {
-		return 0, fmt.Errorf("%w %w", ErrCompanyCreationValidation, err)
+		return uuid.Nil, fmt.Errorf("%w %w", ErrCompanyCreationValidation, err)
 	}
 	companyId, err := s.repo.Create(ctx, company)
 	if err != nil {
 		log.Println("error on creating company: ", err.Error())
+		return uuid.Nil, err
 	}
 
 	return companyId, nil

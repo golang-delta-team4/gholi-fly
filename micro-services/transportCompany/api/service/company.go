@@ -39,6 +39,9 @@ func (s *CompanyService) Create(ctx context.Context, req *pb.CreateCompanyReques
 		Name:        req.Name,
 		Description: req.Description,
 		OwnerId:     ownerId,
+		Address:     req.Address,
+		Phone:       req.Phone,
+		Email:       req.Email,
 	})
 
 	if err != nil {
@@ -46,6 +49,6 @@ func (s *CompanyService) Create(ctx context.Context, req *pb.CreateCompanyReques
 	}
 
 	return &pb.CreateCompanyResponse{
-		Id: int64(comanyId),
+		Id: comanyId.String(),
 	}, nil
 }
