@@ -1,29 +1,29 @@
 package config
 
 type Config struct {
-	DB     DBConfig     `json:"db"`
-	Server ServerConfig `json:"server"`
-	Redis  RedisConfig  `json:"redis"`
+	DB     DBConfig     `mapstructure:"db"`
+	Server ServerConfig `mapstructure:"server"`
+	Redis  RedisConfig  `mapstructure:"redis"`
 }
 
 type DBConfig struct {
-	Host     string `json:"host"`
-	Port     uint   `json:"port"`
-	Database string `json:"database"`
-	Schema   string `json:"schema"`
-	User     string `json:"user"`
-	Password string `json:"password"`
+	Host     string `mapstructure:"host"`
+	Port     uint   `mapstructure:"port"`
+	Database string `mapstructure:"database"`
+	Schema   string `mapstructure:"schema"`
+	User     string `mapstructure:"user"`
+	Password string `mapstructure:"password"`
 }
 
 type ServerConfig struct {
-	HttpHost          string   `json:"httpHost"`
-	HttpPort          uint   `json:"httpPort"`
-	Secret            string `json:"secret"`
-	AuthExpMinute     uint   `json:"authExpMin"`
-	AuthRefreshMinute uint   `json:"authExpRefreshMin"`
+	HttpHost          string `mapstructure:"httpHost"`
+	HttpPort          uint   `mapstructure:"httpPort"`
+	Secret            string `mapstructure:"secret"`
+	AuthExpMinute     uint   `mapstructure:"authExpMin"`
+	AuthRefreshMinute uint   `mapstructure:"authExpRefreshMin"`
 }
 
 type RedisConfig struct {
-	Host string `json:"host"`
-	Port uint   `json:"port"`
+	Host string `mapstructure:"host"`
+	Port uint   `mapstructure:"port"`
 }
