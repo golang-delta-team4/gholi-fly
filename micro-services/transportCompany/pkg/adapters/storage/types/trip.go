@@ -11,7 +11,7 @@ type Trip struct {
 	Id               uuid.UUID `gorm:"type:uuid;primaryKey"`
 	CompanyID        uint      `gorm:"not null"`
 	Company          *Company  `gorm:"foreignKey:CompanyID; constraint:OnDelete:CASCADE;"`
-	TripType         string    `gorm:"type:varchar(20);not null"`
+	TripType         string    `gorm:"not null"`
 	UserReleaseDate  time.Time
 	TourReleaseDate  time.Time
 	UserPrice        float64
@@ -19,15 +19,15 @@ type Trip struct {
 	PathID           uint `gorm:"not null"`
 	FromCountry      string
 	ToCountry        string
-	Origin           string `gorm:"type:varchar(100);not null"`
+	Origin           string `gorm:"not null"`
 	FromTerminalName string
 	ToTerminalName   string
-	Destination      string `gorm:"type:varchar(100);not null"`
+	Destination      string `gorm:"not null"`
 	PathName         string
 	PathDistanceKM   float64
-	Status           string `gorm:"type:varchar(20);default:'pending'"`
+	Status           string `gorm:"default:'pending'"`
 	MinPassengers    uint
-	TechnicalTeamID  *uint          `gorm:""`
+	TechnicalTeamID  *uint
 	TechnicalTeam    *TechnicalTeam `gorm:"foreignKey:TechnicalTeamID; constraint:OnDelete:CASCADE;"`
 	VehicleRequestID *uint
 	VehicleRequest   *VehicleRequest `gorm:"foreignKey:TripID; constraint:OnDelete:CASCADE;"`

@@ -45,7 +45,10 @@ func setTransaction(db *gorm.DB) fiber.Handler {
 
 		context.SetDB(c.UserContext(), tx, true)
 
-		err := c.Next()
+		if err := c.Next(); err != nil {
+			context.Rollback(c.UserContext())
+			return err
+		}
 
 		if c.Response().StatusCode() >= 300 {
 			return context.Rollback(c.UserContext())
@@ -55,6 +58,6 @@ func setTransaction(db *gorm.DB) fiber.Handler {
 			return err
 		}
 
-		return err
+		return nil
 	}
 }

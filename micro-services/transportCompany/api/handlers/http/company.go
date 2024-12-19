@@ -13,7 +13,7 @@ func CreateCompany(svcGetter ServiceGetter[*service.CompanyService]) fiber.Handl
 		svc := svcGetter(c.UserContext())
 		var req pb.CreateCompanyRequest
 		if err := c.BodyParser(&req); err != nil {
-			return fiber.ErrBadRequest
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
 		response, err := svc.Create(c.UserContext(), &req)
 
