@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/api/pb"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company"
@@ -32,10 +33,10 @@ var (
 func (s *CompanyService) Create(ctx context.Context, req *pb.CreateCompanyRequest) (*pb.CreateCompanyResponse, error) {
 	ownerId, err := uuid.Parse(req.OwnerId)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w %w", ErrCompanyCreationValidation, err)
 	}
 
-	comanyId, err := s.svc.CreateCompany(ctx, domain.Company{
+	companyId, err := s.svc.CreateCompany(ctx, domain.Company{
 		Name:        req.Name,
 		Description: req.Description,
 		OwnerId:     ownerId,
@@ -49,6 +50,6 @@ func (s *CompanyService) Create(ctx context.Context, req *pb.CreateCompanyReques
 	}
 
 	return &pb.CreateCompanyResponse{
-		Id: comanyId.String(),
+		Id: companyId.String(),
 	}, nil
 }

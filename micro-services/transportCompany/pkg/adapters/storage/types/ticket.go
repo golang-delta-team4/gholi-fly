@@ -13,7 +13,7 @@ type Ticket struct {
 	Trip      *Trip      `gorm:"foreignKey:TripID; constraint:OnDelete:CASCADE;"`
 	UserID    *uuid.UUID `gorm:"type:uuid;default:NULL"`
 	Price     float64
-	Status    string `gorm:"type:varchar(20);default:'pending'"`
+	Status    string `gorm:"default:'pending'"`
 	InvoiceId uuid.UUID
 	Invoice   Invoice `gorm:"foreignKey:InvoiceId; constraint:OnDelete:CASCADE;"`
 	CreatedAt time.Time

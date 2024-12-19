@@ -10,9 +10,9 @@ import (
 type VehicleRequest struct {
 	Id                    uuid.UUID `gorm:"type:uuid;primaryKey"`
 	TripID                uuid.UUID `gorm:"type:uuid;not null;"`
-	VehicleType           string    `gorm:"type:varchar(50);not null"`
+	VehicleType           string    `gorm:"not null"`
 	MinCapacity           int
-	Status                string    `gorm:"type:varchar(20);default:'pending'"`
+	Status                string    `gorm:"default:'pending'"`
 	MatchedVehicleID      uuid.UUID `gorm:"type:uuid;not null;"`
 	VehicleProductionYear int
 	VehicleName           string

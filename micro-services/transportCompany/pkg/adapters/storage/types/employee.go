@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type Eemployee struct {
+type Employee struct {
 	Id        uuid.UUID `gorm:"type:uuid;primaryKey"`
 	CompanyId uuid.UUID `gorm:"type:uuid;not null"`
 	Position  string    `gorm:"not null"`
