@@ -19,5 +19,6 @@ func Run(appContainer app.App, cfg config.Config) error {
 	userGroup := app.Group("users")
 	userGroup.Post("/sign-up", SignUp(userService))
 	userGroup.Post("/sign-in", SignIn(userService))
+	userGroup.Post("/refresh", newAuthMiddleware([]byte(cfg.Server.Secret)),Refresh(userService))
 	return app.Listen(fmt.Sprintf("%s:%d", cfg.Server.HttpHost, cfg.Server.HttpPort))
 }

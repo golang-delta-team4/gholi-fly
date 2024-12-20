@@ -2,15 +2,19 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 	"user-service/internal/user/domain"
 	userPort "user-service/internal/user/port"
 	"user-service/pkg/jwt"
-	"user-service/pkg/time"
+	timePkg "user-service/pkg/time"
 
 	goJwt "github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
+
+var ErrInvalidRefreshToken = errors.New("refresh token is invalid or expired")
 
 type ErrUserCreationValidation struct {
 	details string
@@ -39,15 +43,15 @@ func (us *UserService) SignIn(ctx context.Context, user *domain.UserSignInReques
 	if err != nil {
 		return "", "", err
 	}
-	accessToken, err := us.createAccessToken(userID)
+	accessToken, _, err := createToken(userID, us.expMin, []byte(us.secret))
 	if err != nil {
 		return "", "", err
 	}
-	refreshToken, err := us.createRefreshToken(userID)
+	refreshToken, expirationTime, err := createToken(userID, us.refreshExpMin, []byte(us.secret))
 	if err != nil {
 		return "", "", err
 	}
-	err = us.service.UpdateUserRefreshToken(ctx, userID, refreshToken)
+	err = us.service.UpdateUserRefreshToken(ctx, userID, refreshToken, expirationTime)
 	if err != nil {
 		return "", "", err
 	}
@@ -55,18 +59,27 @@ func (us *UserService) SignIn(ctx context.Context, user *domain.UserSignInReques
 
 }
 
-func (us *UserService) createAccessToken(userID uint) (string, error) {
-	accessToken, err := jwt.CreateToken([]byte(us.secret), &jwt.UserClaims{UserID: userID, RegisteredClaims: goJwt.RegisteredClaims{ExpiresAt: goJwt.NewNumericDate(time.AddMinutes(us.expMin, true))}})
+func (us *UserService) Refresh(ctx context.Context, userID uint, refreshToken string) (string, error) {
+	valid, err := us.service.ValidateRefreshToken(ctx, userID, refreshToken)
 	if err != nil {
 		return "", err
 	}
-	return accessToken, nil
+	if valid {
+		accessToken, _, err := createToken(userID, us.expMin, []byte(us.secret))
+		return accessToken, err
+	}
+	return "", ErrInvalidRefreshToken
 }
 
-func (us *UserService) createRefreshToken(userID uint) (string, error) {
-	refreshToken, err := jwt.CreateToken([]byte(us.secret), &jwt.UserClaims{UserID: userID, RegisteredClaims: goJwt.RegisteredClaims{ExpiresAt: goJwt.NewNumericDate(time.AddMinutes(us.refreshExpMin, true))}})
+
+func createToken(userID uint, expMin uint, secret []byte) (string, time.Time, error) {
+	expirationTime := timePkg.AddMinutes(expMin, true)
+	token, err := jwt.CreateToken(secret, &jwt.UserClaims{UserID: userID,
+		RegisteredClaims: goJwt.RegisteredClaims{ExpiresAt: goJwt.NewNumericDate(expirationTime)}})
 	if err != nil {
-		return "", err
+		return "", time.Time{}, err
 	}
-	return refreshToken, nil
+	return token, expirationTime, nil
 }
+
+

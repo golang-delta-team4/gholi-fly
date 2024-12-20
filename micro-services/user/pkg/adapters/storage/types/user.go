@@ -1,6 +1,8 @@
 package types
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -13,5 +15,12 @@ type User struct {
 	Email        string
 	Password     string
 	IsVerified   bool
-	RefreshToken string
+}
+
+type RefreshToken struct {
+	gorm.Model
+	UserID         uint
+	User           *User `gorm:"foreignKey:UserID"`
+	Token          string
+	ExpirationTime time.Time
 }
