@@ -1,5 +1,10 @@
 package presenter
 
+import (
+	"errors"
+	"regexp"
+)
+
 type UserSignUpRequest struct {
 	FirstName string `json:"firstName" validate:"required"`
 	LastName  string `json:"lastName" validate:"required"`
@@ -23,6 +28,18 @@ type UserRefreshRequest struct {
 
 type UserRefreshResponse struct {
 	AccessToken string `json:"accessToken"`
+}
+
+func EmailValidation(email string) error {
+	emailRegex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+	emailMatched, err := regexp.MatchString(emailRegex, email)
+	if err != nil {
+		return err
+	}
+	if !emailMatched {
+		return errors.New("invalid email format")
+	}
+	return nil
 }
 
 
