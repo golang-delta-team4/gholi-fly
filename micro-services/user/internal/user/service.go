@@ -3,9 +3,11 @@ package user
 import (
 	"context"
 	"errors"
+	"time"
 	"user-service/internal/user/domain"
 	userPort "user-service/internal/user/port"
 	"user-service/pkg/adapters/storage/mapper"
+	"user-service/pkg/adapters/storage/types"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -64,7 +66,40 @@ func (us *service) SignIn(ctx context.Context, userSingInRequest *domain.UserSig
 	return user.ID, nil
 }
 
-func (us *service) UpdateUserRefreshToken (ctx context.Context, userID uint, refreshToken string) error {
-	return us.repo.UpdateRefreshToken(ctx, userID, refreshToken)
+func (us *service) UpdateUserRefreshToken(ctx context.Context, userID uint, refreshToken string, expirationTime time.Time) error {
+	existingRefreshToken, err := us.repo.GetRefreshToken(ctx, userID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			err = us.repo.AddRefreshToken(ctx, &types.RefreshToken{UserID: userID,
+				Token:          refreshToken,
+				ExpirationTime: expirationTime})
+			return err
+		}
+		return err
+	}
+	existingRefreshToken.Token = refreshToken
+	existingRefreshToken.ExpirationTime = expirationTime
+	return us.repo.UpdateRefreshToken(ctx, existingRefreshToken)
 }
 
+func (us *service) GetUserRefreshToken(ctx context.Context, userID uint) (string, error) {
+	existingRefreshToken, err := us.repo.GetRefreshToken(ctx, userID)
+	if err != nil {
+		return "", err
+	}
+	return existingRefreshToken.Token, nil
+}
+
+func (us *service) ValidateRefreshToken(ctx context.Context, userID uint, refreshToken string) (bool, error) {
+	existingRefreshToken, err := us.repo.GetRefreshToken(ctx, userID)
+	if err != nil {
+		return false, err
+	}
+	if time.Now().After(existingRefreshToken.ExpirationTime) {
+		return false, nil
+	}
+	if existingRefreshToken.Token != refreshToken {
+		return false, nil
+	}
+	return true, nil
+}

@@ -29,6 +29,20 @@ func (ur *userRepo) GetByEmail(ctx context.Context, email string) (*types.User, 
 	return &user, nil
 }
 
-func (ur *userRepo) UpdateRefreshToken(ctx context.Context, userID uint, refreshToken string) error {
-	return ur.db.Model(&types.User{}).Where("id = ?", userID).Update("refresh_token", refreshToken).Error
+func (ur *userRepo) UpdateRefreshToken(ctx context.Context, refreshToken types.RefreshToken) error {
+	return ur.db.Model(&types.RefreshToken{}).Where("user_id = ?", refreshToken.UserID).Save(&refreshToken).Error
+}
+
+func (ur *userRepo) AddRefreshToken(ctx context.Context, userRefreshToken *types.RefreshToken) error {
+	return ur.db.Model(&types.RefreshToken{}).Create(&userRefreshToken).Error
+}
+
+func (ur *userRepo) DeleteRefreshToken(ctx context.Context, userID uint) error {
+	return ur.db.Model(&types.RefreshToken{}).Where("user_id = ?", userID).Delete(&types.RefreshToken{}).Error
+}
+
+func (ur *userRepo) GetRefreshToken(ctx context.Context, userID uint) (types.RefreshToken, error) {
+	var refreshToken types.RefreshToken
+	err := ur.db.Model(&types.RefreshToken{}).Where("user_id = ?", userID).First(&refreshToken).Error
+	return refreshToken, err
 }

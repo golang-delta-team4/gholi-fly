@@ -51,7 +51,8 @@ func (a *app) setDB() error {
 }
 
 func autoMigrate(db *gorm.DB) error {
-	return db.AutoMigrate(&types.User{})
+	return db.AutoMigrate(&types.User{},
+		&types.RefreshToken{})
 }
 
 func NewApp(cfg config.Config) (App, error) {
