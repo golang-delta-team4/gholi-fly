@@ -21,6 +21,10 @@ func SignUp(userService *service.UserService) fiber.Handler {
 		if validationError != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"errors": validationError})
 		}
+		err := presenter.EmailValidation(req.Email)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
 		resp, err := userService.SignUp(c.UserContext(), &req)
 		if err != nil {
 			if errors.Is(err, &service.ErrUserCreationValidation{}) {
@@ -41,6 +45,10 @@ func SignIn(userService *service.UserService) fiber.Handler {
 		validationError := validate(req)
 		if validationError != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"errors": validationError})
+		}
+		err := presenter.EmailValidation(req.Email)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
 		accessToken, refreshToken, err := userService.SignIn(c.UserContext(), &req)
 		if err != nil {
