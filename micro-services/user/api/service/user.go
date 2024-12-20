@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"user-service/api/presenter"
 	"user-service/internal/user/domain"
 	userPort "user-service/internal/user/port"
 	"user-service/pkg/jwt"
@@ -34,12 +35,12 @@ func NewUserService(service userPort.Service, expMin, refreshExpMin uint, secret
 	return &UserService{service: service, expMin: expMin, refreshExpMin: refreshExpMin, secret: secret}
 }
 
-func (us *UserService) SignUp(ctx context.Context, user *domain.User) (uuid.UUID, error) {
-	return us.service.SignUp(ctx, user)
+func (us *UserService) SignUp(ctx context.Context, user *presenter.UserSignUpRequest) (uuid.UUID, error) {
+	return us.service.SignUp(ctx, &domain.User{Email: user.Email, Password: user.Password, FirstName: user.FirstName, LastName: user.LastName})
 }
 
-func (us *UserService) SignIn(ctx context.Context, user *domain.UserSignInRequest) (string, string, error) {
-	userID, err := us.service.SignIn(ctx, user)
+func (us *UserService) SignIn(ctx context.Context, user *presenter.UserSignInRequest) (string, string, error) {
+	userID, err := us.service.SignIn(ctx, &domain.UserSignInRequest{Email: user.Email, Password: user.Password})
 	if err != nil {
 		return "", "", err
 	}
@@ -71,7 +72,6 @@ func (us *UserService) Refresh(ctx context.Context, userID uint, refreshToken st
 	return "", ErrInvalidRefreshToken
 }
 
-
 func createToken(userID uint, expMin uint, secret []byte) (string, time.Time, error) {
 	expirationTime := timePkg.AddMinutes(expMin, true)
 	token, err := jwt.CreateToken(secret, &jwt.UserClaims{UserID: userID,
@@ -81,5 +81,3 @@ func createToken(userID uint, expMin uint, secret []byte) (string, time.Time, er
 	}
 	return token, expirationTime, nil
 }
-
-

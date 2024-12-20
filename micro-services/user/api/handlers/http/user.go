@@ -3,18 +3,23 @@ package http
 import (
 	"errors"
 	"strconv"
+	"user-service/api/presenter"
 	"user-service/api/service"
 	"user-service/internal/user"
-	"user-service/internal/user/domain"
 
+	validator "github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
 func SignUp(userService *service.UserService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var req domain.User
+		var req presenter.UserSignUpRequest
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.ErrBadRequest
+		}
+		validationError := validate(req)
+		if validationError != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"errors": validationError})
 		}
 		resp, err := userService.SignUp(c.UserContext(), &req)
 		if err != nil {
@@ -29,9 +34,13 @@ func SignUp(userService *service.UserService) fiber.Handler {
 
 func SignIn(userService *service.UserService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var req domain.UserSignInRequest
+		var req presenter.UserSignInRequest
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.ErrBadRequest
+		}
+		validationError := validate(req)
+		if validationError != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"errors": validationError})
 		}
 		accessToken, refreshToken, err := userService.SignIn(c.UserContext(), &req)
 		if err != nil {
@@ -43,16 +52,14 @@ func SignIn(userService *service.UserService) fiber.Handler {
 			}
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
-		return c.JSON(fiber.Map{"refreshToken": refreshToken, "accessToken": accessToken})
+		return c.JSON(presenter.UserSignInResponse{AccessToken: accessToken, RefreshToken: refreshToken})
 	}
 }
 
 func Refresh(userService *service.UserService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		type tokenReqBody struct {
-			RefreshToken string `json:"refreshToken"`
-		}
-		var tokenReq tokenReqBody
+
+		var tokenReq presenter.UserRefreshRequest
 		userID, err := strconv.Atoi(c.Locals("UserID").(string))
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, "token invalid")
@@ -70,6 +77,23 @@ func Refresh(userService *service.UserService) fiber.Handler {
 			}
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
-		return c.JSON(fiber.Map{"accessToken": accessToken})
+
+		return c.JSON(presenter.UserRefreshResponse{AccessToken: accessToken})
 	}
+}
+
+func validate(req any) map[string]string {
+	validate := validator.New()
+	err := validate.Struct(req)
+	if err != nil {
+		var errs validator.ValidationErrors
+		errors.As(err, &errs)
+		for _, validationError := range errs {
+			return map[string]string{
+				"field":   validationError.Field(),
+				"message": validationError.Error(),
+			}
+		}
+	}
+	return nil
 }
