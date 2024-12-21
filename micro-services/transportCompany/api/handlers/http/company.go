@@ -28,3 +28,20 @@ func CreateCompany(svcGetter ServiceGetter[*service.CompanyService]) fiber.Handl
 		return c.JSON(response)
 	}
 }
+
+func GetCompanyById(svcGetter ServiceGetter[*service.CompanyService]) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
+		compnayId := c.Params("id")
+		response, err := svc.GetCompanyById(c.UserContext(), compnayId)
+		if err != nil {
+			if errors.Is(err, service.ErrCompanyCreationValidation) {
+				return fiber.NewError(fiber.StatusBadRequest, err.Error())
+			}
+
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+
+		return c.JSON(response)
+	}
+}

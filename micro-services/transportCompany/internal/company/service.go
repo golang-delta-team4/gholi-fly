@@ -38,3 +38,12 @@ func (s *service) CreateCompany(ctx context.Context, company domain.Company) (uu
 
 	return companyId, nil
 }
+
+func (s *service) GetCompanyById(ctx context.Context, companyId uuid.UUID) (*domain.Company, error) {
+	company, err := s.repo.GetCompanyById(ctx, companyId)
+	if err != nil {
+		log.Println("error on creating company: ", err.Error())
+		return nil, err
+	}
+	return company, nil
+}

@@ -53,3 +53,26 @@ func (s *CompanyService) Create(ctx context.Context, req *pb.CreateCompanyReques
 		Id: companyId.String(),
 	}, nil
 }
+
+func (s *CompanyService) GetCompanyById(ctx context.Context, companyId string) (*pb.GetCompanyResponse, error) {
+	companyUid, err := uuid.Parse(companyId)
+	if err != nil {
+		return nil, fmt.Errorf("%w %w", ErrCompanyCreationValidation, err)
+	}
+
+	company, err := s.svc.GetCompanyById(ctx, companyUid)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.GetCompanyResponse{
+		Id:          company.Id.String(),
+		Name:        company.Name,
+		Description: company.Description,
+		Address:     company.Address,
+		Phone:       company.Phone,
+		Email:       company.Email,
+		OwnerId:     company.OwnerId.String(),
+	}, nil
+}

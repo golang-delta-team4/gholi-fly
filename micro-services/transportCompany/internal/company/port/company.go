@@ -9,4 +9,5 @@ import (
 
 type Repo interface {
 	Create(ctx context.Context, company domain.Company) (uuid.UUID, error)
+	GetCompanyById(ctx context.Context, companyId uuid.UUID) (*domain.Company, error)
 }
