@@ -12,7 +12,7 @@ import (
 func Run(appContainer app.App, cfg config.ServerConfig) error {
 	router := fiber.New()
 
-	api := router.Group("/api/v1/company", setUserContext)
+	api := router.Group("/api/v1/transport-company", setUserContext)
 
 	registerCompanyAPI(appContainer, cfg, api)
 
@@ -21,9 +21,9 @@ func Run(appContainer app.App, cfg config.ServerConfig) error {
 
 func registerCompanyAPI(appContainer app.App, cfg config.ServerConfig, router fiber.Router) {
 	companyServiceGetter := companyServiceGetter(appContainer, cfg)
-	router.Post("/", setTransaction(appContainer.DB()), CreateCompany(companyServiceGetter))
-	router.Get("/:id", setTransaction(appContainer.DB()), GetCompanyById(companyServiceGetter))
-	router.Get("/get-by-ownerid/:ownerId", setTransaction(appContainer.DB()), GetByOwnerId(companyServiceGetter))
-	router.Patch("/:id", setTransaction(appContainer.DB()), UpdateCompany(companyServiceGetter))
-	router.Delete("/:id", setTransaction(appContainer.DB()), DeleteCompany(companyServiceGetter))
+	router.Post("/company", setTransaction(appContainer.DB()), CreateCompany(companyServiceGetter))
+	router.Get("/company/:id", setTransaction(appContainer.DB()), GetCompanyById(companyServiceGetter))
+	router.Get("/get_company-by-ownerid/:ownerId", setTransaction(appContainer.DB()), GetByOwnerId(companyServiceGetter))
+	router.Patch("/company/:id", setTransaction(appContainer.DB()), UpdateCompany(companyServiceGetter))
+	router.Delete("/company/:id", setTransaction(appContainer.DB()), DeleteCompany(companyServiceGetter))
 }
