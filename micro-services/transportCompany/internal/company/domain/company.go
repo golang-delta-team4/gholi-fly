@@ -57,6 +57,34 @@ func (c *Company) Validate() error {
 	return nil
 }
 
+func (c *Company) UpdateValidate() error {
+
+	if c.Email != "" {
+		// Validate email
+		emailRegex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+		emailMatched, err := regexp.MatchString(emailRegex, c.Email)
+		if err != nil {
+			return err
+		}
+		if !emailMatched {
+			return errors.New("invalid email format")
+		}
+	}
+
+	if c.Phone != "" {
+		// Validate Iranian landline number
+		landlineRegex := `^0[1-8][0-9]{9}$`
+		landlineMatched, err := regexp.MatchString(landlineRegex, c.Phone)
+		if err != nil {
+			return err
+		}
+		if !landlineMatched {
+			return errors.New("invalid Iranian landline number format")
+		}
+	}
+	return nil
+}
+
 type CompanyFilter struct {
 	Id   uuid.UUID
 	Name string

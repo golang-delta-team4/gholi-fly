@@ -99,3 +99,32 @@ func (s *CompanyService) GetByOwnerId(ctx context.Context, ownerId string) (*pb.
 		OwnerId:     company.OwnerId.String(),
 	}, nil
 }
+
+func (s *CompanyService) UpdateCompany(
+	ctx context.Context,
+	req *pb.UpdateCompanyRequest,
+	companyId string) error {
+
+	companyUId, err := uuid.Parse(companyId)
+	if err != nil {
+		return fmt.Errorf("%w %w", ErrCompanyCreationValidation, err)
+	}
+
+	var ownerId uuid.UUID
+	if req.OwnerId != "" {
+		ownerId, err = uuid.Parse(req.OwnerId)
+		if err != nil {
+			return fmt.Errorf("%w %w", ErrCompanyCreationValidation, err)
+		}
+	}
+
+	return s.svc.UpdateCompany(ctx, domain.Company{
+		Id:          companyUId,
+		Name:        req.Name,
+		Description: req.Description,
+		OwnerId:     ownerId,
+		Address:     req.Address,
+		Phone:       req.Phone,
+		Email:       req.Email,
+	})
+}
