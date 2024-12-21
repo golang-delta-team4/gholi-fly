@@ -82,3 +82,7 @@ func (r *companyRepo) UpdateCompany(ctx context.Context, company domain.Company)
 
 	return r.db.Model(&types.Company{}).Where("id = ?", company.Id).Updates(updates).Error
 }
+
+func (r *companyRepo) DeleteCompany(ctx context.Context, companyId uuid.UUID) error {
+	return r.db.Table("companies").WithContext(ctx).Delete(&types.Company{}, "id = ?", companyId).Error
+}

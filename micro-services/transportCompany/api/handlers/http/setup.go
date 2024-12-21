@@ -25,4 +25,5 @@ func registerCompanyAPI(appContainer app.App, cfg config.ServerConfig, router fi
 	router.Get("/:id", setTransaction(appContainer.DB()), GetCompanyById(companyServiceGetter))
 	router.Get("/get-by-ownerid/:ownerId", setTransaction(appContainer.DB()), GetByOwnerId(companyServiceGetter))
 	router.Patch("/:id", setTransaction(appContainer.DB()), UpdateCompany(companyServiceGetter))
+	router.Delete("/:id", setTransaction(appContainer.DB()), DeleteCompany(companyServiceGetter))
 }
