@@ -22,4 +22,5 @@ func Run(appContainer app.App, cfg config.ServerConfig) error {
 func registerCompanyAPI(appContainer app.App, cfg config.ServerConfig, router fiber.Router) {
 	companyServiceGetter := companyServiceGetter(appContainer, cfg)
 	router.Post("/", setTransaction(appContainer.DB()), CreateCompany(companyServiceGetter))
+	router.Get("/", setTransaction(appContainer.DB()), GetCompanyById(companyServiceGetter))
 }

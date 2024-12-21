@@ -16,3 +16,15 @@ func CompanyDomain2Storage(companyDomain domain.Company) *types.Company {
 		Email:       companyDomain.Email,
 	}
 }
+
+func CompanyStorage2Domain(companyStorage types.Company) *domain.Company {
+	return &domain.Company{
+		Id:          companyStorage.Id,
+		Name:        companyStorage.Name,
+		Description: companyStorage.Description,
+		OwnerId:     companyStorage.OwnerId,
+		Address:     companyStorage.Address,
+		Phone:       companyStorage.Phone,
+		Email:       companyStorage.Email,
+	}
+}
