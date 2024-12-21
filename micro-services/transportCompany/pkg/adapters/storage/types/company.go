@@ -14,7 +14,7 @@ type Company struct {
 	Address     string    `gorm:"not null"`
 	Phone       string    `gorm:"not null"`
 	Email       string    `gorm:"not null"`
-	OwnerId     uuid.UUID `gorm:"type:uuid;not null; uniqueIndex"`
+	OwnerId     uuid.UUID `gorm:"type:uuid;not null;"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   gorm.DeletedAt `gorm:"index"`

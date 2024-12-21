@@ -68,3 +68,12 @@ func (s *service) UpdateCompany(ctx context.Context, company domain.Company) err
 	}
 	return nil
 }
+
+func (s *service) DeleteCompany(ctx context.Context, companyId uuid.UUID) error {
+	err := s.repo.DeleteCompany(ctx, companyId)
+	if err != nil {
+		log.Println("error on creating company: ", err.Error())
+		return err
+	}
+	return nil
+}

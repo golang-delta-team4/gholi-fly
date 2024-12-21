@@ -128,3 +128,12 @@ func (s *CompanyService) UpdateCompany(
 		Email:       req.Email,
 	})
 }
+
+func (s *CompanyService) DeleteCompany(ctx context.Context, companyId string) error {
+	companyUId, err := uuid.Parse(companyId)
+	if err != nil {
+		return fmt.Errorf("%w %w", ErrCompanyCreationValidation, err)
+	}
+
+	return s.svc.DeleteCompany(ctx, companyUId)
+}

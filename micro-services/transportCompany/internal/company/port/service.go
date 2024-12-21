@@ -12,4 +12,5 @@ type Service interface {
 	GetCompanyById(ctx context.Context, companyId uuid.UUID) (*domain.Company, error)
 	GetByOwnerId(ctx context.Context, ownerId uuid.UUID) (*domain.Company, error)
 	UpdateCompany(ctx context.Context, company domain.Company) error
+	DeleteCompany(ctx context.Context, companyId uuid.UUID) error
 }
