@@ -18,14 +18,17 @@ type companyRepo struct {
 
 func NewCompanyRepo(db *gorm.DB, cached bool, provider cache.Provider) port.Repo {
 	repo := &companyRepo{db}
+
 	if !cached {
 		return repo
 	}
 
-	return &companyCashedRepo{
-		repo:     repo,
-		provider: provider,
-	}
+	// return &companyCashedRepo{
+	// 	repo:     repo,
+	// 	provider: provider,
+	// }
+
+	return repo
 }
 
 func (r *companyRepo) Create(ctx context.Context, companyDomain domain.Company) (uuid.UUID, error) {
@@ -53,4 +56,29 @@ func (r *companyRepo) GetByOwnerId(ctx context.Context, ownerId uuid.UUID) (*dom
 	companyDomain := mapper.CompanyStorage2Domain(company)
 
 	return companyDomain, nil
+}
+
+func (r *companyRepo) UpdateCompany(ctx context.Context, company domain.Company) error {
+	updates := make(map[string]interface{})
+
+	if company.Name != "" {
+		updates["name"] = company.Name
+	}
+	if company.Description != "" {
+		updates["description"] = company.Description
+	}
+	if company.Address != "" {
+		updates["address"] = company.Address
+	}
+	if company.OwnerId != uuid.Nil {
+		updates["owner_id"] = company.OwnerId
+	}
+	if company.Phone != "" {
+		updates["phone"] = company.Phone
+	}
+	if company.Email != "" {
+		updates["email"] = company.Email
+	}
+
+	return r.db.Model(&types.Company{}).Where("id = ?", company.Id).Updates(updates).Error
 }

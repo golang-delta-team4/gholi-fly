@@ -56,3 +56,15 @@ func (s *service) GetByOwnerId(ctx context.Context, ownerId uuid.UUID) (*domain.
 	}
 	return company, nil
 }
+
+func (s *service) UpdateCompany(ctx context.Context, company domain.Company) error {
+	if err := company.UpdateValidate(); err != nil {
+		return fmt.Errorf("%w %w", ErrCompanyCreationValidation, err)
+	}
+	err := s.repo.UpdateCompany(ctx, company)
+	if err != nil {
+		log.Println("error on creating company: ", err.Error())
+		return err
+	}
+	return nil
+}

@@ -62,3 +62,24 @@ func GetByOwnerId(svcGetter ServiceGetter[*service.CompanyService]) fiber.Handle
 		return c.JSON(response)
 	}
 }
+
+func UpdateCompany(svcGetter ServiceGetter[*service.CompanyService]) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
+		compnayId := c.Params("id")
+		var req pb.UpdateCompanyRequest
+		if err := c.BodyParser(&req); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+		err := svc.UpdateCompany(c.UserContext(), &req, compnayId)
+		if err != nil {
+			if errors.Is(err, service.ErrCompanyCreationValidation) {
+				return fiber.NewError(fiber.StatusBadRequest, err.Error())
+			}
+
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+
+		return nil
+	}
+}
