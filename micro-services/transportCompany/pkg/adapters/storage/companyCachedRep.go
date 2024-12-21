@@ -36,6 +36,10 @@ func (r *companyCashedRepo) GetCompanyById(ctx context.Context, companyId uuid.U
 	return nil, nil
 }
 
+func (r *companyCashedRepo) GetByOwnerId(ctx context.Context, ownerId uuid.UUID) (*domain.Company, error) {
+	return nil, nil
+}
+
 func (r *companyCashedRepo) companyFilterKey(filter *domain.CompanyFilter) string {
 	return "companies." + filter.Id.String() + "." + filter.Name
 }
