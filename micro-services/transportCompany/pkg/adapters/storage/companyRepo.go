@@ -42,5 +42,15 @@ func (r *companyRepo) GetCompanyById(ctx context.Context, companyId uuid.UUID) (
 	companyDomain := mapper.CompanyStorage2Domain(company)
 
 	return companyDomain, nil
+}
 
+func (r *companyRepo) GetByOwnerId(ctx context.Context, ownerId uuid.UUID) (*domain.Company, error) {
+	var company types.Company
+	result := r.db.Table("companies").WithContext(ctx).First(&company, "owner_id = ?", ownerId)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	companyDomain := mapper.CompanyStorage2Domain(company)
+
+	return companyDomain, nil
 }

@@ -76,3 +76,26 @@ func (s *CompanyService) GetCompanyById(ctx context.Context, companyId string) (
 		OwnerId:     company.OwnerId.String(),
 	}, nil
 }
+
+func (s *CompanyService) GetByOwnerId(ctx context.Context, ownerId string) (*pb.GetCompanyResponse, error) {
+	ownerUid, err := uuid.Parse(ownerId)
+	if err != nil {
+		return nil, fmt.Errorf("%w %w", ErrCompanyCreationValidation, err)
+	}
+
+	company, err := s.svc.GetByOwnerId(ctx, ownerUid)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.GetCompanyResponse{
+		Id:          company.Id.String(),
+		Name:        company.Name,
+		Description: company.Description,
+		Address:     company.Address,
+		Phone:       company.Phone,
+		Email:       company.Email,
+		OwnerId:     company.OwnerId.String(),
+	}, nil
+}
