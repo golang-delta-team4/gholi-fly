@@ -3,6 +3,8 @@ package port
 import (
 	"context"
 	"user-service/pkg/adapters/storage/types"
+
+	"github.com/google/uuid"
 )
 
 type Repo interface {
@@ -12,4 +14,5 @@ type Repo interface {
 	AddRefreshToken(ctx context.Context, refreshToken *types.RefreshToken) error
 	DeleteRefreshToken(ctx context.Context, userID uint) error
 	GetRefreshToken(ctx context.Context, userID uint) (types.RefreshToken, error)
+	GetUserByUUID(ctx context.Context, userUUID uuid.UUID) (*types.User, error)
 }

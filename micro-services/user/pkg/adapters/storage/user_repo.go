@@ -5,6 +5,7 @@ import (
 	userPort "user-service/internal/user/port"
 	"user-service/pkg/adapters/storage/types"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -45,4 +46,13 @@ func (ur *userRepo) GetRefreshToken(ctx context.Context, userID uint) (types.Ref
 	var refreshToken types.RefreshToken
 	err := ur.db.Model(&types.RefreshToken{}).Where("user_id = ?", userID).First(&refreshToken).Error
 	return refreshToken, err
+}
+
+func (ur *userRepo) GetUserByUUID(ctx context.Context, userUUID uuid.UUID) (*types.User, error) {
+	var user types.User
+	err := ur.db.Model(&types.User{}).Where("uuid = ?", userUUID).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
