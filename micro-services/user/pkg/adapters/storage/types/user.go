@@ -15,6 +15,7 @@ type User struct {
 	Email        string
 	Password     string
 	IsVerified   bool
+	Roles []Role `gorm:"many2many:user_roles;"`
 }
 
 type RefreshToken struct {

@@ -13,6 +13,7 @@ import (
 func Run(appContainer app.App, cfg config.Config) error {
 	userService := service.NewUserService(appContainer.UserService(), cfg.Server.AuthExpMinute, cfg.Server.AuthRefreshMinute, cfg.Server.Secret)
 	permissionService := service.NewPermissionService(appContainer.PermissionService())
+	roleService := service.NewRoleService(appContainer.RoleService())
 	app := fiber.New()
 	app.Get("/hello", func(c *fiber.Ctx) error {
 		return c.Status(http.StatusAccepted).JSON("Hello World")
@@ -23,5 +24,7 @@ func Run(appContainer app.App, cfg config.Config) error {
 	userGroup.Post("/refresh", newAuthMiddleware([]byte(cfg.Server.Secret)), Refresh(userService))
 	permissionGroup := app.Group("permissions")
 	permissionGroup.Post("/", CreatePermission(permissionService))
+	roleGroup := app.Group("roles")
+	roleGroup.Post("/", CreateRole(roleService))
 	return app.Listen(fmt.Sprintf("%s:%d", cfg.Server.HttpHost, cfg.Server.HttpPort))
 }

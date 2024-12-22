@@ -31,3 +31,12 @@ func (pr *permissionRepo) CheckPermissionExistence(ctx context.Context, route st
 	}
 	return false, nil
 }
+
+func (pr *permissionRepo) GetPermissionsByUUID(ctx context.Context, permissionsUUID []types.Permission) ([]types.Permission, error) {
+	var permissions []types.Permission
+	err := pr.db.Model(&types.Permission{}).Find(&permissions,permissionsUUID).Error
+	if err != nil {
+		return nil, err
+	}
+	return permissions, nil
+}

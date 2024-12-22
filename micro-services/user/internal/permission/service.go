@@ -6,6 +6,7 @@ import (
 	"user-service/internal/permission/domain"
 	permissionPort "user-service/internal/permission/port"
 	"user-service/pkg/adapters/storage/mapper"
+	"user-service/pkg/adapters/storage/types"
 
 	"github.com/google/uuid"
 )
@@ -35,4 +36,12 @@ func (ps *service) CreatePermission(ctx context.Context, permission *domain.Perm
 	permissionType.UUID = uuid
 	err = ps.repo.Create(ctx, *permissionType)
 	return uuid, err
+}
+
+func (ps *service) GetPermissionsByUUID(ctx context.Context, permissions []domain.Permission) ([]types.Permission, error) {
+	var typedPermission []types.Permission
+	for _, permission := range permissions {
+		typedPermission = append(typedPermission, types.Permission{UUID: permission.UUID})
+	}
+	return ps.repo.GetPermissionsByUUID(ctx, typedPermission)
 }

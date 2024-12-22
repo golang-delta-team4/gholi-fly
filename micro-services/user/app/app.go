@@ -4,6 +4,8 @@ import (
 	"user-service/config"
 	"user-service/internal/permission"
 	permissionPort "user-service/internal/permission/port"
+	"user-service/internal/role"
+	rolePort "user-service/internal/role/port"
 	"user-service/internal/user"
 	userPort "user-service/internal/user/port"
 	"user-service/pkg/adapters/storage"
@@ -18,6 +20,7 @@ type app struct {
 	cfg               config.Config
 	userService       userPort.Service
 	permissionService permissionPort.Service
+	roleService       rolePort.Service
 }
 
 func (a *app) DB() *gorm.DB {
@@ -56,7 +59,8 @@ func (a *app) setDB() error {
 func autoMigrate(db *gorm.DB) error {
 	return db.AutoMigrate(&types.User{},
 		&types.RefreshToken{},
-		types.Permission{})
+		types.Permission{},
+		&types.Role{})
 }
 
 func NewApp(cfg config.Config) (App, error) {
@@ -69,6 +73,7 @@ func NewApp(cfg config.Config) (App, error) {
 	}
 	a.userService = user.NewService(storage.NewUserRepo(a.db))
 	a.permissionService = permission.NewService(storage.NewPermissionRepo(a.db))
+	a.roleService = role.NewService(storage.NewRoleRepo(a.db), a.permissionService)
 	return a, nil
 }
 
@@ -86,4 +91,8 @@ func (a *app) UserService() userPort.Service {
 
 func (a *app) PermissionService() permissionPort.Service {
 	return a.permissionService
+}
+
+func (a *app) RoleService() rolePort.Service {
+	return a.roleService
 }
