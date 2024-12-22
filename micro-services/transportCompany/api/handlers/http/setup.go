@@ -15,6 +15,7 @@ func Run(appContainer app.App, cfg config.ServerConfig) error {
 	api := router.Group("/api/v1/transport-company", setUserContext)
 
 	registerCompanyAPI(appContainer, cfg, api)
+	registerTripApi(appContainer, cfg, api)
 
 	return router.Listen(fmt.Sprintf(":%d", cfg.HttpPort))
 }
@@ -26,4 +27,9 @@ func registerCompanyAPI(appContainer app.App, cfg config.ServerConfig, router fi
 	router.Get("/get_company-by-ownerid/:ownerId", setTransaction(appContainer.DB()), GetByOwnerId(companyServiceGetter))
 	router.Patch("/company/:id", setTransaction(appContainer.DB()), UpdateCompany(companyServiceGetter))
 	router.Delete("/company/:id", setTransaction(appContainer.DB()), DeleteCompany(companyServiceGetter))
+}
+
+func registerTripApi(appContainer app.App, cfg config.ServerConfig, router fiber.Router) {
+	tripServiceGetter := tripServiceGetter(appContainer, cfg)
+	router.Post("/trip", setTransaction(appContainer.DB()), CreateTrip(tripServiceGetter))
 }

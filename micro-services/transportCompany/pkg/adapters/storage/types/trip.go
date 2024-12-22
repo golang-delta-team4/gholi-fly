@@ -9,14 +9,14 @@ import (
 
 type Trip struct {
 	Id               uuid.UUID `gorm:"type:uuid;primaryKey"`
-	CompanyID        uint      `gorm:"not null"`
+	CompanyID        uuid.UUID `gorm:"not null"`
 	Company          *Company  `gorm:"foreignKey:CompanyID; constraint:OnDelete:CASCADE;"`
 	TripType         string    `gorm:"not null"`
 	UserReleaseDate  time.Time
 	TourReleaseDate  time.Time
 	UserPrice        float64
 	AgencyPrice      float64
-	PathID           uint `gorm:"not null"`
+	PathID           uuid.UUID `gorm:"not null"`
 	FromCountry      string
 	ToCountry        string
 	Origin           string `gorm:"not null"`
@@ -27,14 +27,14 @@ type Trip struct {
 	PathDistanceKM   float64
 	Status           string `gorm:"default:'pending'"`
 	MinPassengers    uint
-	TechnicalTeamID  *uint
+	TechnicalTeamID  *uuid.UUID
 	TechnicalTeam    *TechnicalTeam `gorm:"foreignKey:TechnicalTeamID; constraint:OnDelete:CASCADE;"`
-	VehicleRequestID *uint
+	VehicleRequestID *uuid.UUID
 	VehicleRequest   *VehicleRequest `gorm:"foreignKey:TripID; constraint:OnDelete:CASCADE;"`
 	Tickets          []Ticket        `gorm:"foreignKey:TripID; constraint:OnDelete:CASCADE;"`
 	SoldTickets      uint            `gorm:"default:0"`
 	MaxTickets       uint
-	VehicleID        *uint
+	VehicleID        *uuid.UUID
 	VehicleName      string
 	IsCanceled       bool       `gorm:"default:false"`
 	IsFinished       bool       `gorm:"default:false"`
@@ -45,4 +45,11 @@ type Trip struct {
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
 	DeletedAt        gorm.DeletedAt `gorm:"index"`
+}
+
+func (base *Trip) BeforeCreate(tx *gorm.DB) (err error) {
+	if base.Id == uuid.Nil {
+		base.Id = uuid.New()
+	}
+	return
 }
