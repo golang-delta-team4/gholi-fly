@@ -52,10 +52,10 @@ func SignIn(userService *service.UserService) fiber.Handler {
 		}
 		accessToken, refreshToken, err := userService.SignIn(c.UserContext(), &req)
 		if err != nil {
-			if errors.Is(err, user.ErrEmailOrPasswordMismatch{}) {
+			if errors.Is(err, user.ErrEmailOrPasswordMismatch) {
 				return fiber.NewError(fiber.StatusUnauthorized, err.Error())
 			}
-			if errors.Is(err, user.ErrUserNotFound{}) {
+			if errors.Is(err, user.ErrUserNotFound) {
 				return fiber.NewError(fiber.StatusNotFound, err.Error())
 			}
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())

@@ -60,7 +60,8 @@ func autoMigrate(db *gorm.DB) error {
 	return db.AutoMigrate(&types.User{},
 		&types.RefreshToken{},
 		types.Permission{},
-		&types.Role{})
+		&types.Role{},
+		&types.UserRole{})
 }
 
 func NewApp(cfg config.Config) (App, error) {
@@ -73,7 +74,7 @@ func NewApp(cfg config.Config) (App, error) {
 	}
 	a.userService = user.NewService(storage.NewUserRepo(a.db))
 	a.permissionService = permission.NewService(storage.NewPermissionRepo(a.db))
-	a.roleService = role.NewService(storage.NewRoleRepo(a.db), a.permissionService)
+	a.roleService = role.NewService(storage.NewRoleRepo(a.db), a.permissionService, a.userService)
 	return a, nil
 }
 

@@ -12,10 +12,9 @@ type User struct {
 	UUID         uuid.UUID
 	FirstName    string
 	LastName     string
-	Email        string
+	Email        string `gorm:"unique"`
 	Password     string
 	IsVerified   bool
-	Roles []Role `gorm:"many2many:user_roles;"`
 }
 
 type RefreshToken struct {

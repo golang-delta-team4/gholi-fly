@@ -13,17 +13,10 @@ import (
 	"gorm.io/gorm"
 )
 
-type ErrEmailOrPasswordMismatch struct{}
-
-func (err ErrEmailOrPasswordMismatch) Error() string {
-	return "email or password mismatch"
-}
-
-type ErrUserNotFound struct{}
-
-func (err ErrUserNotFound) Error() string {
-	return "user not found"
-}
+var (
+	ErrUserNotFound            = errors.New("user not found")
+	ErrEmailOrPasswordMismatch = errors.New("email or password mismatch")
+)
 
 type service struct {
 	repo userPort.Repo
@@ -55,13 +48,13 @@ func (us *service) SignIn(ctx context.Context, userSingInRequest *domain.UserSig
 	user, err := us.repo.GetByEmail(ctx, userSingInRequest.Email)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return 0, ErrUserNotFound{}
+			return 0, ErrUserNotFound
 		}
 		return 0, err
 	}
 	passwordMatch := domain.HashVerify(user.Password, userSingInRequest.Password)
 	if !passwordMatch {
-		return 0, ErrEmailOrPasswordMismatch{}
+		return 0, ErrEmailOrPasswordMismatch
 	}
 	return user.ID, nil
 }
@@ -102,4 +95,15 @@ func (us *service) ValidateRefreshToken(ctx context.Context, userID uint, refres
 		return false, nil
 	}
 	return true, nil
+}
+
+func (us *service) GetUserIDByUUID(ctx context.Context, userUUID uuid.UUID) (uint, error) {
+	user, err := us.repo.GetUserByUUID(ctx, userUUID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return 0, ErrUserNotFound
+		}
+		return 0, err
+	}
+	return user.ID, nil
 }

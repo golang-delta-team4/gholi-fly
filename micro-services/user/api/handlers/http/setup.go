@@ -26,5 +26,6 @@ func Run(appContainer app.App, cfg config.Config) error {
 	permissionGroup.Post("/", CreatePermission(permissionService))
 	roleGroup := app.Group("roles")
 	roleGroup.Post("/", CreateRole(roleService))
+	roleGroup.Post("/assign", AssignRole(roleService))
 	return app.Listen(fmt.Sprintf("%s:%d", cfg.Server.HttpHost, cfg.Server.HttpPort))
 }
