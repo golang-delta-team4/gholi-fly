@@ -20,3 +20,10 @@ type Ticket struct {
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
+
+func (base *Ticket) BeforeCreate(tx *gorm.DB) (err error) {
+	if base.Id == uuid.Nil {
+		base.Id = uuid.New()
+	}
+	return
+}

@@ -18,3 +18,10 @@ type TechnicalTeam struct {
 	UpdatedAt   time.Time
 	DeletedAt   gorm.DeletedAt `gorm:"index"`
 }
+
+func (base *TechnicalTeam) BeforeCreate(tx *gorm.DB) (err error) {
+	if base.Id == uuid.Nil {
+		base.Id = uuid.New()
+	}
+	return
+}

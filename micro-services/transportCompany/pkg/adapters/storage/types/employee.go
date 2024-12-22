@@ -16,3 +16,10 @@ type Employee struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 	Company   Company        `gorm:"foreignKey:CompanyId;constraint:OnDelete:CASCADE;"`
 }
+
+func (base *Employee) BeforeCreate(tx *gorm.DB) (err error) {
+	if base.Id == uuid.Nil {
+		base.Id = uuid.New()
+	}
+	return
+}
