@@ -16,10 +16,7 @@ type DBConfig struct {
 }
 
 type ServerConfig struct {
-	HttpPort          uint   `json:"httpPort"`
-	Secret            string `json:"secret"`
-	AuthExpMinute     uint   `json:"authExpMin"`
-	AuthRefreshMinute uint   `json:"authExpRefreshMin"`
+	HttpPort uint `json:"httpPort"`
 }
 
 type RedisConfig struct {

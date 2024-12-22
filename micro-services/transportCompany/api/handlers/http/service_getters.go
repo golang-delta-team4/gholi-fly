@@ -11,7 +11,6 @@ import (
 // company service transient instance handler
 func companyServiceGetter(appContainer app.App, cfg config.ServerConfig) ServiceGetter[*service.CompanyService] {
 	return func(ctx context.Context) *service.CompanyService {
-		return service.NewCompanyService(appContainer.CompanyService(ctx),
-			cfg.Secret, cfg.AuthExpMinute, cfg.AuthRefreshMinute)
+		return service.NewCompanyService(appContainer.CompanyService(ctx))
 	}
 }

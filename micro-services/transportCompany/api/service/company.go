@@ -12,17 +12,12 @@ import (
 )
 
 type CompanyService struct {
-	svc                   companyPort.Service
-	authSecret            string
-	expMin, refreshExpMin uint
+	svc companyPort.Service
 }
 
-func NewCompanyService(svc companyPort.Service, authSecret string, expMin, refreshExpMin uint) *CompanyService {
+func NewCompanyService(svc companyPort.Service) *CompanyService {
 	return &CompanyService{
-		svc:           svc,
-		authSecret:    authSecret,
-		expMin:        expMin,
-		refreshExpMin: refreshExpMin,
+		svc: svc,
 	}
 }
 
