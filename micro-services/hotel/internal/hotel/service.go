@@ -5,12 +5,15 @@ import (
 	"errors"
 	"gholi-fly-hotel/internal/hotel/domain"
 	"gholi-fly-hotel/internal/hotel/port"
+	"strings"
 )
 
 var (
-	ErrHotelCreation        = errors.New("error on creating hotel")
-	ErrHotelNotFound        = errors.New("hotel not found")
-	ErrInvalidSourceService = errors.New("invalid source service")
+	ErrHotelCreation           = errors.New("error on creating hotel")
+	ErrHotelCreationValidation = errors.New("error on creating hotel: validation failed")
+	ErrHotelCreationDuplicate  = errors.New("hotel already exists")
+	ErrHotelNotFound           = errors.New("hotel not found")
+	ErrInvalidSourceService    = errors.New("invalid source service")
 )
 
 type service struct {
@@ -27,6 +30,9 @@ func NewService(repo port.Repo) port.Service {
 func (s *service) CreateHotel(ctx context.Context, hotel domain.Hotel) (domain.HotelUUID, error) {
 	hotelID, err := s.repo.Create(ctx, hotel)
 	if err != nil {
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			return domain.HotelUUID{}, ErrHotelCreationDuplicate
+		}
 		return domain.HotelUUID{}, ErrHotelCreation
 	}
 	return hotelID, nil
