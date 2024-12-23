@@ -6,13 +6,23 @@ import (
 	"github.com/google/uuid"
 )
 
-type HotelUUID = uuid.UUID
+type (
+	HotelID   uint
+	HotelUUID = uuid.UUID
+)
+
+func HotelUUIDFromString(s string) (HotelUUID, error) {
+	uid, err := uuid.Parse(s)
+	return HotelUUID(uid), err
+}
 
 type Hotel struct {
-	ID        HotelUUID
-	OwnerID   uuid.UUID
-	Name      string
-	City      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID         HotelID
+	UUID       HotelUUID
+	OwnerEmail string
+	Name       string
+	City       string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	DeletedAt  time.Time
 }

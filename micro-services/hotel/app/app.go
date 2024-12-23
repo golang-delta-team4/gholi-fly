@@ -1,19 +1,43 @@
 package app
 
 import (
+	"context"
+	"fmt"
 	"gholi-fly-hotel/config"
+	"gholi-fly-hotel/internal/hotel"
+	hotelPort "gholi-fly-hotel/internal/hotel/port"
+	"gholi-fly-hotel/pkg/adapters/storage"
 	"gholi-fly-hotel/pkg/postgres"
 
 	"gorm.io/gorm"
+
+	appCtx "gholi-fly-hotel/pkg/context"
 )
 
 type app struct {
-	db  *gorm.DB
-	cfg config.Config
+	db           *gorm.DB
+	cfg          config.Config
+	hotelService hotelPort.Service
 }
 
 func (a *app) DB() *gorm.DB {
 	return a.db
+}
+
+func (a *app) HotelService(ctx context.Context) hotelPort.Service {
+	db := appCtx.GetDB(ctx)
+	if db == nil {
+		if a.hotelService == nil {
+			a.hotelService = a.hotelServiceWithDB(a.db)
+		}
+		return a.hotelService
+	}
+
+	return a.hotelServiceWithDB(db)
+}
+
+func (a *app) hotelServiceWithDB(db *gorm.DB) hotelPort.Service {
+	return hotel.NewService(storage.NewHotelRepo(db))
 }
 
 func (a *app) Config() config.Config {
@@ -32,6 +56,10 @@ func (a *app) setDB() error {
 
 	if err != nil {
 		return err
+	}
+
+	if err := postgres.Migrate(db); err != nil {
+		return fmt.Errorf("failed to migrate database: %w", err)
 	}
 
 	a.db = db

@@ -1,0 +1,42 @@
+{
+	"info": {
+		"_postman_id": "463cd3f3-6ef4-404d-914a-3996a7951107",
+		"name": "gholi-fly",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "16380423"
+	},
+	"item": [
+		{
+			"name": "hotel",
+			"item": [
+				{
+					"name": "health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/api/v1/hotel/health"
+					},
+					"response": []
+				},
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"test\",\r\n    \"city\": \"tehran\",\r\n    \"ownerEmail\": \"test@email.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/v1/hotel/create"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

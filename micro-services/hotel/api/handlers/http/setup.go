@@ -10,14 +10,23 @@ import (
 )
 
 func Run(appContainer app.App, cfg config.ServerConfig) error {
-	app := fiber.New()
+	router := fiber.New()
 
-	app.Get("/health", func(c *fiber.Ctx) error {
+	router.Get("/health", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"status":  "OK",
 			"message": "gholi-hotels-api is running",
 		})
 	})
 
-	return app.Listen(fmt.Sprintf(":%d", cfg.HttpPort))
+	api := router.Group("/", setUserContext)
+
+	registerHotelAPI(appContainer, api)
+
+	return router.Listen(fmt.Sprintf(":%d", cfg.HttpPort))
+}
+
+func registerHotelAPI(appContainer app.App, router fiber.Router) {
+	hotelSvcGetter := hotelServiceGetter(appContainer)
+	router.Post("/create", setTransaction(appContainer.DB()), CreateHotel(hotelSvcGetter))
 }
