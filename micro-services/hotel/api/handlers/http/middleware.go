@@ -5,7 +5,6 @@ import (
 	"gholi-fly-hotel/pkg/logger"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/log"
 	"gorm.io/gorm"
 )
 
@@ -20,19 +19,19 @@ func setTransaction(db *gorm.DB) fiber.Handler {
 
 		context.SetDB(c.UserContext(), tx, true)
 
-		err := c.Next()
+		if err := c.Next(); err != nil {
+			context.Rollback(c.UserContext())
+			return err
+		}
 
 		if c.Response().StatusCode() >= 300 {
 			return context.Rollback(c.UserContext())
 		}
 
 		if err := context.CommitOrRollback(c.UserContext(), true); err != nil {
-
-			log.Errorf("ERROR HERE %v", err)
-
 			return err
 		}
 
-		return err
+		return nil
 	}
 }
