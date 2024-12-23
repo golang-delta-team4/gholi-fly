@@ -48,20 +48,22 @@ func (s *TripService) CreateTrip(ctx context.Context, req *pb.CreateTripRequest)
 		return nil, fmt.Errorf("%w %w", ErrTripCreationValidation, err)
 	}
 
-	var technicalTeamId uuid.UUID
+	var technicalTeamId *uuid.UUID
 	if req.TechnicalTeamId != "" {
-		technicalTeamId, err = uuid.Parse(req.TechnicalTeamId)
+		technicalTeamIdTemp, err := uuid.Parse(req.TechnicalTeamId)
 		if err != nil {
 			return nil, fmt.Errorf("%w %w", ErrTripCreationValidation, err)
 		}
+		technicalTeamId = &technicalTeamIdTemp
 	}
 
-	var vehicleRequestID uuid.UUID
+	var vehicleRequestID *uuid.UUID
 	if req.VehicleRequestId != "" {
-		vehicleRequestID, err = uuid.Parse(req.VehicleRequestId)
+		vehicleRequestIDTemp, err := uuid.Parse(req.VehicleRequestId)
 		if err != nil {
 			return nil, fmt.Errorf("%w %w", ErrTripCreationValidation, err)
 		}
+		vehicleRequestID = &vehicleRequestIDTemp
 	}
 
 	startDate, err := time.Parse("2006-01-02 15:04:05.999999-07:00", req.StartDate)
@@ -83,8 +85,8 @@ func (s *TripService) CreateTrip(ctx context.Context, req *pb.CreateTripRequest)
 		AgencyPrice:      float64(req.AgencyPrice),
 		PathID:           pathId,
 		MinPassengers:    uint(req.MinPassengers),
-		TechnicalTeamID:  &technicalTeamId,
-		VehicleRequestID: &vehicleRequestID,
+		TechnicalTeamID:  technicalTeamId,
+		VehicleRequestID: vehicleRequestID,
 		SoldTickets:      uint(req.SoldTickets),
 		MaxTickets:       uint(req.MaxTickets),
 		StartDate:        &startDate,

@@ -27,7 +27,7 @@ type Trip struct {
 	PathDistanceKM   float64
 	Status           string `gorm:"default:'pending'"`
 	MinPassengers    uint
-	TechnicalTeamID  *uuid.UUID
+	TechnicalTeamID  *uuid.UUID     `gorm:"type:uuid;null"`
 	TechnicalTeam    *TechnicalTeam `gorm:"foreignKey:TechnicalTeamID; constraint:OnDelete:CASCADE;"`
 	VehicleRequestID *uuid.UUID
 	VehicleRequest   *VehicleRequest `gorm:"foreignKey:TripID; constraint:OnDelete:CASCADE;"`
