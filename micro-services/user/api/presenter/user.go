@@ -22,14 +22,6 @@ type UserSignInResponse struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
-type UserRefreshRequest struct {
-	RefreshToken string `json:"refreshToken" validate:"required"`
-}
-
-type UserRefreshResponse struct {
-	AccessToken string `json:"accessToken"`
-}
-
 func EmailValidation(email string) error {
 	emailRegex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 	emailMatched, err := regexp.MatchString(emailRegex, email)

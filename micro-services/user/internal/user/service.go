@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 	"user-service/internal/user/domain"
 	userPort "user-service/internal/user/port"
@@ -45,7 +44,6 @@ func (us *service) SignUp(ctx context.Context, user *domain.User) (uuid.UUID, er
 }
 
 func (us *service) SignIn(ctx context.Context, userReq *domain.User) (uuid.UUID, error) {
-	fmt.Println(userReq)
 	user, err := us.repo.GetByEmail(ctx, userReq.Email)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
