@@ -3,7 +3,8 @@ package staff
 import (
 	"context"
 	"errors"
-	"gholi-fly-hotel/internal/staff/domain"
+	hotelDomain "gholi-fly-hotel/internal/hotel/domain"
+	staffDomain "gholi-fly-hotel/internal/staff/domain"
 	"gholi-fly-hotel/internal/staff/port"
 )
 
@@ -24,16 +25,16 @@ func NewService(repo port.Repo) port.Service {
 }
 
 // CreateStaff creates a new staff
-func (s *service) CreateStaff(ctx context.Context, staff domain.Staff) (domain.StaffUUID, error) {
-	staffID, err := s.repo.Create(ctx, staff)
+func (s *service) CreateStaffByHotelID(ctx context.Context, staff staffDomain.Staff, hotelID hotelDomain.HotelUUID) (staffDomain.StaffUUID, error) {
+	staffID, err := s.repo.CreateByHotelID(ctx, staff, hotelID)
 	if err != nil {
-		return domain.StaffUUID{}, ErrStaffCreation
+		return staffDomain.StaffUUID{}, ErrStaffCreation
 	}
 	return staffID, nil
 }
 
 // GetStaffByID returns a staff by its ID
-func (s *service) GetStaffByID(ctx context.Context, staffID domain.StaffUUID) (*domain.Staff, error) {
+func (s *service) GetStaffByID(ctx context.Context, staffID staffDomain.StaffUUID) (*staffDomain.Staff, error) {
 	staff, err := s.repo.GetByID(ctx, staffID)
 	if err != nil {
 		return nil, ErrStaffNotFound
@@ -42,8 +43,8 @@ func (s *service) GetStaffByID(ctx context.Context, staffID domain.StaffUUID) (*
 }
 
 // GetStaffs returns all staffs
-func (s *service) GetStaffs(ctx context.Context) ([]domain.Staff, error) {
-	staffs, err := s.repo.GetAll(ctx)
+func (s *service) GetAllStaffsByHotelID(ctx context.Context, hotelID hotelDomain.HotelUUID) ([]staffDomain.Staff, error) {
+	staffs, err := s.repo.GetByHotelID(ctx, hotelID)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +52,7 @@ func (s *service) GetStaffs(ctx context.Context) ([]domain.Staff, error) {
 }
 
 // UpdateStaff updates a staff
-func (s *service) UpdateStaff(ctx context.Context, staff domain.Staff) error {
+func (s *service) UpdateStaff(ctx context.Context, staff staffDomain.Staff) error {
 	err := s.repo.Update(ctx, staff)
 	if err != nil {
 		return err
@@ -60,7 +61,7 @@ func (s *service) UpdateStaff(ctx context.Context, staff domain.Staff) error {
 }
 
 // DeleteStaff deletes a staff
-func (s *service) DeleteStaff(ctx context.Context, staffID domain.StaffUUID) error {
+func (s *service) DeleteStaff(ctx context.Context, staffID staffDomain.StaffUUID) error {
 	err := s.repo.Delete(ctx, staffID)
 	if err != nil {
 		return err

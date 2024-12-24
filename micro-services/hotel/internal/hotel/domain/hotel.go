@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	HotelID   uint
+	HotelID   = uint
 	HotelUUID = uuid.UUID
 )
 
@@ -17,12 +17,16 @@ func HotelUUIDFromString(s string) (HotelUUID, error) {
 }
 
 type Hotel struct {
-	ID         HotelID
-	UUID       HotelUUID
-	OwnerEmail string
-	Name       string
-	City       string
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
-	DeletedAt  time.Time
+	UUID      HotelUUID
+	OwnerID   uuid.UUID
+	Name      string
+	City      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
+}
+
+type HotelFilters struct {
+	Name string
+	City string
 }

@@ -9,10 +9,10 @@ import (
 
 type Invoice struct {
 	gorm.Model
-	UUID      uuid.UUID `gorm:"unique"`
+	UUID      uuid.UUID `gorm:"unique;primaryKey"`
 	FactorId  uuid.UUID
-	BookingID uuid.UUID
-	Booking   Booking `gorm:"foreignKey:BookingID;constraint:OnDelete:CASCADE"`
+	BookingID uuid.UUID `gorm:"type:uuid;references:UUID;not null"`
+	Booking   Booking   `gorm:"foreignKey:BookingID;references:UUID;constraint:OnDelete:CASCADE"`
 	PaidAt    *time.Time
 	IsPaid    bool
 }

@@ -9,6 +9,7 @@ import (
 	"gholi-fly-hotel/pkg/adapters/storage/mapper"
 	"gholi-fly-hotel/pkg/adapters/storage/types"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -29,10 +30,28 @@ func (r *hotelRepo) Create(ctx context.Context, hotelDomain domain.Hotel) (domai
 	return domain.HotelUUID(hotel.UUID), nil
 }
 
+func (r *hotelRepo) Get(ctx context.Context) ([]domain.Hotel, error) {
+	var hotels []types.Hotel
+	err := r.db.Table("hotels").WithContext(ctx).Find(&hotels).Error
+	if err != nil {
+		return nil, err
+	}
+	return mapper.BatchHotelStorage2Domain(hotels), nil
+}
+
+func (r *hotelRepo) GetByOwnerID(ctx context.Context, ownerID uuid.UUID) ([]domain.Hotel, error) {
+	var hotels []types.Hotel
+	err := r.db.Table("hotels").WithContext(ctx).Where("owner_id = ?", ownerID).Find(&hotels).Error
+	if err != nil {
+		return nil, err
+	}
+	return mapper.BatchHotelStorage2Domain(hotels), nil
+}
+
 func (r *hotelRepo) GetByID(ctx context.Context, hotelID domain.HotelUUID) (*domain.Hotel, error) {
 	var hotel types.Hotel
 
-	err := r.db.Table("hotels").WithContext(ctx).Where("id = ?", hotelID).First(&hotel).Error
+	err := r.db.Table("hotels").WithContext(ctx).Where("uuid = ?", hotelID).First(&hotel).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}
@@ -44,25 +63,11 @@ func (r *hotelRepo) GetByID(ctx context.Context, hotelID domain.HotelUUID) (*dom
 	return mapper.HotelStorage2Domain(hotel), nil
 }
 
-func (r *hotelRepo) GetAll(ctx context.Context) ([]domain.Hotel, error) {
-	// var hotels []types.Hotel
-	// err := r.db.Table("hotels").WithContext(ctx).Find(&hotels).Error
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// var domainHotels []domain.Hotel
-	// for _, hotel := range hotels {
-	// 	domainHotels = append(domainHotels, mapper.HotelStorage2Domain(hotel))
-	// }
-	// return domainHotels, nil
-	panic("not implemented")
-}
-
 func (r *hotelRepo) Update(ctx context.Context, hotel domain.Hotel) error {
 	storageHotel := mapper.HotelDomain2Storage(hotel)
 	return r.db.Table("hotels").WithContext(ctx).Save(storageHotel).Error
 }
 
 func (r *hotelRepo) Delete(ctx context.Context, hotelID domain.HotelUUID) error {
-	return r.db.Table("hotels").WithContext(ctx).Delete(&types.Hotel{}, "id = ?", hotelID).Error
+	return r.db.Table("hotels").WithContext(ctx).Delete(&types.Hotel{}, "uuid = ?", hotelID).Error
 }

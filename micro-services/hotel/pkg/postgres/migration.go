@@ -9,6 +9,9 @@ import (
 )
 
 func Migrate(db *gorm.DB) error {
+	if err := addUUIDExtension(db); err != nil {
+		return fmt.Errorf("failed to add UUID extension: %w", err)
+	}
 
 	if err := db.AutoMigrate(
 		&types.Hotel{},
@@ -22,4 +25,8 @@ func Migrate(db *gorm.DB) error {
 
 	log.Println("Database migration completed successfully.")
 	return nil
+}
+
+func addUUIDExtension(db *gorm.DB) error {
+	return db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`).Error
 }

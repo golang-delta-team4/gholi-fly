@@ -9,16 +9,16 @@ import (
 
 type Booking struct {
 	gorm.Model
-	UUID     uuid.UUID `gorm:"unique"`
-	HotelID  uint
-	Hotel    Hotel `gorm:"foreignKey:HotelID;constraint:OnDelete:CASCADE"`
-	RoomID   uint
-	Room     Room `gorm:"foreignKey:RoomID;constraint:OnDelete:CASCADE"`
+	UUID     uuid.UUID `gorm:"unique;primaryKey"`
+	HotelID  uuid.UUID `gorm:"type:uuid;not null;references:UUID"`
+	Hotel    Hotel     `gorm:"foreignKey:HotelID;references:UUID;constraint:OnDelete:CASCADE"`
+	RoomID   uuid.UUID `gorm:"type:uuid;not null;references:UUID"`
+	Room     Room      `gorm:"foreignKey:RoomID;references:UUID;constraint:OnDelete:CASCADE"`
 	UserID   *uuid.UUID
 	AgencyID *uuid.UUID
 	CheckIn  time.Time
 	CheckOut time.Time
-	Status   string
+	Status   uint8
 }
 
 func (h *Booking) BeforeCreate(tx *gorm.DB) error {
