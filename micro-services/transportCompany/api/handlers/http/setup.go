@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/app"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/config"
 
@@ -11,6 +12,7 @@ import (
 
 func Run(appContainer app.App, cfg config.ServerConfig) error {
 	router := fiber.New()
+	router.Use(recover.New())
 
 	api := router.Group("/api/v1/transport-company", setUserContext)
 
@@ -24,7 +26,7 @@ func registerCompanyAPI(appContainer app.App, cfg config.ServerConfig, router fi
 	companyServiceGetter := companyServiceGetter(appContainer, cfg)
 	router.Post("/company", setTransaction(appContainer.DB()), CreateCompany(companyServiceGetter))
 	router.Get("/company/:id", setTransaction(appContainer.DB()), GetCompanyById(companyServiceGetter))
-	router.Get("/get_company-by-ownerid/:ownerId", setTransaction(appContainer.DB()), GetByOwnerId(companyServiceGetter))
+	router.Get("/get-company-by-ownerid/:ownerId", setTransaction(appContainer.DB()), GetByOwnerId(companyServiceGetter))
 	router.Patch("/company/:id", setTransaction(appContainer.DB()), UpdateCompany(companyServiceGetter))
 	router.Delete("/company/:id", setTransaction(appContainer.DB()), DeleteCompany(companyServiceGetter))
 }
@@ -32,4 +34,6 @@ func registerCompanyAPI(appContainer app.App, cfg config.ServerConfig, router fi
 func registerTripApi(appContainer app.App, cfg config.ServerConfig, router fiber.Router) {
 	tripServiceGetter := tripServiceGetter(appContainer, cfg)
 	router.Post("/trip", setTransaction(appContainer.DB()), CreateTrip(tripServiceGetter))
+	router.Get("/trip/:id", setTransaction(appContainer.DB()), GetTripById(tripServiceGetter))
+	router.Get("/agency-trip/:id", setTransaction(appContainer.DB()), GetAgencyTripById(tripServiceGetter))
 }

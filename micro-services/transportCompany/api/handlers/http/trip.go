@@ -28,3 +28,39 @@ func CreateTrip(svcGetter ServiceGetter[*service.TripService]) fiber.Handler {
 		return c.JSON(response)
 	}
 }
+
+func GetTripById(svcGetter ServiceGetter[*service.TripService]) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
+		tripId := c.Params("id")
+		response, err := svc.GetTripById(c.UserContext(), tripId)
+
+		if err != nil {
+			if errors.Is(err, service.ErrCompanyCreationValidation) {
+				return fiber.NewError(fiber.StatusBadRequest, err.Error())
+			}
+
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+
+		return c.JSON(response)
+	}
+}
+
+func GetAgencyTripById(svcGetter ServiceGetter[*service.TripService]) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
+		tripId := c.Params("id")
+		response, err := svc.GetAgencyTripById(c.UserContext(), tripId)
+
+		if err != nil {
+			if errors.Is(err, service.ErrCompanyCreationValidation) {
+				return fiber.NewError(fiber.StatusBadRequest, err.Error())
+			}
+
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+
+		return c.JSON(response)
+	}
+}

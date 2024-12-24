@@ -38,3 +38,13 @@ func (s *service) CreateTrip(ctx context.Context, trip domain.Trip) (uuid.UUID, 
 
 	return companyId, nil
 }
+
+func (s *service) GetTripById(ctx context.Context, id uuid.UUID) (*domain.Trip, error) {
+	trip, err := s.repo.GetTripById(ctx, id)
+	if err != nil {
+		log.Println("error on getting trip by id: ", err.Error())
+		return nil, err
+	}
+
+	return trip, nil
+}

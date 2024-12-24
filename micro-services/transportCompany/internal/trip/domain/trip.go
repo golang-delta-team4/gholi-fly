@@ -54,6 +54,9 @@ func (t *Trip) Validate() error {
 	if t.TourReleaseDate.IsZero() {
 		return errors.New("TourReleaseDate can't be zero")
 	}
+	if t.UserReleaseDate.Before(t.TourReleaseDate) {
+		return errors.New("Tour release date can't be before user release date")
+	}
 	if t.UserPrice < 0 {
 		return errors.New("UserPrice can't be negative")
 	}
@@ -63,33 +66,6 @@ func (t *Trip) Validate() error {
 	if t.PathID == uuid.Nil {
 		return errors.New("PathID can't be nil")
 	}
-	// if t.FromCountry == "" {
-	// 	return errors.New("FromCountry can't be empty")
-	// }
-	// if t.ToCountry == "" {
-	// 	return errors.New("ToCountry can't be empty")
-	// }
-	// if t.Origin == "" {
-	// 	return errors.New("Origin can't be empty")
-	// }
-	// if t.FromTerminalName == "" {
-	// 	return errors.New("FromTerminalName can't be empty")
-	// }
-	// if t.ToTerminalName == "" {
-	// 	return errors.New("ToTerminalName can't be empty")
-	// }
-	// if t.Destination == "" {
-	// 	return errors.New("Destination can't be empty")
-	// }
-	// if t.PathName == "" {
-	// 	return errors.New("PathName can't be empty")
-	// }
-	// if t.PathDistanceKM < 0 {
-	// 	return errors.New("PathDistanceKM can't be negative")
-	// }
-	// if t.Status == "" {
-	// 	return errors.New("Status can't be empty")
-	// }
 	if t.MinPassengers == 0 {
 		return errors.New("MinPassengers can't be zero")
 	}

@@ -24,3 +24,12 @@ func (r *tripRepo) CreateTrip(ctx context.Context, tripDomain domain.Trip) (uuid
 	trip := mapper.TripDomain2Storage(tripDomain)
 	return trip.Id, r.db.Table("trips").WithContext(ctx).Create(trip).Error
 }
+
+func (r *tripRepo) GetTripById(ctx context.Context, id uuid.UUID) (*domain.Trip, error) {
+	var trip domain.Trip
+	err := r.db.Table("trips").WithContext(ctx).Where("id = ?", id).First(&trip).Error
+	if err != nil {
+		return nil, err
+	}
+	return &trip, nil
+}

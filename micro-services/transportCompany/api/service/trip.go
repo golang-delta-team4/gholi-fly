@@ -101,3 +101,77 @@ func (s *TripService) CreateTrip(ctx context.Context, req *pb.CreateTripRequest)
 		Id: tripId.String(),
 	}, nil
 }
+
+func (s *TripService) GetTripById(ctx context.Context, tripId string) (*pb.GetTripResponse, error) {
+	tripUId, err := uuid.Parse(tripId)
+	if err != nil {
+		return nil, fmt.Errorf("%w %w", ErrTripCreationValidation, err)
+	}
+
+	trip, err := s.svc.GetTripById(ctx, tripUId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var technicalTeamId string
+	if trip.TechnicalTeamID != nil {
+		technicalTeamId = trip.TechnicalTeamID.String()
+	}
+
+	return &pb.GetTripResponse{
+		Id:               trip.Id.String(),
+		CompanyId:        trip.CompanyID.String(),
+		TripType:         trip.TripType,
+		ReleaseDate:      trip.UserReleaseDate.String(),
+		Price:            trip.UserPrice,
+		PathId:           trip.PathID.String(),
+		FromCountry:      trip.FromCountry,
+		ToCountry:        trip.ToCountry,
+		Origin:           trip.Origin,
+		FromTerminalName: trip.FromTerminalName,
+		ToTerminalName:   trip.ToTerminalName,
+		Destination:      trip.Destination,
+		PathName:         trip.PathName,
+		PathDistanceKm:   trip.PathDistanceKM,
+		Status:           trip.Status,
+		MinPassengers:    uint32(trip.MinPassengers),
+		TechnicalTeamId:  technicalTeamId,
+	}, nil
+}
+
+func (s *TripService) GetAgencyTripById(ctx context.Context, tripId string) (*pb.GetTripResponse, error) {
+	tripUId, err := uuid.Parse(tripId)
+	if err != nil {
+		return nil, fmt.Errorf("%w %w", ErrTripCreationValidation, err)
+	}
+
+	trip, err := s.svc.GetTripById(ctx, tripUId)
+
+	if err != nil {
+		return nil, err
+	}
+	var technicalTeamId string
+	if trip.TechnicalTeamID != nil {
+		technicalTeamId = trip.TechnicalTeamID.String()
+	}
+	return &pb.GetTripResponse{
+		Id:               trip.Id.String(),
+		CompanyId:        trip.CompanyID.String(),
+		TripType:         trip.TripType,
+		ReleaseDate:      trip.TourReleaseDate.String(),
+		Price:            trip.AgencyPrice,
+		PathId:           trip.PathID.String(),
+		FromCountry:      trip.FromCountry,
+		ToCountry:        trip.ToCountry,
+		Origin:           trip.Origin,
+		FromTerminalName: trip.FromTerminalName,
+		ToTerminalName:   trip.ToTerminalName,
+		Destination:      trip.Destination,
+		PathName:         trip.PathName,
+		PathDistanceKm:   trip.PathDistanceKM,
+		Status:           trip.Status,
+		MinPassengers:    uint32(trip.MinPassengers),
+		TechnicalTeamId:  technicalTeamId,
+	}, nil
+}
