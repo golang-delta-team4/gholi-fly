@@ -15,7 +15,7 @@ import (
 	"github.com/google/uuid"
 )
 
-var ErrInvalidRefreshToken = errors.New("refresh token is invalid or expired")
+var ErrInvalidRefreshToken = errors.New("refresh token is invalid")
 
 type ErrUserCreationValidation struct {
 	details string
@@ -64,20 +64,33 @@ func (us *UserService) SignIn(ctx context.Context, user *presenter.UserSignInReq
 
 }
 
-func (us *UserService) Refresh(ctx context.Context, userUUID uuid.UUID, refreshToken string) (string, error) {
+func (us *UserService) Refresh(ctx context.Context, userUUID uuid.UUID, refreshToken string) (string, string, error) {
 	userID, err := us.service.GetUserIDByUUID(ctx, userUUID)
 	if err != nil {
-		return "", err
-	} 
+		return "", "", err
+	}
 	valid, err := us.service.ValidateRefreshToken(ctx, userID, refreshToken)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
-	if valid {
-		accessToken, _, err := createToken(userUUID, us.expMin, []byte(us.secret))
-		return accessToken, err
+	if !valid {
+		return "", "", ErrInvalidRefreshToken
 	}
-	return "", ErrInvalidRefreshToken
+
+	accessToken, _, err := createToken(userUUID, us.expMin, []byte(us.secret))
+	if err != nil {
+		return "", "", err
+	}
+	refreshToken, expirationTime, err := createToken(userUUID, us.expMin, []byte(us.secret))
+	if err != nil {
+		return "", "", err
+	}
+	err = us.service.UpdateUserRefreshToken(ctx, userID, refreshToken, expirationTime)
+	if err != nil {
+		return "", "", err
+	}
+	return accessToken, refreshToken, nil
+
 }
 
 func createToken(userUUID uuid.UUID, expMin uint, secret []byte) (string, time.Time, error) {

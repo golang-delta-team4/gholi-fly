@@ -67,18 +67,15 @@ func SignIn(userService *service.UserService) fiber.Handler {
 func Refresh(userService *service.UserService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
-		var tokenReq presenter.UserRefreshRequest
 		userUUID := c.Locals("UserUUID")
 		if userUUID == nil {
 			return fiber.NewError(fiber.StatusBadRequest, "invalid access token")
 		}
-		if err := c.BodyParser(&tokenReq); err != nil {
-			return fiber.NewError(fiber.StatusBadRequest, "please provide refresh token")
-		}
-		if tokenReq.RefreshToken == "" {
+		token := userToken(c)
+		if token == "" {
 			return fiber.NewError(fiber.StatusBadRequest, "refresh token required")
 		}
-		accessToken, err := userService.Refresh(c.UserContext(), userUUID.(uuid.UUID), tokenReq.RefreshToken)
+		accessToken, refreshToken, err := userService.Refresh(c.UserContext(), userUUID.(uuid.UUID), token)
 		if err != nil {
 			if errors.Is(err, service.ErrInvalidRefreshToken) {
 				return fiber.NewError(fiber.StatusForbidden, err.Error())
@@ -86,7 +83,7 @@ func Refresh(userService *service.UserService) fiber.Handler {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 
-		return c.JSON(presenter.UserRefreshResponse{AccessToken: accessToken})
+		return c.JSON(presenter.UserSignInResponse{AccessToken: accessToken, RefreshToken: refreshToken})
 	}
 }
 
