@@ -3,8 +3,11 @@ package booking
 import (
 	"context"
 	"errors"
-	"gholi-fly-hotel/internal/booking/domain"
+	bookingDomain "gholi-fly-hotel/internal/booking/domain"
 	"gholi-fly-hotel/internal/booking/port"
+	roomDomain "gholi-fly-hotel/internal/room/domain"
+
+	"github.com/google/uuid"
 )
 
 var (
@@ -23,17 +26,27 @@ func NewService(repo port.Repo) port.Service {
 	}
 }
 
-// CreateBooking creates a new booking
-func (s *service) CreateBooking(ctx context.Context, booking domain.Booking) (domain.BookingUUID, error) {
-	bookingID, err := s.repo.Create(ctx, booking)
+// CreateBookingByRoomID creates a new booking by room ID
+func (s *service) CreateBookingByRoomID(ctx context.Context, booking bookingDomain.Booking, roomID roomDomain.RoomUUID) (bookingDomain.BookingUUID, error) {
+	bookingID, err := s.repo.CreateByRoomID(ctx, booking, roomID)
 	if err != nil {
-		return domain.BookingUUID{}, ErrBookingCreation
+		return bookingDomain.BookingUUID{}, ErrBookingCreation
 	}
 	return bookingID, nil
 }
 
+// GetAllBookingsByRoomID returns all bookings by room ID
+func (s *service) GetAllBookingsByRoomID(ctx context.Context, roomID roomDomain.RoomUUID) ([]bookingDomain.Booking, error) {
+	return s.repo.GetByRoomID(ctx, roomID)
+}
+
+// GetAllBookingsByUserID returns all bookings by user ID
+func (s *service) GetAllBookingsByUserID(ctx context.Context, userID uuid.UUID) ([]bookingDomain.Booking, error) {
+	return s.repo.GetByUserID(ctx, userID)
+}
+
 // GetBookingByID returns a booking by its ID
-func (s *service) GetBookingByID(ctx context.Context, bookingID domain.BookingUUID) (*domain.Booking, error) {
+func (s *service) GetBookingByID(ctx context.Context, bookingID bookingDomain.BookingUUID) (*bookingDomain.Booking, error) {
 	booking, err := s.repo.GetByID(ctx, bookingID)
 	if err != nil {
 		return nil, ErrBookingNotFound
@@ -41,29 +54,12 @@ func (s *service) GetBookingByID(ctx context.Context, bookingID domain.BookingUU
 	return booking, nil
 }
 
-// GetBookings returns all bookings
-func (s *service) GetBookings(ctx context.Context) ([]domain.Booking, error) {
-	bookings, err := s.repo.GetAll(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return bookings, nil
-}
-
 // UpdateBooking updates a booking
-func (s *service) UpdateBooking(ctx context.Context, booking domain.Booking) error {
-	err := s.repo.Update(ctx, booking)
-	if err != nil {
-		return err
-	}
-	return nil
+func (s *service) UpdateBooking(ctx context.Context, booking bookingDomain.Booking) error {
+	return s.repo.Update(ctx, booking)
 }
 
 // DeleteBooking deletes a booking
-func (s *service) DeleteBooking(ctx context.Context, bookingID domain.BookingUUID) error {
-	err := s.repo.Delete(ctx, bookingID)
-	if err != nil {
-		return err
-	}
-	return nil
+func (s *service) DeleteBooking(ctx context.Context, bookingID bookingDomain.BookingUUID) error {
+	return s.repo.Delete(ctx, bookingID)
 }

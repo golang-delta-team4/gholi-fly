@@ -3,7 +3,8 @@ package room
 import (
 	"context"
 	"errors"
-	"gholi-fly-hotel/internal/room/domain"
+	hotelDomain "gholi-fly-hotel/internal/hotel/domain"
+	roomDomain "gholi-fly-hotel/internal/room/domain"
 	"gholi-fly-hotel/internal/room/port"
 )
 
@@ -23,17 +24,26 @@ func NewService(repo port.Repo) port.Service {
 	}
 }
 
-// CreateRoom creates a new room
-func (s *service) CreateRoom(ctx context.Context, room domain.Room) (domain.RoomUUID, error) {
-	roomID, err := s.repo.Create(ctx, room)
+// CreateRoom creates a new room by hotel id
+func (s *service) CreateRoomByHotelID(ctx context.Context, room roomDomain.Room, hotelID hotelDomain.HotelUUID) (roomDomain.RoomUUID, error) {
+	roomID, err := s.repo.CreateByHotelID(ctx, room, hotelID)
 	if err != nil {
-		return domain.RoomUUID{}, ErrRoomCreation
+		return roomDomain.RoomUUID{}, ErrRoomCreation
 	}
 	return roomID, nil
 }
 
+// GetRooms returns all rooms
+func (s *service) GetAllRoomsByHotelID(ctx context.Context, hotelID hotelDomain.HotelUUID) ([]roomDomain.Room, error) {
+	rooms, err := s.repo.GetByHotelID(ctx, hotelID)
+	if err != nil {
+		return nil, err
+	}
+	return rooms, nil
+}
+
 // GetRoomByID returns a room by its ID
-func (s *service) GetRoomByID(ctx context.Context, roomID domain.RoomUUID) (*domain.Room, error) {
+func (s *service) GetRoomByID(ctx context.Context, roomID roomDomain.RoomUUID) (*roomDomain.Room, error) {
 	room, err := s.repo.GetByID(ctx, roomID)
 	if err != nil {
 		return nil, ErrRoomNotFound
@@ -41,17 +51,8 @@ func (s *service) GetRoomByID(ctx context.Context, roomID domain.RoomUUID) (*dom
 	return room, nil
 }
 
-// GetRooms returns all rooms
-func (s *service) GetRooms(ctx context.Context) ([]domain.Room, error) {
-	rooms, err := s.repo.GetAll(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return rooms, nil
-}
-
 // UpdateRoom updates a room
-func (s *service) UpdateRoom(ctx context.Context, room domain.Room) error {
+func (s *service) UpdateRoom(ctx context.Context, room roomDomain.Room) error {
 	err := s.repo.Update(ctx, room)
 	if err != nil {
 		return err
@@ -60,7 +61,7 @@ func (s *service) UpdateRoom(ctx context.Context, room domain.Room) error {
 }
 
 // DeleteRoom deletes a room
-func (s *service) DeleteRoom(ctx context.Context, roomID domain.RoomUUID) error {
+func (s *service) DeleteRoom(ctx context.Context, roomID roomDomain.RoomUUID) error {
 	err := s.repo.Delete(ctx, roomID)
 	if err != nil {
 		return err

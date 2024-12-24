@@ -2,16 +2,21 @@ package domain
 
 import (
 	hotelDomain "gholi-fly-hotel/internal/hotel/domain"
+	"time"
 
 	"github.com/google/uuid"
 )
 
-type StaffUUID = uuid.UUID
+type (
+	StaffID   = uint
+	StaffUUID = uuid.UUID
+)
 
-type StaffType uint8
+type StaffType = uint8
 
 const (
 	StaffTypeUnknown StaffType = iota
+	StaffTypeOwner
 	StaffTypeManager
 	StaffTypeReceptionist
 	StaffTypeCleaner
@@ -19,8 +24,12 @@ const (
 )
 
 type Staff struct {
-	ID        StaffUUID
+	ID        StaffID
+	UUID      StaffUUID
 	HotelID   hotelDomain.HotelUUID
 	Name      string
 	StaffType StaffType
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
 }

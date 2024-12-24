@@ -7,9 +7,9 @@ import (
 
 type Room struct {
 	gorm.Model
-	UUID        uuid.UUID `gorm:"unique"`
-	HotelID     uuid.UUID
-	Hotel       Hotel `gorm:"foreignKey:HotelID;constraint:OnDelete:CASCADE"`
+	UUID        uuid.UUID `gorm:"type:uuid;unique;not null;primaryKey"`
+	HotelID     uuid.UUID `gorm:"type:uuid;references:UUID;not null"`
+	Hotel       Hotel     `gorm:"foreignKey:HotelID;references:UUID;constraint:OnDelete:CASCADE"`
 	RoomNumber  uint
 	Floor       uint
 	Size        uint

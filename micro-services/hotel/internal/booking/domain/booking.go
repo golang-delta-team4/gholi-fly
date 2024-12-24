@@ -8,9 +8,12 @@ import (
 	"github.com/google/uuid"
 )
 
-type BookingUUID = uuid.UUID
+type (
+	BookingID   = uint
+	BookingUUID = uuid.UUID
+)
 
-type BookingStatus uint8
+type BookingStatus = uint8
 
 const (
 	BookingStatusUnknown BookingStatus = iota
@@ -20,11 +23,16 @@ const (
 )
 
 type Booking struct {
-	ID       BookingUUID
-	HotelID  hotelDomain.HotelUUID
-	RoomID   roomDomain.RoomUUID
-	UserID   uuid.UUID
-	CheckIn  time.Time
-	CheckOut time.Time
-	Status   BookingStatus
+	ID        BookingID
+	UUID      BookingUUID
+	HotelID   hotelDomain.HotelUUID
+	RoomID    roomDomain.RoomUUID
+	UserID    *uuid.UUID
+	AgencyID  *uuid.UUID
+	CheckIn   time.Time
+	CheckOut  time.Time
+	Status    BookingStatus
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
 }

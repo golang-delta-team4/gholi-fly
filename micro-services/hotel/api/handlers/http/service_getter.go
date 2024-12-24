@@ -14,3 +14,17 @@ func hotelServiceGetter(appContainer app.App) ServiceGetter[*service.HotelServic
 		return service.NewHotelService(appContainer.HotelService(ctx))
 	}
 }
+
+func roomServiceGetter(appContainer app.App) ServiceGetter[*service.RoomService] {
+
+	return func(ctx context.Context) *service.RoomService {
+		return service.NewRoomService(appContainer.RoomService(ctx))
+	}
+}
+
+func staffServiceGetter(appContainer app.App) ServiceGetter[*service.StaffService] {
+
+	return func(ctx context.Context) *service.StaffService {
+		return service.NewStaffService(appContainer.StaffService(ctx))
+	}
+}

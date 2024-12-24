@@ -7,10 +7,14 @@ import (
 	"github.com/google/uuid"
 )
 
-type RoomUUID = uuid.UUID
+type (
+	RoomID   = uint
+	RoomUUID = uuid.UUID
+)
 
 type Room struct {
-	ID          RoomUUID
+	ID          RoomID
+	UUID        RoomUUID
 	HotelID     hotelDomain.HotelUUID
 	RoomNumber  uint
 	Floor       uint
@@ -18,4 +22,5 @@ type Room struct {
 	AgencyPrice uint
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+	DeletedAt   time.Time
 }

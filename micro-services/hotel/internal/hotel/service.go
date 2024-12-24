@@ -6,6 +6,8 @@ import (
 	"gholi-fly-hotel/internal/hotel/domain"
 	"gholi-fly-hotel/internal/hotel/port"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 var (
@@ -38,6 +40,27 @@ func (s *service) CreateHotel(ctx context.Context, hotel domain.Hotel) (domain.H
 	return hotelID, nil
 }
 
+// TODO: filter
+// GetHotels returns all hotels
+func (s *service) GetAllHotels(ctx context.Context) ([]domain.Hotel, error) {
+	hotels, err := s.repo.Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return hotels, nil
+}
+
+// TODO: filter
+// GetHotels returns all hotels
+func (s *service) GetAllHotelsByOwnerID(ctx context.Context, ownerID uuid.UUID) ([]domain.Hotel, error) {
+	hotels, err := s.repo.GetByOwnerID(ctx, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	return hotels, nil
+}
+
+// TODO:
 // GetHotelByID returns a hotel by its ID
 func (s *service) GetHotelByID(ctx context.Context, hotelID domain.HotelUUID) (*domain.Hotel, error) {
 	hotel, err := s.repo.GetByID(ctx, hotelID)
@@ -47,15 +70,7 @@ func (s *service) GetHotelByID(ctx context.Context, hotelID domain.HotelUUID) (*
 	return hotel, nil
 }
 
-// GetHotels returns all hotels
-func (s *service) GetHotels(ctx context.Context) ([]domain.Hotel, error) {
-	hotels, err := s.repo.GetAll(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return hotels, nil
-}
-
+// TODO:
 // UpdateHotel updates a hotel
 func (s *service) UpdateHotel(ctx context.Context, hotel domain.Hotel) error {
 	err := s.repo.Update(ctx, hotel)
@@ -65,6 +80,7 @@ func (s *service) UpdateHotel(ctx context.Context, hotel domain.Hotel) error {
 	return nil
 }
 
+// TODO:
 // DeleteHotel deletes a hotel
 func (s *service) DeleteHotel(ctx context.Context, hotelID domain.HotelUUID) error {
 	err := s.repo.Delete(ctx, hotelID)
