@@ -12,8 +12,8 @@ type Service interface {
 	// Retrieve a factor by its ID.
 	GetFactorByID(ctx context.Context, factorID domain.FactorUUID) (*domain.Factor, error)
 
-	// Retrieve factors based on filters.
-	GetFactors(ctx context.Context, filters domain.FactorFilters) ([]domain.Factor, error)
+	// Retrieve factors based on filters with pagination.
+	GetFactors(ctx context.Context, filters domain.FactorFilters) ([]domain.Factor, int, error)
 
 	// Update the status of a factor.
 	UpdateFactorStatus(ctx context.Context, factorID domain.FactorUUID, status domain.FactorStatus) error

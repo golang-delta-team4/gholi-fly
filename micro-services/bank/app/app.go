@@ -65,7 +65,7 @@ func (a *app) TransactionService(ctx context.Context) transactionPort.Service {
 }
 
 func (a *app) transactionServiceWithDB(db *gorm.DB) transactionPort.Service {
-	return transaction.NewService(storage.NewTransactionRepo(db))
+	return transaction.NewService(storage.NewTransactionRepo(db), storage.NewWalletRepo(db))
 }
 
 // CreditService provides the credit card service, with support for contextual DB switching.

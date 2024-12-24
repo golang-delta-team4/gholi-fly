@@ -61,14 +61,14 @@ func (s *service) GetFactorByID(ctx context.Context, factorID domain.FactorUUID)
 	return factor, nil
 }
 
-func (s *service) GetFactors(ctx context.Context, filters domain.FactorFilters) ([]domain.Factor, error) {
-	factors, err := s.repo.Get(ctx, filters)
+func (s *service) GetFactors(ctx context.Context, filters domain.FactorFilters) ([]domain.Factor, int, error) {
+	factors, total, err := s.repo.Get(ctx, filters)
 	if err != nil {
 		log.Println("error fetching factors:", err.Error())
-		return nil, err
+		return nil, 0, err
 	}
 
-	return factors, nil
+	return factors, total, nil
 }
 
 func (s *service) UpdateFactorStatus(ctx context.Context, factorID domain.FactorUUID, status domain.FactorStatus) error {
