@@ -1,7 +1,6 @@
 package http
 
 import (
-	"strconv"
 	"user-service/pkg/jwt"
 
 	jwtware "github.com/gofiber/contrib/jwt"
@@ -18,7 +17,7 @@ func newAuthMiddleware(secret []byte) fiber.Handler {
 			if userClaims == nil {
 				return fiber.ErrUnauthorized
 			}
-			ctx.Locals("UserID", strconv.Itoa(int(userClaims.UserID)))
+			ctx.Locals("UserUUID", userClaims.UserUUID)
 			return ctx.Next()
 		},
 		ErrorHandler: func(ctx *fiber.Ctx, err error) error {

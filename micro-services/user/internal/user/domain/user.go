@@ -7,19 +7,15 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserSignInRequest struct {
-	Email     string    `json:"email"`
-	Password  string    `json:"password"`
-}
 
 type User struct {
-	UUID      uuid.UUID `json:"uuid"`
-	FirstName string    `json:"firstName"`
-	LastName  string    `json:"lastName"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	UUID      uuid.UUID
+	FirstName string
+	LastName  string
+	Email     string
+	Password  string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func HashPassword(password string) (string, error) {

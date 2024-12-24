@@ -40,15 +40,19 @@ func (us *UserService) SignUp(ctx context.Context, user *presenter.UserSignUpReq
 }
 
 func (us *UserService) SignIn(ctx context.Context, user *presenter.UserSignInRequest) (string, string, error) {
-	userID, err := us.service.SignIn(ctx, &domain.UserSignInRequest{Email: user.Email, Password: user.Password})
+	userUUID, err := us.service.SignIn(ctx, &domain.User{Email: user.Email, Password: user.Password})
 	if err != nil {
 		return "", "", err
 	}
-	accessToken, _, err := createToken(userID, us.expMin, []byte(us.secret))
+	userID, err := us.service.GetUserIDByUUID(ctx, userUUID)
 	if err != nil {
 		return "", "", err
 	}
-	refreshToken, expirationTime, err := createToken(userID, us.refreshExpMin, []byte(us.secret))
+	accessToken, _, err := createToken(userUUID, us.expMin, []byte(us.secret))
+	if err != nil {
+		return "", "", err
+	}
+	refreshToken, expirationTime, err := createToken(userUUID, us.refreshExpMin, []byte(us.secret))
 	if err != nil {
 		return "", "", err
 	}
@@ -60,21 +64,25 @@ func (us *UserService) SignIn(ctx context.Context, user *presenter.UserSignInReq
 
 }
 
-func (us *UserService) Refresh(ctx context.Context, userID uint, refreshToken string) (string, error) {
+func (us *UserService) Refresh(ctx context.Context, userUUID uuid.UUID, refreshToken string) (string, error) {
+	userID, err := us.service.GetUserIDByUUID(ctx, userUUID)
+	if err != nil {
+		return "", err
+	} 
 	valid, err := us.service.ValidateRefreshToken(ctx, userID, refreshToken)
 	if err != nil {
 		return "", err
 	}
 	if valid {
-		accessToken, _, err := createToken(userID, us.expMin, []byte(us.secret))
+		accessToken, _, err := createToken(userUUID, us.expMin, []byte(us.secret))
 		return accessToken, err
 	}
 	return "", ErrInvalidRefreshToken
 }
 
-func createToken(userID uint, expMin uint, secret []byte) (string, time.Time, error) {
+func createToken(userUUID uuid.UUID, expMin uint, secret []byte) (string, time.Time, error) {
 	expirationTime := timePkg.AddMinutes(expMin, true)
-	token, err := jwt.CreateToken(secret, &jwt.UserClaims{UserID: userID,
+	token, err := jwt.CreateToken(secret, &jwt.UserClaims{UserUUID: userUUID,
 		RegisteredClaims: goJwt.RegisteredClaims{ExpiresAt: goJwt.NewNumericDate(expirationTime)}})
 	if err != nil {
 		return "", time.Time{}, err

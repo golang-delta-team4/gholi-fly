@@ -6,7 +6,6 @@ import (
 	"user-service/api/presenter"
 	permissionDomain "user-service/internal/permission/domain"
 	roleDomain "user-service/internal/role/domain"
-	"user-service/internal/role/domain"
 	rolePort "user-service/internal/role/port"
 
 	"github.com/google/uuid"
@@ -33,7 +32,7 @@ func (ps *RoleService) Create(ctx context.Context, role *presenter.CreateRoleReq
 	for _, permissionUUID := range role.PermissionUUIDs {
 		permissions = append(permissions, permissionDomain.Permission{UUID: permissionUUID})
 	}
-	return ps.service.CreateRole(ctx, &domain.Role{Name: role.Name, Permissions: permissions})
+	return ps.service.CreateRole(ctx, &roleDomain.Role{Name: role.Name, Permissions: permissions})
 }
 
 func (ps *RoleService) Assign(ctx context.Context, assignRolePresenter *presenter.AssignRoleRequest) (error) {

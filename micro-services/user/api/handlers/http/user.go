@@ -2,13 +2,13 @@ package http
 
 import (
 	"errors"
-	"strconv"
 	"user-service/api/presenter"
 	"user-service/api/service"
 	"user-service/internal/user"
 
 	validator "github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 func SignUp(userService *service.UserService) fiber.Handler {
@@ -68,9 +68,9 @@ func Refresh(userService *service.UserService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
 		var tokenReq presenter.UserRefreshRequest
-		userID, err := strconv.Atoi(c.Locals("UserID").(string))
-		if err != nil {
-			return fiber.NewError(fiber.StatusBadRequest, "token invalid")
+		userUUID := c.Locals("UserUUID")
+		if userUUID == nil {
+			return fiber.NewError(fiber.StatusBadRequest, "invalid access token")
 		}
 		if err := c.BodyParser(&tokenReq); err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, "please provide refresh token")
@@ -78,7 +78,7 @@ func Refresh(userService *service.UserService) fiber.Handler {
 		if tokenReq.RefreshToken == "" {
 			return fiber.NewError(fiber.StatusBadRequest, "refresh token required")
 		}
-		accessToken, err := userService.Refresh(c.UserContext(), uint(userID), tokenReq.RefreshToken)
+		accessToken, err := userService.Refresh(c.UserContext(), userUUID.(uuid.UUID), tokenReq.RefreshToken)
 		if err != nil {
 			if errors.Is(err, service.ErrInvalidRefreshToken) {
 				return fiber.NewError(fiber.StatusForbidden, err.Error())
