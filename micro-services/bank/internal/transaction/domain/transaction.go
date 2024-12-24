@@ -32,8 +32,8 @@ const (
 // Transaction represents a money movement in the system.
 type Transaction struct {
 	ID          TransactionUUID
-	WalletID    uint              // ID of the wallet involved in the transaction.
-	FactorID    uint              // Associated factor ID (if applicable).
+	WalletID    uuid.UUID         // ID of the wallet involved in the transaction.
+	FactorID    uuid.UUID         // Associated factor ID (if applicable).
 	Amount      uint              // Transaction amount.
 	Type        TransactionType   // Credit or Debit.
 	Status      TransactionStatus // Pending, Completed, etc.

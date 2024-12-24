@@ -10,9 +10,9 @@ import (
 // Transaction represents the GORM entity for the Transaction domain.
 type Transaction struct {
 	ID          uuid.UUID      `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	WalletID    uint           `gorm:"not null;index"`                                   // Foreign key referencing Wallet.
+	WalletID    uuid.UUID      `gorm:"not null;index"`                                   // Foreign key referencing Wallet.
 	Wallet      Wallet         `gorm:"foreignKey:WalletID;constraint:OnDelete:CASCADE"`  // Relation to Wallet.
-	FactorID    *uint          `gorm:"index"`                                            // Foreign key referencing Factor (nullable).
+	FactorID    *uuid.UUID     `gorm:"index"`                                            // Foreign key referencing Factor (nullable).
 	Factor      *Factor        `gorm:"foreignKey:FactorID;constraint:OnDelete:SET NULL"` // Relation to Factor.
 	Amount      uint           `gorm:"not null"`                                         // Transaction amount.
 	Type        uint8          `gorm:"not null;default:0"`                               // Transaction type (0: Unknown, 1: Credit, 2: Debit).

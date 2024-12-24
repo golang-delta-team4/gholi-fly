@@ -17,4 +17,6 @@ type Repo interface {
 
 	// Update the status of a transaction.
 	UpdateStatus(ctx context.Context, transactionID domain.TransactionUUID, status domain.TransactionStatus) error
+
+	GetSum(ctx context.Context, filters domain.TransactionFilters) (int64, error)
 }

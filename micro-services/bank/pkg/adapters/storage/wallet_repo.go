@@ -7,6 +7,7 @@ import (
 	"gholi-fly-bank/internal/wallet/port"
 	"gholi-fly-bank/pkg/adapters/storage/mapper"
 	"gholi-fly-bank/pkg/adapters/storage/types"
+	appCtx "gholi-fly-bank/pkg/context"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -21,9 +22,20 @@ func NewWalletRepo(db *gorm.DB) port.Repo {
 	return &walletRepo{db: db}
 }
 
+func (r *walletRepo) getDB(ctx context.Context) *gorm.DB {
+	// Try to get the DB from the context
+	db := appCtx.GetDB(ctx)
+	if db != nil {
+		return db
+	}
+	// Fall back to the repository's DB instance
+	return r.db
+}
+
 func (r *walletRepo) Create(ctx context.Context, walletDomain domain.Wallet) (domain.WalletUUID, error) {
+	db := r.getDB(ctx) // Use the method to fetch the correct DB instance
 	wallet := mapper.WalletDomain2Storage(walletDomain)
-	err := r.db.WithContext(ctx).Table("wallets").Create(wallet).Error
+	err := db.WithContext(ctx).Table("wallets").Create(wallet).Error
 	if err != nil {
 		return domain.WalletUUID{}, err
 	}
@@ -31,8 +43,9 @@ func (r *walletRepo) Create(ctx context.Context, walletDomain domain.Wallet) (do
 }
 
 func (r *walletRepo) GetByID(ctx context.Context, walletID domain.WalletUUID) (*domain.Wallet, error) {
+	db := r.getDB(ctx) // Use the method to fetch the correct DB instance
 	var wallet types.Wallet
-	err := r.db.WithContext(ctx).Table("wallets").Where("id = ?", walletID).First(&wallet).Error
+	err := db.WithContext(ctx).Table("wallets").Where("id = ?", walletID).First(&wallet).Error
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -45,8 +58,9 @@ func (r *walletRepo) GetByID(ctx context.Context, walletID domain.WalletUUID) (*
 }
 
 func (r *walletRepo) Get(ctx context.Context, filters domain.WalletFilters) ([]domain.Wallet, error) {
+	db := r.getDB(ctx) // Use the method to fetch the correct DB instance
 	var wallets []types.Wallet
-	query := r.db.WithContext(ctx).Table("wallets")
+	query := db.WithContext(ctx).Table("wallets")
 
 	// Apply filters
 	if filters.OwnerID != uuid.Nil {
@@ -65,7 +79,8 @@ func (r *walletRepo) Get(ctx context.Context, filters domain.WalletFilters) ([]d
 }
 
 func (r *walletRepo) UpdateBalance(ctx context.Context, walletID domain.WalletUUID, newBalance uint) error {
-	result := r.db.WithContext(ctx).Table("wallets").
+	db := r.getDB(ctx) // Use the method to fetch the correct DB instance
+	result := db.WithContext(ctx).Table("wallets").
 		Where("id = ?", walletID).
 		Update("balance", newBalance)
 

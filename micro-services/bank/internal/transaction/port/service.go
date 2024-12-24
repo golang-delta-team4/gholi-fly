@@ -17,4 +17,7 @@ type Service interface {
 
 	// Update the status of a transaction.
 	UpdateTransactionStatus(ctx context.Context, transactionID domain.TransactionUUID, status domain.TransactionStatus) error
+
+	// Sum transactions based on filters.
+	GetTransactionSum(ctx context.Context, filters domain.TransactionFilters) (int64, error)
 }

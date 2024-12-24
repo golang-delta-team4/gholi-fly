@@ -17,8 +17,11 @@ import (
 // Run initializes and starts the gRPC server.
 func Run(app app.App, cfg config.Config) error {
 	methodsRequiringTx := map[string]bool{
-		"/wallet.WalletService/CreateWallet": true,
-		"/wallet.WalletService/GetWallets":   false,
+		"/bank.WalletService/CreateWallet": true,
+		"/bank.WalletService/GetWallets":   false,
+		"/bank.FactorService/CreateFactor": true,
+		"/bank.FactorService/ApplyFactor":  true,
+		"/bank.FactorService/GetFactors":   false,
 	}
 	// Create gRPC server with interceptors
 	server := grpc.NewServer(
@@ -30,6 +33,7 @@ func Run(app app.App, cfg config.Config) error {
 
 	// Register gRPC handlers
 	pb.RegisterWalletServiceServer(server, handlers.NewGRPCBankHandler(context.Background(), app))
+	pb.RegisterFactorServiceServer(server, handlers.NewGRPCBankHandler(context.Background(), app))
 
 	// Start listening
 	address := fmt.Sprintf(":%d", cfg.Server.GrpcPort)

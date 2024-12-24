@@ -74,12 +74,6 @@ func (s *service) UpdateWalletBalance(ctx context.Context, walletID domain.Walle
 		return ErrWalletNotFound
 	}
 
-	// Ensure the new balance does not go negative
-	if wallet.Balance > newBalance {
-		log.Println("insufficient balance for update")
-		return ErrInsufficientBalance
-	}
-
 	err = s.repo.UpdateBalance(ctx, walletID, newBalance)
 	if err != nil {
 		log.Println("error updating wallet balance:", err.Error())
