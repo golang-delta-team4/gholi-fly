@@ -57,3 +57,23 @@ message CreateTripResponse {
     string id = 1 [json_name = "id"];
     string message = 2 [json_name = "message"];
 }
+
+message GetTripResponse {
+  string id = 1;
+  string company_id = 2;
+  string trip_type = 3;
+  string release_date = 4;
+  double price = 6;
+  string path_id = 8;
+  string from_country = 9;
+  string to_country = 10;
+  string origin = 11;
+  string from_terminal_name = 12;
+  string to_terminal_name = 13;
+  string destination = 14;
+  string path_name = 15;
+  double path_distance_km = 16;
+  string status = 17;
+  uint32 min_passengers = 18;
+  string technical_team_id = 19;
+}
