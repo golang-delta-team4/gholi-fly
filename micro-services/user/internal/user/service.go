@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 	"user-service/internal/user/domain"
 	userPort "user-service/internal/user/port"
@@ -43,20 +44,20 @@ func (us *service) SignUp(ctx context.Context, user *domain.User) (uuid.UUID, er
 	return storageUser.UUID, nil
 }
 
-func (us *service) SignIn(ctx context.Context, userSingInRequest *domain.UserSignInRequest) (uint, error) {
-
-	user, err := us.repo.GetByEmail(ctx, userSingInRequest.Email)
+func (us *service) SignIn(ctx context.Context, userReq *domain.User) (uuid.UUID, error) {
+	fmt.Println(userReq)
+	user, err := us.repo.GetByEmail(ctx, userReq.Email)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return 0, ErrUserNotFound
+			return uuid.Nil, ErrUserNotFound
 		}
-		return 0, err
+		return uuid.Nil, err
 	}
-	passwordMatch := domain.HashVerify(user.Password, userSingInRequest.Password)
+	passwordMatch := domain.HashVerify(user.Password, userReq.Password)
 	if !passwordMatch {
-		return 0, ErrEmailOrPasswordMismatch
+		return uuid.Nil, ErrEmailOrPasswordMismatch
 	}
-	return user.ID, nil
+	return user.UUID, nil
 }
 
 func (us *service) UpdateUserRefreshToken(ctx context.Context, userID uint, refreshToken string, expirationTime time.Time) error {
