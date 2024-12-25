@@ -15,4 +15,5 @@ type Service interface {
 	GetUserRefreshToken(ctx context.Context, userID uint) (string, error)
 	ValidateRefreshToken(ctx context.Context, userID uint, refreshToken string) (bool, error)
 	GetUserIDByUUID(ctx context.Context, userUUID uuid.UUID) (uint, error)
+	AuthorizeUser(ctx context.Context, userAuthorization *domain.UserAuthorize) (bool, error)
 }

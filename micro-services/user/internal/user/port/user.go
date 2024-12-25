@@ -15,4 +15,5 @@ type Repo interface {
 	DeleteRefreshToken(ctx context.Context, userID uint) error
 	GetRefreshToken(ctx context.Context, userID uint) (types.RefreshToken, error)
 	GetUserByUUID(ctx context.Context, userUUID uuid.UUID) (*types.User, error)
+	AuthorizeUser(ctx context.Context, userAuthorization *types.UserAuthorization) (bool, error)
 }

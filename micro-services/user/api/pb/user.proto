@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option go_package = "gholi-fly/pb";
+
+enum Status {
+    FAILED = 0;
+    SUCCESS = 1;
+}
+
+message UserAuthorizationRequest {
+    string userUUID = 1 [json_name="userUUID"];
+    string route = 2 [json_name="route"];
+    string method = 3 [json_name="method"];
+}
+
+message UserAuthorizationResponse {
+    Status AuthorizationStatus = 1 [json_name="authorizationStatus"];
+}
+
+service UserService {
+    rpc UserAuthorization(UserAuthorizationRequest) returns (UserAuthorizationResponse);
+}

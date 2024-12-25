@@ -9,12 +9,12 @@ import (
 
 type User struct {
 	gorm.Model
-	UUID         uuid.UUID
-	FirstName    string
-	LastName     string
-	Email        string `gorm:"unique"`
-	Password     string
-	IsVerified   bool
+	UUID       uuid.UUID
+	FirstName  string
+	LastName   string
+	Email      string `gorm:"unique"`
+	Password   string
+	IsVerified bool
 }
 
 type RefreshToken struct {
@@ -23,4 +23,10 @@ type RefreshToken struct {
 	User           *User `gorm:"foreignKey:UserID"`
 	Token          string
 	ExpirationTime time.Time
+}
+
+type UserAuthorization struct {
+	UserUUID uuid.UUID
+	Route    string
+	Method   string
 }

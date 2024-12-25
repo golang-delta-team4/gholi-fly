@@ -7,7 +7,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-
 type User struct {
 	UUID      uuid.UUID
 	FirstName string
@@ -16,6 +15,12 @@ type User struct {
 	Password  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
+}
+
+type UserAuthorize struct {
+	UserUUID uuid.UUID
+	Route    string
+	Method   string
 }
 
 func HashPassword(password string) (string, error) {
