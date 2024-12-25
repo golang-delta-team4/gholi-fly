@@ -28,3 +28,10 @@ func staffServiceGetter(appContainer app.App) ServiceGetter[*service.StaffServic
 		return service.NewStaffService(appContainer.StaffService(ctx))
 	}
 }
+
+func bookingServiceGetter(appContainer app.App) ServiceGetter[*service.BookingService] {
+
+	return func(ctx context.Context) *service.BookingService {
+		return service.NewBookingService(appContainer.BookingService(ctx))
+	}
+}

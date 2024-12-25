@@ -54,9 +54,9 @@ func registerRoomAPI(appContainer app.App, router fiber.Router) {
 }
 
 func registerBookingAPI(appContainer app.App, router fiber.Router) {
-	hotelSvcGetter := hotelServiceGetter(appContainer)
+	bookingSvcGetter := bookingServiceGetter(appContainer)
 	bookingRouter := router.Group("/booking")
-	bookingRouter.Post("/", setTransaction(appContainer.DB()), CreateBookingByRoomID(hotelSvcGetter))
+	bookingRouter.Post("/:room_id", setTransaction(appContainer.DB()), CreateBookingByRoomID(bookingSvcGetter))
 	// bookingRouter.Get("/room/:room_id", setTransaction(appContainer.DB()), GetAllBookingsByRoomID(hotelSvcGetter))
 	// bookingRouter.Get("/user/:user_id", setTransaction(appContainer.DB()), GetAllBookingsByUserID(hotelSvcGetter))
 	// bookingRouter.Get("/:id", setTransaction(appContainer.DB()), GetBookingByID(hotelSvcGetter))
