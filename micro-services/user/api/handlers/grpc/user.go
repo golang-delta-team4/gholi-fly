@@ -38,3 +38,11 @@ func (h *grpcUserHandler) GetUserByEmail(ctx context.Context, req *pb.GetUserByE
 	}
 	return &pb.GetUserResponse{Email: user.Email, FirstName: user.FirstName, LastName: user.LastName, Uuid: user.UUID.String()}, nil
 }
+
+func (h *grpcUserHandler) GetUserByUUID(ctx context.Context, req *pb.GetUserByUUIDRequest) (*pb.GetUserResponse, error) {
+	user, err := h.userService.GetUserByUUID(ctx, req)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to check user authorization: %v", err)
+	}
+	return &pb.GetUserResponse{Email: user.Email, FirstName: user.FirstName, LastName: user.LastName, Uuid: user.UUID.String()}, nil
+}
