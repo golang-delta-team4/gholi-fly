@@ -10,6 +10,7 @@ import (
 type Service interface {
 	CreateTrip(ctx context.Context, trip domain.Trip) (uuid.UUID, error)
 	GetTripById(ctx context.Context, id uuid.UUID) (*domain.Trip, error)
-	// UpdateTrip(ctx context.Context, trip domain.Trip) error
-	// DeleteTrip(ctx context.Context, id uuid.UUID) error
+	GetTrips(ctx context.Context, pageSize int, page int) ([]domain.Trip, error)
+	UpdateTrip(ctx context.Context, trip domain.Trip, oldTrip domain.Trip) error
+	DeleteTrip(ctx context.Context, id uuid.UUID) error
 }

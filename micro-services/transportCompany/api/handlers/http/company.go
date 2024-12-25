@@ -87,8 +87,8 @@ func UpdateCompany(svcGetter ServiceGetter[*service.CompanyService]) fiber.Handl
 func DeleteCompany(svcGetter ServiceGetter[*service.CompanyService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		svc := svcGetter(c.UserContext())
-		compnayId := c.Params("id")
-		err := svc.DeleteCompany(c.UserContext(), compnayId)
+		companyId := c.Params("id")
+		err := svc.DeleteCompany(c.UserContext(), companyId)
 		if err != nil {
 			if errors.Is(err, service.ErrCompanyCreationValidation) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())

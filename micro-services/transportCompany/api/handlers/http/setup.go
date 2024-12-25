@@ -36,4 +36,8 @@ func registerTripApi(appContainer app.App, cfg config.ServerConfig, router fiber
 	router.Post("/trip", setTransaction(appContainer.DB()), CreateTrip(tripServiceGetter))
 	router.Get("/trip/:id", setTransaction(appContainer.DB()), GetTripById(tripServiceGetter))
 	router.Get("/agency-trip/:id", setTransaction(appContainer.DB()), GetAgencyTripById(tripServiceGetter))
+	router.Get("/trip", setTransaction(appContainer.DB()), GetTrips(tripServiceGetter))
+	router.Get("/agency-trip", setTransaction(appContainer.DB()), GetAgencyTrips(tripServiceGetter))
+	router.Patch("/trip/:id", setTransaction(appContainer.DB()), UpdateTrip(tripServiceGetter))
+	router.Delete("/trip/:id", setTransaction(appContainer.DB()), DeleteTrip(tripServiceGetter))
 }

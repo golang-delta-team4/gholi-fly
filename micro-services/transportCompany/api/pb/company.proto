@@ -77,3 +77,24 @@ message GetTripResponse {
   uint32 min_passengers = 18;
   string technical_team_id = 19;
 }
+
+message UpdateTripRequest {
+    string companyId = 1 [json_name = "companyId"];
+    string tripType = 2 [json_name = "tripType"];
+    string userReleaseDate = 3 [json_name = "userReleaseDate"];
+    string tourReleaseDate =4 [json_name = "tourReleaseDate"];
+	uint64 userPrice =5 [json_name = "userPrice"];
+    uint64 agencyPrice =6 [json_name = "agencyPrice"];
+	string pathId =7 [json_name = "pathId"];
+    uint64 minPassengers =8 [json_name = "minPassengers"];
+    string technicalTeamId =9 [json_name = "technicalTeamId"];
+    string vehicleRequestId =10 [json_name = "vehicleRequestId"];
+    uint64 soldTickets =11 [json_name = "soldTickets"];
+    uint64 maxTickets =12 [json_name = "maxTickets"];
+    string startDate =13 [json_name = "startDate"];
+    string endDate =14 [json_name = "endDate"];
+}	
+
+message GetTripsResponse {
+    repeated GetTripResponse trips = 1 [json_name = "trips"];
+}
