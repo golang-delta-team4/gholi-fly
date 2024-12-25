@@ -20,7 +20,7 @@ func CreateRoomByHotelID(svcGetter ServiceGetter[*service.RoomService]) fiber.Ha
 
 		resp, err := svc.CreateRoom(c.UserContext(), &req, hotelID)
 		if err != nil {
-			if errors.Is(err, service.ErrHotelCreationValidation) || errors.Is(err, service.ErrHotelCreationDuplicate) {
+			if errors.Is(err, service.ErrRoomCreationValidation) || errors.Is(err, service.ErrRoomCreationDuplicate) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())
 			}
 
@@ -34,28 +34,45 @@ func CreateRoomByHotelID(svcGetter ServiceGetter[*service.RoomService]) fiber.Ha
 
 func GetAllRoomsByHotelID(svcGetter ServiceGetter[*service.RoomService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
+		svc := svcGetter(c.UserContext())
+		hotelId := c.Params("hotel_id")
 
+		resp, err := svc.GetAllRooms(c.UserContext(), hotelId)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+
+		return c.JSON(resp)
 	}
 }
 
 func GetRoomByID(svcGetter ServiceGetter[*service.RoomService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
+		svc := svcGetter(c.UserContext())
+		roomID := c.Params("id")
 
+		resp, err := svc.GetRoomByID(c.UserContext(), roomID)
+		if err != nil {
+			if errors.Is(err, service.ErrHotelNotFound) {
+				return fiber.NewError(fiber.StatusNotFound, err.Error())
+			}
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+
+		return c.JSON(resp)
 	}
 }
 
-func UpdateRoomByID(svcGetter ServiceGetter[*service.RoomService]) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
+// func UpdateRoomByID(svcGetter ServiceGetter[*service.RoomService]) fiber.Handler {
+// 	return func(c *fiber.Ctx) error {
+// 		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
 
-	}
-}
+// 	}
+// }
 
-func DeleteRoomByID(svcGetter ServiceGetter[*service.RoomService]) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
+// func DeleteRoomByID(svcGetter ServiceGetter[*service.RoomService]) fiber.Handler {
+// 	return func(c *fiber.Ctx) error {
+// 		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
 
-	}
-}
+// 	}
+// }
