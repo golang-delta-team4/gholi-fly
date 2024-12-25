@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
+	"user-service/api/pb"
 	"user-service/api/presenter"
 	"user-service/internal/user/domain"
 	userPort "user-service/internal/user/port"
@@ -15,7 +17,9 @@ import (
 	"github.com/google/uuid"
 )
 
-var ErrInvalidRefreshToken = errors.New("refresh token is invalid")
+var (
+	ErrInvalidRefreshToken = errors.New("refresh token is invalid")
+)
 
 type ErrUserCreationValidation struct {
 	details string
@@ -91,6 +95,14 @@ func (us *UserService) Refresh(ctx context.Context, userUUID uuid.UUID, refreshT
 	}
 	return accessToken, refreshToken, nil
 
+}
+
+func (us *UserService) AuthorizeUser(ctx context.Context, req *pb.UserAuthorizationRequest) (bool, error) {
+	uuid, err := uuid.Parse(req.UserUUID)
+	if err != nil {
+		return false, errors.New("user uuid invalid")
+	}
+	return us.service.AuthorizeUser(ctx, &domain.UserAuthorize{UserUUID: uuid, Route: strings.ToLower(req.Route), Method: strings.ToLower(req.Method)})
 }
 
 func createToken(userUUID uuid.UUID, expMin uint, secret []byte) (string, time.Time, error) {

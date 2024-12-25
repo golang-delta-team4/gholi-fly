@@ -106,3 +106,14 @@ func (us *service) GetUserIDByUUID(ctx context.Context, userUUID uuid.UUID) (uin
 	}
 	return user.ID, nil
 }
+
+func (us *service) AuthorizeUser(ctx context.Context, userAuthorization *domain.UserAuthorize) (bool, error) {
+	ok, err := us.repo.AuthorizeUser(ctx, &types.UserAuthorization{UserUUID: userAuthorization.UserUUID, Route: userAuthorization.Route, Method: userAuthorization.Method})
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+	return ok, nil
+}

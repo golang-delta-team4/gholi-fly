@@ -19,6 +19,7 @@ type ServerConfig struct {
 	HttpHost          string `mapstructure:"httpHost"`
 	HttpPort          uint   `mapstructure:"httpPort"`
 	Secret            string `mapstructure:"secret"`
+	GRPCPort          uint   `mapstructure:"grpcPort"`
 	AuthExpMinute     uint   `mapstructure:"authExpMin"`
 	AuthRefreshMinute uint   `mapstructure:"authExpRefreshMin"`
 }
