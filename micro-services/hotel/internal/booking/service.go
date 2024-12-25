@@ -11,9 +11,11 @@ import (
 )
 
 var (
-	ErrBookingCreation      = errors.New("error on creating booking")
-	ErrBookingNotFound      = errors.New("booking not found")
-	ErrInvalidSourceService = errors.New("invalid source service")
+	ErrBookingCreation           = errors.New("error on creating booking")
+	ErrBookingCreationValidation = errors.New("error on creating booking: validation failed")
+	ErrBookingCreationDuplicate  = errors.New("booking already exists")
+	ErrBookingNotFound           = errors.New("booking not found")
+	ErrInvalidSourceService      = errors.New("invalid source service")
 )
 
 type service struct {
