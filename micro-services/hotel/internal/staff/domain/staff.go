@@ -24,9 +24,10 @@ const (
 )
 
 type Staff struct {
-	ID        StaffID
-	UUID      StaffUUID
-	HotelID   hotelDomain.HotelUUID
+	ID      StaffID
+	UUID    StaffUUID
+	HotelID hotelDomain.HotelUUID
+	// WalletID
 	Name      string
 	StaffType StaffType
 	CreatedAt time.Time

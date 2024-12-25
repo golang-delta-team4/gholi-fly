@@ -20,64 +20,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type StaffType int32
-
-const (
-	StaffType_UNKNOWN      StaffType = 0
-	StaffType_OWNER        StaffType = 1
-	StaffType_MANAGER      StaffType = 2
-	StaffType_RECEPTIONIST StaffType = 3
-	StaffType_CLEANER      StaffType = 4
-	StaffType_SECURITY     StaffType = 5
-)
-
-// Enum value maps for StaffType.
-var (
-	StaffType_name = map[int32]string{
-		0: "UNKNOWN",
-		1: "OWNER",
-		2: "MANAGER",
-		3: "RECEPTIONIST",
-		4: "CLEANER",
-		5: "SECURITY",
-	}
-	StaffType_value = map[string]int32{
-		"UNKNOWN":      0,
-		"OWNER":        1,
-		"MANAGER":      2,
-		"RECEPTIONIST": 3,
-		"CLEANER":      4,
-		"SECURITY":     5,
-	}
-)
-
-func (x StaffType) Enum() *StaffType {
-	p := new(StaffType)
-	*p = x
-	return p
-}
-
-func (x StaffType) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (StaffType) Descriptor() protoreflect.EnumDescriptor {
-	return file_hotel_proto_enumTypes[0].Descriptor()
-}
-
-func (StaffType) Type() protoreflect.EnumType {
-	return &file_hotel_proto_enumTypes[0]
-}
-
-func (x StaffType) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use StaffType.Descriptor instead.
-func (StaffType) EnumDescriptor() ([]byte, []int) {
-	return file_hotel_proto_rawDescGZIP(), []int{0}
-}
-
 type HotelCreateRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -182,258 +124,6 @@ func (x *HotelCreateResponse) GetHotelId() string {
 	return ""
 }
 
-type RoomCreateRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	RoomNumber    int32                  `protobuf:"varint,2,opt,name=roomNumber,proto3" json:"roomNumber,omitempty"`
-	Floor         int32                  `protobuf:"varint,3,opt,name=floor,proto3" json:"floor,omitempty"`
-	Size          int32                  `protobuf:"varint,4,opt,name=size,proto3" json:"size,omitempty"`
-	BasePrice     int32                  `protobuf:"varint,5,opt,name=basePrice,proto3" json:"basePrice,omitempty"`
-	AgencyPrice   int32                  `protobuf:"varint,6,opt,name=agencyPrice,proto3" json:"agencyPrice,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *RoomCreateRequest) Reset() {
-	*x = RoomCreateRequest{}
-	mi := &file_hotel_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *RoomCreateRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RoomCreateRequest) ProtoMessage() {}
-
-func (x *RoomCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_hotel_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RoomCreateRequest.ProtoReflect.Descriptor instead.
-func (*RoomCreateRequest) Descriptor() ([]byte, []int) {
-	return file_hotel_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *RoomCreateRequest) GetRoomNumber() int32 {
-	if x != nil {
-		return x.RoomNumber
-	}
-	return 0
-}
-
-func (x *RoomCreateRequest) GetFloor() int32 {
-	if x != nil {
-		return x.Floor
-	}
-	return 0
-}
-
-func (x *RoomCreateRequest) GetSize() int32 {
-	if x != nil {
-		return x.Size
-	}
-	return 0
-}
-
-func (x *RoomCreateRequest) GetBasePrice() int32 {
-	if x != nil {
-		return x.BasePrice
-	}
-	return 0
-}
-
-func (x *RoomCreateRequest) GetAgencyPrice() int32 {
-	if x != nil {
-		return x.AgencyPrice
-	}
-	return 0
-}
-
-type RoomCreateResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	RoomId        string                 `protobuf:"bytes,1,opt,name=roomId,proto3" json:"roomId,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *RoomCreateResponse) Reset() {
-	*x = RoomCreateResponse{}
-	mi := &file_hotel_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *RoomCreateResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RoomCreateResponse) ProtoMessage() {}
-
-func (x *RoomCreateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_hotel_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RoomCreateResponse.ProtoReflect.Descriptor instead.
-func (*RoomCreateResponse) Descriptor() ([]byte, []int) {
-	return file_hotel_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *RoomCreateResponse) GetRoomId() string {
-	if x != nil {
-		return x.RoomId
-	}
-	return ""
-}
-
-type StaffCreateRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	StaffType     StaffType              `protobuf:"varint,2,opt,name=staffType,proto3,enum=StaffType" json:"staffType,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *StaffCreateRequest) Reset() {
-	*x = StaffCreateRequest{}
-	mi := &file_hotel_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *StaffCreateRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StaffCreateRequest) ProtoMessage() {}
-
-func (x *StaffCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_hotel_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StaffCreateRequest.ProtoReflect.Descriptor instead.
-func (*StaffCreateRequest) Descriptor() ([]byte, []int) {
-	return file_hotel_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *StaffCreateRequest) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *StaffCreateRequest) GetStaffType() StaffType {
-	if x != nil {
-		return x.StaffType
-	}
-	return StaffType_UNKNOWN
-}
-
-type StaffCreateResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	StaffId       string                 `protobuf:"bytes,1,opt,name=staffId,proto3" json:"staffId,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *StaffCreateResponse) Reset() {
-	*x = StaffCreateResponse{}
-	mi := &file_hotel_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *StaffCreateResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StaffCreateResponse) ProtoMessage() {}
-
-func (x *StaffCreateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_hotel_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StaffCreateResponse.ProtoReflect.Descriptor instead.
-func (*StaffCreateResponse) Descriptor() ([]byte, []int) {
-	return file_hotel_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *StaffCreateResponse) GetStaffId() string {
-	if x != nil {
-		return x.StaffId
-	}
-	return ""
-}
-
-type GetAllHotelsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetAllHotelsRequest) Reset() {
-	*x = GetAllHotelsRequest{}
-	mi := &file_hotel_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetAllHotelsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetAllHotelsRequest) ProtoMessage() {}
-
-func (x *GetAllHotelsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_hotel_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetAllHotelsRequest.ProtoReflect.Descriptor instead.
-func (*GetAllHotelsRequest) Descriptor() ([]byte, []int) {
-	return file_hotel_proto_rawDescGZIP(), []int{6}
-}
-
 type GetAllHotelsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Hotels        []*Hotel               `protobuf:"bytes,1,rep,name=hotels,proto3" json:"hotels,omitempty"`
@@ -443,7 +133,7 @@ type GetAllHotelsResponse struct {
 
 func (x *GetAllHotelsResponse) Reset() {
 	*x = GetAllHotelsResponse{}
-	mi := &file_hotel_proto_msgTypes[7]
+	mi := &file_hotel_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -455,7 +145,7 @@ func (x *GetAllHotelsResponse) String() string {
 func (*GetAllHotelsResponse) ProtoMessage() {}
 
 func (x *GetAllHotelsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_hotel_proto_msgTypes[7]
+	mi := &file_hotel_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -468,7 +158,7 @@ func (x *GetAllHotelsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAllHotelsResponse.ProtoReflect.Descriptor instead.
 func (*GetAllHotelsResponse) Descriptor() ([]byte, []int) {
-	return file_hotel_proto_rawDescGZIP(), []int{7}
+	return file_hotel_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GetAllHotelsResponse) GetHotels() []*Hotel {
@@ -487,7 +177,7 @@ type GetAllHotelsByOwnerIDRequest struct {
 
 func (x *GetAllHotelsByOwnerIDRequest) Reset() {
 	*x = GetAllHotelsByOwnerIDRequest{}
-	mi := &file_hotel_proto_msgTypes[8]
+	mi := &file_hotel_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -499,7 +189,7 @@ func (x *GetAllHotelsByOwnerIDRequest) String() string {
 func (*GetAllHotelsByOwnerIDRequest) ProtoMessage() {}
 
 func (x *GetAllHotelsByOwnerIDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_hotel_proto_msgTypes[8]
+	mi := &file_hotel_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -512,7 +202,7 @@ func (x *GetAllHotelsByOwnerIDRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAllHotelsByOwnerIDRequest.ProtoReflect.Descriptor instead.
 func (*GetAllHotelsByOwnerIDRequest) Descriptor() ([]byte, []int) {
-	return file_hotel_proto_rawDescGZIP(), []int{8}
+	return file_hotel_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetAllHotelsByOwnerIDRequest) GetOwnerId() string {
@@ -531,7 +221,7 @@ type GetHotelByIDRequest struct {
 
 func (x *GetHotelByIDRequest) Reset() {
 	*x = GetHotelByIDRequest{}
-	mi := &file_hotel_proto_msgTypes[9]
+	mi := &file_hotel_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -543,7 +233,7 @@ func (x *GetHotelByIDRequest) String() string {
 func (*GetHotelByIDRequest) ProtoMessage() {}
 
 func (x *GetHotelByIDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_hotel_proto_msgTypes[9]
+	mi := &file_hotel_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -556,7 +246,7 @@ func (x *GetHotelByIDRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetHotelByIDRequest.ProtoReflect.Descriptor instead.
 func (*GetHotelByIDRequest) Descriptor() ([]byte, []int) {
-	return file_hotel_proto_rawDescGZIP(), []int{9}
+	return file_hotel_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetHotelByIDRequest) GetHotelId() string {
@@ -577,7 +267,7 @@ type UpdateHotelRequest struct {
 
 func (x *UpdateHotelRequest) Reset() {
 	*x = UpdateHotelRequest{}
-	mi := &file_hotel_proto_msgTypes[10]
+	mi := &file_hotel_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -589,7 +279,7 @@ func (x *UpdateHotelRequest) String() string {
 func (*UpdateHotelRequest) ProtoMessage() {}
 
 func (x *UpdateHotelRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_hotel_proto_msgTypes[10]
+	mi := &file_hotel_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -602,7 +292,7 @@ func (x *UpdateHotelRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateHotelRequest.ProtoReflect.Descriptor instead.
 func (*UpdateHotelRequest) Descriptor() ([]byte, []int) {
-	return file_hotel_proto_rawDescGZIP(), []int{10}
+	return file_hotel_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *UpdateHotelRequest) GetHotelId() string {
@@ -634,7 +324,7 @@ type UpdateHotelResponse struct {
 
 func (x *UpdateHotelResponse) Reset() {
 	*x = UpdateHotelResponse{}
-	mi := &file_hotel_proto_msgTypes[11]
+	mi := &file_hotel_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -646,7 +336,7 @@ func (x *UpdateHotelResponse) String() string {
 func (*UpdateHotelResponse) ProtoMessage() {}
 
 func (x *UpdateHotelResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_hotel_proto_msgTypes[11]
+	mi := &file_hotel_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -659,7 +349,7 @@ func (x *UpdateHotelResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateHotelResponse.ProtoReflect.Descriptor instead.
 func (*UpdateHotelResponse) Descriptor() ([]byte, []int) {
-	return file_hotel_proto_rawDescGZIP(), []int{11}
+	return file_hotel_proto_rawDescGZIP(), []int{6}
 }
 
 type DeleteHotelRequest struct {
@@ -671,7 +361,7 @@ type DeleteHotelRequest struct {
 
 func (x *DeleteHotelRequest) Reset() {
 	*x = DeleteHotelRequest{}
-	mi := &file_hotel_proto_msgTypes[12]
+	mi := &file_hotel_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -683,7 +373,7 @@ func (x *DeleteHotelRequest) String() string {
 func (*DeleteHotelRequest) ProtoMessage() {}
 
 func (x *DeleteHotelRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_hotel_proto_msgTypes[12]
+	mi := &file_hotel_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -696,7 +386,7 @@ func (x *DeleteHotelRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteHotelRequest.ProtoReflect.Descriptor instead.
 func (*DeleteHotelRequest) Descriptor() ([]byte, []int) {
-	return file_hotel_proto_rawDescGZIP(), []int{12}
+	return file_hotel_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *DeleteHotelRequest) GetHotelId() string {
@@ -714,7 +404,7 @@ type DeleteHotelResponse struct {
 
 func (x *DeleteHotelResponse) Reset() {
 	*x = DeleteHotelResponse{}
-	mi := &file_hotel_proto_msgTypes[13]
+	mi := &file_hotel_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -726,7 +416,7 @@ func (x *DeleteHotelResponse) String() string {
 func (*DeleteHotelResponse) ProtoMessage() {}
 
 func (x *DeleteHotelResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_hotel_proto_msgTypes[13]
+	mi := &file_hotel_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -739,7 +429,7 @@ func (x *DeleteHotelResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteHotelResponse.ProtoReflect.Descriptor instead.
 func (*DeleteHotelResponse) Descriptor() ([]byte, []int) {
-	return file_hotel_proto_rawDescGZIP(), []int{13}
+	return file_hotel_proto_rawDescGZIP(), []int{8}
 }
 
 type Hotel struct {
@@ -753,7 +443,7 @@ type Hotel struct {
 
 func (x *Hotel) Reset() {
 	*x = Hotel{}
-	mi := &file_hotel_proto_msgTypes[14]
+	mi := &file_hotel_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -765,7 +455,7 @@ func (x *Hotel) String() string {
 func (*Hotel) ProtoMessage() {}
 
 func (x *Hotel) ProtoReflect() protoreflect.Message {
-	mi := &file_hotel_proto_msgTypes[14]
+	mi := &file_hotel_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -778,7 +468,7 @@ func (x *Hotel) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Hotel.ProtoReflect.Descriptor instead.
 func (*Hotel) Descriptor() ([]byte, []int) {
-	return file_hotel_proto_rawDescGZIP(), []int{14}
+	return file_hotel_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *Hotel) GetId() string {
@@ -814,63 +504,35 @@ var file_hotel_proto_rawDesc = []byte{
 	0x6e, 0x65, 0x72, 0x49, 0x64, 0x22, 0x2f, 0x0a, 0x13, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x43, 0x72,
 	0x65, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a, 0x07,
 	0x68, 0x6f, 0x74, 0x65, 0x6c, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x68,
-	0x6f, 0x74, 0x65, 0x6c, 0x49, 0x64, 0x22, 0x9d, 0x01, 0x0a, 0x11, 0x52, 0x6f, 0x6f, 0x6d, 0x43,
-	0x72, 0x65, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1e, 0x0a, 0x0a,
-	0x72, 0x6f, 0x6f, 0x6d, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05,
-	0x52, 0x0a, 0x72, 0x6f, 0x6f, 0x6d, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x12, 0x14, 0x0a, 0x05,
-	0x66, 0x6c, 0x6f, 0x6f, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x66, 0x6c, 0x6f,
-	0x6f, 0x72, 0x12, 0x12, 0x0a, 0x04, 0x73, 0x69, 0x7a, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x05,
-	0x52, 0x04, 0x73, 0x69, 0x7a, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x62, 0x61, 0x73, 0x65, 0x50, 0x72,
-	0x69, 0x63, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x05, 0x52, 0x09, 0x62, 0x61, 0x73, 0x65, 0x50,
-	0x72, 0x69, 0x63, 0x65, 0x12, 0x20, 0x0a, 0x0b, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x50, 0x72,
-	0x69, 0x63, 0x65, 0x18, 0x06, 0x20, 0x01, 0x28, 0x05, 0x52, 0x0b, 0x61, 0x67, 0x65, 0x6e, 0x63,
-	0x79, 0x50, 0x72, 0x69, 0x63, 0x65, 0x22, 0x2c, 0x0a, 0x12, 0x52, 0x6f, 0x6f, 0x6d, 0x43, 0x72,
-	0x65, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x16, 0x0a, 0x06,
-	0x72, 0x6f, 0x6f, 0x6d, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x6f,
-	0x6f, 0x6d, 0x49, 0x64, 0x22, 0x52, 0x0a, 0x12, 0x53, 0x74, 0x61, 0x66, 0x66, 0x43, 0x72, 0x65,
-	0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61,
-	0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x28,
-	0x0a, 0x09, 0x73, 0x74, 0x61, 0x66, 0x66, 0x54, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x0e, 0x32, 0x0a, 0x2e, 0x53, 0x74, 0x61, 0x66, 0x66, 0x54, 0x79, 0x70, 0x65, 0x52, 0x09, 0x73,
-	0x74, 0x61, 0x66, 0x66, 0x54, 0x79, 0x70, 0x65, 0x22, 0x2f, 0x0a, 0x13, 0x53, 0x74, 0x61, 0x66,
-	0x66, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
-	0x18, 0x0a, 0x07, 0x73, 0x74, 0x61, 0x66, 0x66, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x07, 0x73, 0x74, 0x61, 0x66, 0x66, 0x49, 0x64, 0x22, 0x15, 0x0a, 0x13, 0x47, 0x65, 0x74,
-	0x41, 0x6c, 0x6c, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x22, 0x36, 0x0a, 0x14, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x73,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1e, 0x0a, 0x06, 0x68, 0x6f, 0x74, 0x65,
-	0x6c, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x06, 0x2e, 0x48, 0x6f, 0x74, 0x65, 0x6c,
-	0x52, 0x06, 0x68, 0x6f, 0x74, 0x65, 0x6c, 0x73, 0x22, 0x38, 0x0a, 0x1c, 0x47, 0x65, 0x74, 0x41,
-	0x6c, 0x6c, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x73, 0x42, 0x79, 0x4f, 0x77, 0x6e, 0x65, 0x72, 0x49,
-	0x44, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x6f, 0x77, 0x6e, 0x65,
-	0x72, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6f, 0x77, 0x6e, 0x65, 0x72,
-	0x49, 0x64, 0x22, 0x2f, 0x0a, 0x13, 0x47, 0x65, 0x74, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x42, 0x79,
-	0x49, 0x44, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x68, 0x6f, 0x74,
-	0x65, 0x6c, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x68, 0x6f, 0x74, 0x65,
-	0x6c, 0x49, 0x64, 0x22, 0x56, 0x0a, 0x12, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x48, 0x6f, 0x74,
-	0x65, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x68, 0x6f, 0x74,
-	0x65, 0x6c, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x68, 0x6f, 0x74, 0x65,
-	0x6c, 0x49, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x69, 0x74, 0x79, 0x18,
-	0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x63, 0x69, 0x74, 0x79, 0x22, 0x15, 0x0a, 0x13, 0x55,
-	0x70, 0x64, 0x61, 0x74, 0x65, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x22, 0x2e, 0x0a, 0x12, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x48, 0x6f, 0x74, 0x65,
-	0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x68, 0x6f, 0x74, 0x65,
-	0x6c, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x68, 0x6f, 0x74, 0x65, 0x6c,
-	0x49, 0x64, 0x22, 0x15, 0x0a, 0x13, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x48, 0x6f, 0x74, 0x65,
-	0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x3f, 0x0a, 0x05, 0x48, 0x6f, 0x74,
-	0x65, 0x6c, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02,
-	0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x69, 0x74, 0x79, 0x18, 0x03,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x63, 0x69, 0x74, 0x79, 0x2a, 0x5d, 0x0a, 0x09, 0x53, 0x74,
-	0x61, 0x66, 0x66, 0x54, 0x79, 0x70, 0x65, 0x12, 0x0b, 0x0a, 0x07, 0x55, 0x4e, 0x4b, 0x4e, 0x4f,
-	0x57, 0x4e, 0x10, 0x00, 0x12, 0x09, 0x0a, 0x05, 0x4f, 0x57, 0x4e, 0x45, 0x52, 0x10, 0x01, 0x12,
-	0x0b, 0x0a, 0x07, 0x4d, 0x41, 0x4e, 0x41, 0x47, 0x45, 0x52, 0x10, 0x02, 0x12, 0x10, 0x0a, 0x0c,
-	0x52, 0x45, 0x43, 0x45, 0x50, 0x54, 0x49, 0x4f, 0x4e, 0x49, 0x53, 0x54, 0x10, 0x03, 0x12, 0x0b,
-	0x0a, 0x07, 0x43, 0x4c, 0x45, 0x41, 0x4e, 0x45, 0x52, 0x10, 0x04, 0x12, 0x0c, 0x0a, 0x08, 0x53,
-	0x45, 0x43, 0x55, 0x52, 0x49, 0x54, 0x59, 0x10, 0x05, 0x42, 0x18, 0x5a, 0x16, 0x67, 0x68, 0x6f,
-	0x6c, 0x69, 0x2d, 0x66, 0x6c, 0x79, 0x2d, 0x68, 0x6f, 0x74, 0x65, 0x6c, 0x2f, 0x61, 0x70, 0x69,
-	0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6f, 0x74, 0x65, 0x6c, 0x49, 0x64, 0x22, 0x36, 0x0a, 0x14, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c,
+	0x48, 0x6f, 0x74, 0x65, 0x6c, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1e,
+	0x0a, 0x06, 0x68, 0x6f, 0x74, 0x65, 0x6c, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x06,
+	0x2e, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x52, 0x06, 0x68, 0x6f, 0x74, 0x65, 0x6c, 0x73, 0x22, 0x38,
+	0x0a, 0x1c, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x73, 0x42, 0x79,
+	0x4f, 0x77, 0x6e, 0x65, 0x72, 0x49, 0x44, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x18,
+	0x0a, 0x07, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x07, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x49, 0x64, 0x22, 0x2f, 0x0a, 0x13, 0x47, 0x65, 0x74, 0x48,
+	0x6f, 0x74, 0x65, 0x6c, 0x42, 0x79, 0x49, 0x44, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
+	0x18, 0x0a, 0x07, 0x68, 0x6f, 0x74, 0x65, 0x6c, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x07, 0x68, 0x6f, 0x74, 0x65, 0x6c, 0x49, 0x64, 0x22, 0x56, 0x0a, 0x12, 0x55, 0x70, 0x64,
+	0x61, 0x74, 0x65, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
+	0x18, 0x0a, 0x07, 0x68, 0x6f, 0x74, 0x65, 0x6c, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x07, 0x68, 0x6f, 0x74, 0x65, 0x6c, 0x49, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d,
+	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a,
+	0x04, 0x63, 0x69, 0x74, 0x79, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x63, 0x69, 0x74,
+	0x79, 0x22, 0x15, 0x0a, 0x13, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x48, 0x6f, 0x74, 0x65, 0x6c,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x2e, 0x0a, 0x12, 0x44, 0x65, 0x6c, 0x65,
+	0x74, 0x65, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x18,
+	0x0a, 0x07, 0x68, 0x6f, 0x74, 0x65, 0x6c, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x07, 0x68, 0x6f, 0x74, 0x65, 0x6c, 0x49, 0x64, 0x22, 0x15, 0x0a, 0x13, 0x44, 0x65, 0x6c, 0x65,
+	0x74, 0x65, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
+	0x3f, 0x0a, 0x05, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04,
+	0x63, 0x69, 0x74, 0x79, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x63, 0x69, 0x74, 0x79,
+	0x42, 0x18, 0x5a, 0x16, 0x67, 0x68, 0x6f, 0x6c, 0x69, 0x2d, 0x66, 0x6c, 0x79, 0x2d, 0x68, 0x6f,
+	0x74, 0x65, 0x6c, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -885,34 +547,26 @@ func file_hotel_proto_rawDescGZIP() []byte {
 	return file_hotel_proto_rawDescData
 }
 
-var file_hotel_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_hotel_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_hotel_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_hotel_proto_goTypes = []any{
-	(StaffType)(0),                       // 0: StaffType
-	(*HotelCreateRequest)(nil),           // 1: HotelCreateRequest
-	(*HotelCreateResponse)(nil),          // 2: HotelCreateResponse
-	(*RoomCreateRequest)(nil),            // 3: RoomCreateRequest
-	(*RoomCreateResponse)(nil),           // 4: RoomCreateResponse
-	(*StaffCreateRequest)(nil),           // 5: StaffCreateRequest
-	(*StaffCreateResponse)(nil),          // 6: StaffCreateResponse
-	(*GetAllHotelsRequest)(nil),          // 7: GetAllHotelsRequest
-	(*GetAllHotelsResponse)(nil),         // 8: GetAllHotelsResponse
-	(*GetAllHotelsByOwnerIDRequest)(nil), // 9: GetAllHotelsByOwnerIDRequest
-	(*GetHotelByIDRequest)(nil),          // 10: GetHotelByIDRequest
-	(*UpdateHotelRequest)(nil),           // 11: UpdateHotelRequest
-	(*UpdateHotelResponse)(nil),          // 12: UpdateHotelResponse
-	(*DeleteHotelRequest)(nil),           // 13: DeleteHotelRequest
-	(*DeleteHotelResponse)(nil),          // 14: DeleteHotelResponse
-	(*Hotel)(nil),                        // 15: Hotel
+	(*HotelCreateRequest)(nil),           // 0: HotelCreateRequest
+	(*HotelCreateResponse)(nil),          // 1: HotelCreateResponse
+	(*GetAllHotelsResponse)(nil),         // 2: GetAllHotelsResponse
+	(*GetAllHotelsByOwnerIDRequest)(nil), // 3: GetAllHotelsByOwnerIDRequest
+	(*GetHotelByIDRequest)(nil),          // 4: GetHotelByIDRequest
+	(*UpdateHotelRequest)(nil),           // 5: UpdateHotelRequest
+	(*UpdateHotelResponse)(nil),          // 6: UpdateHotelResponse
+	(*DeleteHotelRequest)(nil),           // 7: DeleteHotelRequest
+	(*DeleteHotelResponse)(nil),          // 8: DeleteHotelResponse
+	(*Hotel)(nil),                        // 9: Hotel
 }
 var file_hotel_proto_depIdxs = []int32{
-	0,  // 0: StaffCreateRequest.staffType:type_name -> StaffType
-	15, // 1: GetAllHotelsResponse.hotels:type_name -> Hotel
-	2,  // [2:2] is the sub-list for method output_type
-	2,  // [2:2] is the sub-list for method input_type
-	2,  // [2:2] is the sub-list for extension type_name
-	2,  // [2:2] is the sub-list for extension extendee
-	0,  // [0:2] is the sub-list for field type_name
+	9, // 0: GetAllHotelsResponse.hotels:type_name -> Hotel
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_hotel_proto_init() }
@@ -925,14 +579,13 @@ func file_hotel_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_hotel_proto_rawDesc,
-			NumEnums:      1,
-			NumMessages:   15,
+			NumEnums:      0,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_hotel_proto_goTypes,
 		DependencyIndexes: file_hotel_proto_depIdxs,
-		EnumInfos:         file_hotel_proto_enumTypes,
 		MessageInfos:      file_hotel_proto_msgTypes,
 	}.Build()
 	File_hotel_proto = out.File

@@ -10,8 +10,8 @@ type Staff struct {
 	UUID      uuid.UUID `gorm:"unique;primaryKey"`
 	HotelID   uuid.UUID `gorm:"type:uuid;references:UUID;not null"`
 	Hotel     Hotel     `gorm:"foreignKey:HotelID;references:UUID;constraint:OnDelete:CASCADE"`
-	Name      string
-	StaffType uint8 `gorm:"not null;default:0"`
+	Name      string    `gorm:"unique;not null;required"`
+	StaffType uint8     `gorm:"not null;default:0"`
 }
 
 func (h *Staff) BeforeCreate(tx *gorm.DB) error {

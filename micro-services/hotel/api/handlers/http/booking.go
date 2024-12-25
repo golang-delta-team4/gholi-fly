@@ -31,44 +31,37 @@ func CreateBookingByRoomID(svcGetter ServiceGetter[*service.HotelService]) fiber
 	}
 }
 
-func GetA(svcGetter ServiceGetter[*service.HotelService]) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
+// func GetAllBookingsByRoomID(svcGetter ServiceGetter[*service.HotelService]) fiber.Handler {
+// 	return func(c *fiber.Ctx) error {
+// 		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
 
-	}
-}
+// 	}
+// }
 
-func GetAllBookingsByRoomID(svcGetter ServiceGetter[*service.HotelService]) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
+// func GetAllBookingsByUserID(svcGetter ServiceGetter[*service.HotelService]) fiber.Handler {
+// 	return func(c *fiber.Ctx) error {
+// 		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
 
-	}
-}
+// 	}
+// }
 
-func GetAllBookingsByUserID(svcGetter ServiceGetter[*service.HotelService]) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
+// func GetBookingByID(svcGetter ServiceGetter[*service.HotelService]) fiber.Handler {
+// 	return func(c *fiber.Ctx) error {
+// 		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
 
-	}
-}
+// 	}
+// }
 
-func GetBookingByID(svcGetter ServiceGetter[*service.HotelService]) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
+// func UpdateBookingByID(svcGetter ServiceGetter[*service.HotelService]) fiber.Handler {
+// 	return func(c *fiber.Ctx) error {
+// 		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
 
-	}
-}
+// 	}
+// }
 
-func UpdateBookingByID(svcGetter ServiceGetter[*service.HotelService]) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
+// func DeleteBookingByID(svcGetter ServiceGetter[*service.HotelService]) fiber.Handler {
+// 	return func(c *fiber.Ctx) error {
+// 		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
 
-	}
-}
-
-func DeleteBookingByID(svcGetter ServiceGetter[*service.HotelService]) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
-
-	}
-}
+// 	}
+// }

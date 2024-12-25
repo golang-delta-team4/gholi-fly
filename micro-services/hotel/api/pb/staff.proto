@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+option go_package = "gholi-fly-hotel/api/pb";
+
+
+enum StaffType {
+    UNKNOWN = 0;
+    MANAGER = 1;
+    RECEPTIONIST = 2;
+    CLEANER = 3;
+    SECURITY = 4;
+}
+
+message StaffCreateRequest {
+    string name = 1 [json_name = "name"];
+    StaffType staffType = 2 [json_name = "staffType"];
+}
+
+message StaffCreateResponse {
+    string staffId = 1 [json_name = "staffId"];
+}
+
+message GetAllStaffsResponse {
+    repeated Staff staffs = 1 [json_name = "staffs"];
+}
+
+message Staff {
+    string id = 1 [json_name = "id"];
+    string name = 2 [json_name = "name"];
+    int32 staffType = 3 [json_name = "staffType"];
+}
