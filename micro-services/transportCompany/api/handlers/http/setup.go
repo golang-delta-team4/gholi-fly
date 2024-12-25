@@ -14,7 +14,11 @@ func Run(appContainer app.App, cfg config.ServerConfig) error {
 	router := fiber.New()
 	router.Use(recover.New())
 
-	api := router.Group("/api/v1/transport-company", setUserContext)
+	api := router.Group(
+		"/api/v1/transport-company",
+		setUserContext,
+		//newAuthMiddleware([]byte(cfg.Secret)),
+	)
 
 	registerCompanyAPI(appContainer, cfg, api)
 	registerTripApi(appContainer, cfg, api)

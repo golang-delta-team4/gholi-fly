@@ -16,7 +16,8 @@ type DBConfig struct {
 }
 
 type ServerConfig struct {
-	HttpPort uint `json:"httpPort"`
+	HttpPort uint   `json:"httpPort"`
+	Secret   string `json:"secret"`
 }
 
 type RedisConfig struct {
