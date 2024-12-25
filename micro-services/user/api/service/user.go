@@ -105,6 +105,18 @@ func (us *UserService) AuthorizeUser(ctx context.Context, req *pb.UserAuthorizat
 	return us.service.AuthorizeUser(ctx, &domain.UserAuthorize{UserUUID: uuid, Route: strings.ToLower(req.Route), Method: strings.ToLower(req.Method)})
 }
 
+func (us *UserService) GetUserByUUID(ctx context.Context, req *pb.GetUserByUUIDRequest) (*domain.User, error) {
+	uuid, err := uuid.Parse(req.UserUUID)
+	if err != nil {
+		return nil, errors.New("user uuid invalid")
+	}
+	return us.service.GetUserByUUID(ctx, uuid)
+}
+
+func (us *UserService) GetUserByEmail(ctx context.Context, req *pb.GetUserByEmailRequest) (*domain.User, error) {
+	return us.service.GetUserByEmail(ctx, req.UserEmail)
+}
+
 func createToken(userUUID uuid.UUID, expMin uint, secret []byte) (string, time.Time, error) {
 	expirationTime := timePkg.AddMinutes(expMin, true)
 	token, err := jwt.CreateToken(secret, &jwt.UserClaims{UserUUID: userUUID,

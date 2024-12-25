@@ -30,3 +30,11 @@ func (h *grpcUserHandler) UserAuthorization(ctx context.Context, req *pb.UserAut
 	}
 	return &pb.UserAuthorizationResponse{AuthorizationStatus: pb.Status_SUCCESS}, nil
 }
+
+func (h *grpcUserHandler) GetUserByEmail(ctx context.Context, req *pb.GetUserByEmailRequest) (*pb.GetUserResponse, error) {
+	user, err := h.userService.GetUserByEmail(ctx, req)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to check user authorization: %v", err)
+	}
+	return &pb.GetUserResponse{Email: user.Email, FirstName: user.FirstName, LastName: user.LastName, Uuid: user.UUID.String()}, nil
+}
