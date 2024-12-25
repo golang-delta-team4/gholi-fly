@@ -117,3 +117,25 @@ func (us *service) AuthorizeUser(ctx context.Context, userAuthorization *domain.
 	}
 	return ok, nil
 }
+
+func (us *service) GetUserByUUID(ctx context.Context, userUUID uuid.UUID) (*domain.User, error) {
+	user, err := us.repo.GetUserByUUID(ctx, userUUID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrUserNotFound
+		}
+		return nil, err
+	}
+	return mapper.Storage2Domain(*user), nil
+}
+
+func (us *service) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
+	user, err := us.repo.GetUserByEmail(ctx, email)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrUserNotFound
+		}
+		return nil, err
+	}
+	return mapper.Storage2Domain(*user), nil
+}

@@ -76,3 +76,12 @@ func (ur *userRepo) AuthorizeUser(ctx context.Context, userAuthorization *types.
 	return false, nil
 
 }
+
+func (ur *userRepo) GetUserByEmail(ctx context.Context, email string) (*types.User, error) {
+	var user types.User
+	err := ur.db.Model(&types.User{}).Where("email = ?", email).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
