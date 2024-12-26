@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package wallet;
+
+// Specify Go package option
+option go_package = "gholi-fly-bank/api/pb";
+
+// Enum for wallet types
+enum WalletType {
+    UNKNOWN = 0;
+    PERSON = 1;
+    COMPANY = 2;
+    APP = 3;
+}
+
+// Enum for response status
+enum ResponseStatus {
+    FAILED = 0;
+    SUCCESS = 1;
+}
+
+// Wallet message
+message Wallet {
+    string id = 1 [json_name = "id"];               // UUID of the wallet
+    string owner_id = 2 [json_name = "ownerId"];    // UUID of the owner
+    WalletType type = 3 [json_name = "type"];       // Type of wallet
+    uint64 balance = 4 [json_name = "balance"];     // Balance of the wallet
+    string created_at = 5 [json_name = "createdAt"];// Timestamp of creation
+    string updated_at = 6 [json_name = "updatedAt"];// Timestamp of last update
+}
+
+// Request for creating a wallet
+message CreateWalletRequest {
+    string owner_id = 1 [json_name = "ownerId"];    // UUID of the owner
+    WalletType type = 2 [json_name = "type"];       // Type of wallet
+}
+
+// Response for creating a wallet
+message CreateWalletResponse {
+    ResponseStatus status = 1 [json_name = "status"]; // Success or failure status
+    Wallet wallet = 2 [json_name = "wallet"];         // The created wallet (if successful)
+    string message = 3 [json_name = "message"];       // Additional information (error or success message)
+}
+
+// Request for retrieving wallets with filters
+message GetWalletsRequest {
+    string owner_id = 1 [json_name = "ownerId"];    // UUID of the owner (optional filter)
+    WalletType type = 2 [json_name = "type"];       // Type of wallet (optional filter)
+}
+
+// Response for retrieving wallets
+message GetWalletsResponse {
+    ResponseStatus status = 1 [json_name = "status"]; // Success or failure status
+    repeated Wallet wallets = 2 [json_name = "wallets"]; // List of wallets matching filters
+    string message = 3 [json_name = "message"];         // Additional information (error or success message)
+}
+
+// Wallet service definition
+service WalletService {
+    // Create a wallet
+    rpc CreateWallet(CreateWalletRequest) returns (CreateWalletResponse);
+
+    // Get wallets by filters
+    rpc GetWallets(GetWalletsRequest) returns (GetWalletsResponse);
+}
