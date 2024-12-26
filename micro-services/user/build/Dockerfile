@@ -1,5 +1,6 @@
 # ------------------------ Base Stage ------------------------
     FROM golang:1.23 AS base
+    RUN go install github.com/air-verse/air@v1.61.5
 
     ENV GO111MODULE=on \
         CGO_ENABLED=0 \
@@ -16,8 +17,6 @@
     FROM base AS dev
 
     COPY . .
-    
-    RUN go install github.com/air-verse/air@v1.61.5
     
     CMD ["air", "-c", ".air.toml"]
     

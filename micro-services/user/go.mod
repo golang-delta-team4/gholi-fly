@@ -1,11 +1,12 @@
 module user-service
 
-go 1.21.4
+go 1.23.1
 
 require (
 	github.com/go-playground/validator/v10 v10.23.0
 	github.com/gofiber/contrib/jwt v1.0.10
 	github.com/gofiber/fiber/v2 v2.52.5
+	github.com/golang-delta-team4/gholi-fly/shared/jwt v0.0.0-00010101000000-000000000000
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.5.5
@@ -16,6 +17,8 @@ require (
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.25.12
 )
+
+replace github.com/golang-delta-team4/gholi-fly/shared/jwt => ../../shared/jwt
 
 require (
 	github.com/MicahParks/keyfunc/v2 v2.1.0 // indirect
