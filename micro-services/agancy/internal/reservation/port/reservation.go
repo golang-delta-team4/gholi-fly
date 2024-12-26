@@ -13,6 +13,6 @@ type ReservationRepo interface {
 	GetByID(ctx context.Context, id domain.ReservationID) (*domain.Reservation, error)
 	Update(ctx context.Context, reservation domain.Reservation) error
 	Delete(ctx context.Context, id domain.ReservationID) error
-	ListByToureID(ctx context.Context, toureID uuid.UUID) ([]domain.Reservation, error)
+	ListBytourID(ctx context.Context, tourID uuid.UUID) ([]domain.Reservation, error)
 	ListByUserID(ctx context.Context, userID uuid.UUID) ([]domain.Reservation, error)
 }

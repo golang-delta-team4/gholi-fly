@@ -11,18 +11,17 @@ type StaffID uuid.UUID
 
 type Staff struct {
 	ID        StaffID
+	UserID    uuid.UUID
 	AgencyID  uuid.UUID
-	FirstName string
-	LastName  string
+	WalletID  uuid.UUID
+	Stock     int
 	Role      string
-	Email     string
-	Phone     string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
 func (s *Staff) Validate() error {
-	if s.AgencyID == uuid.Nil || s.FirstName == "" || s.LastName == "" || s.Role == "" || s.Email == "" {
+	if s.UserID == uuid.Nil || s.AgencyID == uuid.Nil || s.Role == "" {
 		return errors.New("invalid staff details")
 	}
 	return nil
