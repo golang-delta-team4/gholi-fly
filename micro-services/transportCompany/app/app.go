@@ -8,6 +8,8 @@ import (
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/config"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company"
 	companyPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company/port"
+	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/ticket"
+	ticketPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/ticket/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip"
 	tripPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/storage"
@@ -27,6 +29,7 @@ type app struct {
 	cfg            config.Config
 	companyService companyPort.Service
 	tripService    tripPort.Service
+	ticketService  ticketPort.Service
 	redisProvider  cache.Provider
 }
 
@@ -64,6 +67,22 @@ func (a *app) TripService(ctx context.Context) tripPort.Service {
 
 func (a *app) tripServiceWithDB(db *gorm.DB) tripPort.Service {
 	return trip.NewService(storage.NewTripRepo(db, false, a.redisProvider))
+}
+
+func (a *app) TicketService(ctx context.Context) ticketPort.Service {
+	db := appCtx.GetDB(ctx)
+	if db == nil {
+		if a.ticketService == nil {
+			a.ticketService = a.ticketServiceWithDB(a.db)
+		}
+		return a.ticketService
+	}
+
+	return a.ticketServiceWithDB(db)
+}
+
+func (a *app) ticketServiceWithDB(db *gorm.DB) ticketPort.Service {
+	return ticket.NewService(storage.NewTicketRepo(db, false, a.redisProvider), a.tripServiceWithDB(db))
 }
 
 func (a *app) Config() config.Config {

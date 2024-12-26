@@ -20,3 +20,9 @@ func tripServiceGetter(appContainer app.App, cfg config.ServerConfig) ServiceGet
 		return service.NewTripService(appContainer.TripService(ctx))
 	}
 }
+
+func ticketServiceGetter(appContainer app.App, cfg config.ServerConfig) ServiceGetter[*service.TicketService] {
+	return func(ctx context.Context) *service.TicketService {
+		return service.NewTicketService(appContainer.TicketService(ctx))
+	}
+}

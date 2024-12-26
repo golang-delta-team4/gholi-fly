@@ -22,6 +22,7 @@ func Run(appContainer app.App, cfg config.ServerConfig) error {
 
 	registerCompanyAPI(appContainer, cfg, api)
 	registerTripApi(appContainer, cfg, api)
+	registerTicketApi(appContainer, cfg, api)
 
 	return router.Listen(fmt.Sprintf(":%d", cfg.HttpPort))
 }
@@ -44,4 +45,14 @@ func registerTripApi(appContainer app.App, cfg config.ServerConfig, router fiber
 	router.Get("/agency-trip", setTransaction(appContainer.DB()), GetAgencyTrips(tripServiceGetter))
 	router.Patch("/trip/:id", setTransaction(appContainer.DB()), UpdateTrip(tripServiceGetter))
 	router.Delete("/trip/:id", setTransaction(appContainer.DB()), DeleteTrip(tripServiceGetter))
+}
+
+func registerTicketApi(appContainer app.App, cfg config.ServerConfig, router fiber.Router) {
+	ticketServiceGetter := ticketServiceGetter(appContainer, cfg)
+	router.Post("/buy", setTransaction(appContainer.DB()), BuyTicket(ticketServiceGetter))
+	// router.Post("/ticket", setTransaction(appContainer.DB()), CreateTicket(ticketServiceGetter))
+	// router.Get("/ticket/:id", setTransaction(appContainer.DB()), GetTicketById(ticketServiceGetter))
+	// router.Get("/ticket", setTransaction(appContainer.DB()), GetTickets(ticketServiceGetter))
+	// router.Patch("/ticket/:id", setTransaction(appContainer.DB()), UpdateTicket(ticketServiceGetter))
+	// router.Delete("/ticket/:id", setTransaction(appContainer.DB()), DeleteTicket(ticketServiceGetter))
 }
