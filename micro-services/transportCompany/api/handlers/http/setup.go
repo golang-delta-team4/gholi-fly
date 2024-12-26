@@ -49,10 +49,7 @@ func registerTripApi(appContainer app.App, cfg config.ServerConfig, router fiber
 
 func registerTicketApi(appContainer app.App, cfg config.ServerConfig, router fiber.Router) {
 	ticketServiceGetter := ticketServiceGetter(appContainer, cfg)
-	router.Post("/buy", setTransaction(appContainer.DB()), BuyTicket(ticketServiceGetter))
-	// router.Post("/ticket", setTransaction(appContainer.DB()), CreateTicket(ticketServiceGetter))
-	// router.Get("/ticket/:id", setTransaction(appContainer.DB()), GetTicketById(ticketServiceGetter))
-	// router.Get("/ticket", setTransaction(appContainer.DB()), GetTickets(ticketServiceGetter))
-	// router.Patch("/ticket/:id", setTransaction(appContainer.DB()), UpdateTicket(ticketServiceGetter))
-	// router.Delete("/ticket/:id", setTransaction(appContainer.DB()), DeleteTicket(ticketServiceGetter))
+	router.Post("/ticket/buy", setTransaction(appContainer.DB()), BuyTicket(ticketServiceGetter))
+	router.Post("/ticket/agency-buy", setTransaction(appContainer.DB()), BuyAgencyTicket(ticketServiceGetter))
+	router.Post("/ticket/cancel/:id", setTransaction(appContainer.DB()), CancelTicket(ticketServiceGetter))
 }
