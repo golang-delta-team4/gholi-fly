@@ -1,6 +1,5 @@
 # ------------------------ Base Stage ------------------------
     FROM golang:1.23 AS base
-    RUN go install github.com/air-verse/air@v1.61.5
 
     ENV GO111MODULE=on \
         CGO_ENABLED=0 \
@@ -12,6 +11,9 @@
     
     COPY go.mod go.sum ./
     RUN go mod download
+
+    # Install air in the base stage to use cache
+    RUN go install github.com/air-verse/air@v1.61.5
     
     # ------------------------ Development Stage ------------------------
     FROM base AS dev
