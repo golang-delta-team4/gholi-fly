@@ -8,6 +8,7 @@ import (
 	rolePort "user-service/internal/role/port"
 	"user-service/internal/user"
 	userPort "user-service/internal/user/port"
+	"user-service/pkg/adapters/clients/grpc"
 	"user-service/pkg/adapters/storage"
 	"user-service/pkg/adapters/storage/types"
 	"user-service/pkg/postgres"
@@ -72,7 +73,7 @@ func NewApp(cfg config.Config) (App, error) {
 	if err := a.setDB(); err != nil {
 		return nil, err
 	}
-	a.userService = user.NewService(storage.NewUserRepo(a.db))
+	a.userService = user.NewService(storage.NewUserRepo(a.db), grpc.NewGRPCBankClient(cfg.BankGRPCConfig.Host, int(cfg.BankGRPCConfig.Port)))
 	a.permissionService = permission.NewService(storage.NewPermissionRepo(a.db))
 	a.roleService = role.NewService(storage.NewRoleRepo(a.db), a.permissionService, a.userService)
 	return a, nil

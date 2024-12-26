@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package bank;
+
+option go_package = "user-service/pkg/pb";
+
+// Common Enums
+enum ResponseStatus {
+    FAILED = 0;
+    SUCCESS = 1;
+}
+
+// Wallet Service Definitions
+enum WalletType {
+    UNKNOWN = 0;
+    PERSON = 1;
+    COMPANY = 2;
+    APP = 3;
+}
+
+message Wallet {
+    string id = 1;
+    string owner_id = 2;
+    WalletType type = 3;
+    uint64 balance = 4;
+    string created_at = 5;
+    string updated_at = 6;
+}
+
+message CreateWalletRequest {
+    string owner_id = 1;
+    WalletType type = 2;
+}
+
+message CreateWalletResponse {
+    ResponseStatus status = 1;
+    Wallet wallet = 2;
+    string message = 3;
+            
+}
+
+// Wallet Service
+service WalletService {
+    rpc CreateWallet(CreateWalletRequest) returns (CreateWalletResponse);
+}

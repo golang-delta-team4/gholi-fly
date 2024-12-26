@@ -4,6 +4,7 @@ type Config struct {
 	DB     DBConfig     `mapstructure:"db"`
 	Server ServerConfig `mapstructure:"server"`
 	Redis  RedisConfig  `mapstructure:"redis"`
+	BankGRPCConfig BankGRPCConfig `mapstructure:"bankGRPC"` 
 }
 
 type DBConfig struct {
@@ -25,6 +26,11 @@ type ServerConfig struct {
 }
 
 type RedisConfig struct {
+	Host string `mapstructure:"host"`
+	Port uint   `mapstructure:"port"`
+}
+
+type BankGRPCConfig struct {
 	Host string `mapstructure:"host"`
 	Port uint   `mapstructure:"port"`
 }

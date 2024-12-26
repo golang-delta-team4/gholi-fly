@@ -6,6 +6,8 @@ import (
 	"time"
 	"user-service/internal/user/domain"
 	userPort "user-service/internal/user/port"
+	"user-service/pkg/adapters/clients/grpc/pb"
+	bankClientPort "user-service/pkg/adapters/clients/grpc/port"
 	"user-service/pkg/adapters/storage/mapper"
 	"user-service/pkg/adapters/storage/types"
 
@@ -20,11 +22,13 @@ var (
 
 type service struct {
 	repo userPort.Repo
+	bankClient bankClientPort.GRPCBankClient
 }
 
-func NewService(repo userPort.Repo) userPort.Service {
+func NewService(repo userPort.Repo, bankClient bankClientPort.GRPCBankClient) userPort.Service {
 	return &service{
 		repo: repo,
+		bankClient: bankClient,
 	}
 }
 
@@ -38,6 +42,10 @@ func (us *service) SignUp(ctx context.Context, user *domain.User) (uuid.UUID, er
 	}
 	err = us.repo.Create(ctx, *storageUser)
 	if err != nil {
+		return uuid.Nil, err
+	}
+	resp, err := us.bankClient.CreateUserWallet(storageUser.UUID.String())
+	if resp.Status == pb.ResponseStatus_FAILED {
 		return uuid.Nil, err
 	}
 	return storageUser.UUID, nil
