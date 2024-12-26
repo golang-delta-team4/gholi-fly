@@ -1,7 +1,6 @@
 package domain
 
 import (
-	hotelDomain "gholi-fly-hotel/internal/hotel/domain"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,7 +14,7 @@ type (
 type Room struct {
 	ID          RoomID
 	UUID        RoomUUID
-	HotelID     hotelDomain.HotelUUID
+	HotelID     uuid.UUID
 	RoomNumber  uint
 	Floor       uint
 	BasePrice   uint

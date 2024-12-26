@@ -11,6 +11,7 @@ type Hotel struct {
 	OwnerID uuid.UUID `gorm:"type:uuid;not null;required"`
 	Name    string    `gorm:"unique;not null;required"`
 	City    string    `gorm:"not null;required"`
+	Rooms   []Room    `gorm:"foreignKey:HotelID;references:UUID;constraint:OnDelete:CASCADE"`
 }
 
 func (h *Hotel) BeforeCreate(tx *gorm.DB) error {

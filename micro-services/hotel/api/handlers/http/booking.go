@@ -32,12 +32,22 @@ func CreateBookingByRoomID(svcGetter ServiceGetter[*service.BookingService]) fib
 	}
 }
 
-// func GetAllBookingsByRoomID(svcGetter ServiceGetter[*service.BookingService]) fiber.Handler {
-// 	return func(c *fiber.Ctx) error {
-// 		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
+func GetAllBookingsByRoomID(svcGetter ServiceGetter[*service.BookingService]) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
+		roomId := c.Params("room_id")
 
-// 	}
-// }
+		resp, err := svc.GetAllBookingsByRoomID(c.UserContext(), roomId)
+		if err != nil {
+			if errors.Is(err, service.ErrBookingNotFound) {
+				return fiber.NewError(fiber.StatusBadRequest, err.Error())
+			}
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+
+		return c.JSON(resp)
+	}
+}
 
 // func GetAllBookingsByUserID(svcGetter ServiceGetter[*service.BookingService]) fiber.Handler {
 // 	return func(c *fiber.Ctx) error {

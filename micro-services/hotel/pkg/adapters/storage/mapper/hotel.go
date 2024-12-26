@@ -2,6 +2,7 @@ package mapper
 
 import (
 	"gholi-fly-hotel/internal/hotel/domain"
+	roomDomain "gholi-fly-hotel/internal/room/domain"
 	"gholi-fly-hotel/pkg/adapters/storage/types"
 	"gholi-fly-hotel/pkg/fp"
 
@@ -41,11 +42,17 @@ func BatchHotelDomain2Storage(domains []domain.Hotel) []types.Hotel {
 }
 
 func HotelStorage2Domain(hotel types.Hotel) *domain.Hotel {
+	var rooms []roomDomain.Room
+	if len(hotel.Rooms) > 0 {
+		rooms = BatchRoomStorage2Domain(hotel.Rooms)
+
+	}
 	return &domain.Hotel{
 		UUID:      domain.HotelUUID(hotel.UUID),
 		OwnerID:   hotel.OwnerID,
 		Name:      hotel.Name,
 		City:      hotel.City,
+		Rooms:     rooms,
 		CreatedAt: hotel.CreatedAt,
 		UpdatedAt: hotel.UpdatedAt,
 		DeletedAt: hotel.DeletedAt.Time,
@@ -53,11 +60,17 @@ func HotelStorage2Domain(hotel types.Hotel) *domain.Hotel {
 }
 
 func hotelStorage2Domain(hotel types.Hotel) domain.Hotel {
+	var rooms []roomDomain.Room
+	if len(hotel.Rooms) > 0 {
+		rooms = BatchRoomStorage2Domain(hotel.Rooms)
+
+	}
 	return domain.Hotel{
 		UUID:      domain.HotelUUID(hotel.UUID),
 		OwnerID:   hotel.OwnerID,
 		Name:      hotel.Name,
 		City:      hotel.City,
+		Rooms:     rooms,
 		CreatedAt: hotel.CreatedAt,
 		UpdatedAt: hotel.UpdatedAt,
 		DeletedAt: hotel.DeletedAt.Time,

@@ -3,6 +3,8 @@ package domain
 import (
 	"time"
 
+	roomDomain "gholi-fly-hotel/internal/room/domain"
+
 	"github.com/google/uuid"
 )
 
@@ -21,6 +23,7 @@ type Hotel struct {
 	OwnerID   uuid.UUID
 	Name      string
 	City      string
+	Rooms     []roomDomain.Room
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt time.Time

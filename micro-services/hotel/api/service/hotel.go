@@ -56,10 +56,21 @@ func (s *HotelService) GetAllHotels(ctx context.Context) (*pb.GetAllHotelsRespon
 
 	var hotelList []*pb.Hotel
 	for _, h := range hotels {
+		var rooms []*pb.Room
+		for _, r := range h.Rooms {
+			rooms = append(rooms, &pb.Room{
+				Id:          r.UUID.String(),
+				RoomNumber:  int32(r.RoomNumber),
+				Floor:       int32(r.Floor),
+				BasePrice:   int32(r.BasePrice),
+				AgencyPrice: int32(r.AgencyPrice),
+			})
+		}
 		hotelList = append(hotelList, &pb.Hotel{
-			Id:   h.UUID.String(),
-			Name: h.Name,
-			City: h.City,
+			Id:    h.UUID.String(),
+			Name:  h.Name,
+			City:  h.City,
+			Rooms: rooms,
 		})
 	}
 
@@ -80,10 +91,21 @@ func (s *HotelService) GetAllHotelsByOwnerID(ctx context.Context, ownerID string
 
 	var hotelList []*pb.Hotel
 	for _, h := range hotels {
+		var rooms []*pb.Room
+		for _, r := range h.Rooms {
+			rooms = append(rooms, &pb.Room{
+				Id:          r.UUID.String(),
+				RoomNumber:  int32(r.RoomNumber),
+				Floor:       int32(r.Floor),
+				BasePrice:   int32(r.BasePrice),
+				AgencyPrice: int32(r.AgencyPrice),
+			})
+		}
 		hotelList = append(hotelList, &pb.Hotel{
-			Id:   h.UUID.String(),
-			Name: h.Name,
-			City: h.City,
+			Id:    h.UUID.String(),
+			Name:  h.Name,
+			City:  h.City,
+			Rooms: rooms,
 		})
 	}
 
@@ -101,11 +123,21 @@ func (s *HotelService) GetHotelByID(ctx context.Context, hotelID string) (*pb.Ho
 	if err != nil {
 		return nil, err
 	}
-
+	var rooms []*pb.Room
+	for _, r := range hotel.Rooms {
+		rooms = append(rooms, &pb.Room{
+			Id:          r.UUID.String(),
+			RoomNumber:  int32(r.RoomNumber),
+			Floor:       int32(r.Floor),
+			BasePrice:   int32(r.BasePrice),
+			AgencyPrice: int32(r.AgencyPrice),
+		})
+	}
 	return &pb.Hotel{
-		Id:   hotel.UUID.String(),
-		Name: hotel.Name,
-		City: hotel.City,
+		Id:    hotel.UUID.String(),
+		Name:  hotel.Name,
+		City:  hotel.City,
+		Rooms: rooms,
 	}, nil
 }
 
