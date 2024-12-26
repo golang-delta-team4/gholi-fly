@@ -20,7 +20,7 @@ message BookingCreateRequest {
 }
 
 message BookingCreateResponse {
-    string bookingId = 1 [json_name = "bookingId"];
+    string reservationId = 1 [json_name = "reservationId"];
 }
 
 message GetAllBookingResponse {
