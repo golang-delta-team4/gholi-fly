@@ -70,9 +70,16 @@ func GetRoomByID(svcGetter ServiceGetter[*service.RoomService]) fiber.Handler {
 // 	}
 // }
 
-// func DeleteRoomByID(svcGetter ServiceGetter[*service.RoomService]) fiber.Handler {
-// 	return func(c *fiber.Ctx) error {
-// 		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
+func DeleteRoomByID(svcGetter ServiceGetter[*service.RoomService]) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
+		hotelID := c.Params("id")
 
-// 	}
-// }
+		resp, err := svc.DeleteRoom(c.UserContext(), hotelID)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+
+		return c.JSON(resp)
+	}
+}

@@ -32,7 +32,7 @@ func (r *hotelRepo) Create(ctx context.Context, hotelDomain domain.Hotel) (domai
 
 func (r *hotelRepo) Get(ctx context.Context) ([]domain.Hotel, error) {
 	var hotels []types.Hotel
-	err := r.db.Table("hotels").WithContext(ctx).Find(&hotels).Error
+	err := r.db.Table("hotels").WithContext(ctx).Preload("Rooms").Find(&hotels).Error
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (r *hotelRepo) Get(ctx context.Context) ([]domain.Hotel, error) {
 
 func (r *hotelRepo) GetByOwnerID(ctx context.Context, ownerID uuid.UUID) ([]domain.Hotel, error) {
 	var hotels []types.Hotel
-	err := r.db.Table("hotels").WithContext(ctx).Where("owner_id = ?", ownerID).Find(&hotels).Error
+	err := r.db.Table("hotels").WithContext(ctx).Preload("Rooms").Where("owner_id = ?", ownerID).Find(&hotels).Error
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (r *hotelRepo) GetByOwnerID(ctx context.Context, ownerID uuid.UUID) ([]doma
 func (r *hotelRepo) GetByID(ctx context.Context, hotelID domain.HotelUUID) (*domain.Hotel, error) {
 	var hotel types.Hotel
 
-	err := r.db.Table("hotels").WithContext(ctx).Where("uuid = ?", hotelID).First(&hotel).Error
+	err := r.db.Table("hotels").WithContext(ctx).Preload("Rooms").Where("uuid = ?", hotelID).First(&hotel).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}

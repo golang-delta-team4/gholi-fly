@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "room.proto";
+
 option go_package = "gholi-fly-hotel/api/pb";
 
 message HotelCreateRequest {
@@ -42,4 +44,6 @@ message Hotel {
     string id = 1 [json_name = "id"];
     string name = 2 [json_name = "name"];
     string city = 3 [json_name = "city"];
+    repeated Room rooms = 4 [json_name = "rooms"];
 }
+

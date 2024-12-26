@@ -19,6 +19,12 @@ message GetAllRoomsResponse {
     repeated Room rooms = 1 [json_name = "rooms"];
 }
 
+message DeleteRoomRequest {
+    string roomId = 1 [json_name = "roomId"];
+}
+
+message DeleteRoomResponse {}
+
 message Room {
     string id = 1 [json_name = "id"];
     string hotelId = 2 [json_name = "hotelId"];

@@ -63,32 +63,33 @@ func (s *BookingService) CreateBooking(ctx context.Context, req *pb.BookingCreat
 	}, nil
 }
 
-// func (s *RoomService) GetAllRooms(ctx context.Context, hotelID string) (*pb.GetAllRoomsResponse, error) {
-// 	hotelUUID, err := uuid.Parse(hotelID)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	rooms, err := s.svc.GetAllRoomsByHotelID(ctx, hotelUUID)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func (s *BookingService) GetAllBookingsByRoomID(ctx context.Context, roomID string) (*pb.GetAllBookingResponse, error) {
+	roomUUID, err := uuid.Parse(roomID)
+	if err != nil {
+		return nil, err
+	}
+	bookings, err := s.svc.GetAllBookingsByRoomID(ctx, roomUUID)
+	if err != nil {
+		return nil, err
+	}
 
-// 	var roomList []*pb.Room
-// 	for _, r := range rooms {
-// 		roomList = append(roomList, &pb.Room{
-// 			Id:          r.UUID.String(),
-// 			HotelId:     r.HotelID.String(),
-// 			RoomNumber:  int32(r.RoomNumber),
-// 			Floor:       int32(r.Floor),
-// 			BasePrice:   int32(r.BasePrice),
-// 			AgencyPrice: int32(r.AgencyPrice),
-// 		})
-// 	}
+	var bookingList []*pb.Booking
+	for _, r := range bookings {
+		bookingList = append(bookingList, &pb.Booking{
+			Id:      r.UUID.String(),
+			HotelId: r.HotelID.String(),
+			// UserId:   r.UserID.String(),
+			// AgencyId: r.AgencyID.String(),
+			CheckIn:  r.CheckIn.Format("2006-01-02"),
+			CheckOut: r.CheckOut.Format("2006-01-02"),
+			// BookingStatus: int32(r.Status),
+		})
+	}
 
-// 	return &pb.GetAllRoomsResponse{
-// 		Rooms: roomList,
-// 	}, nil
-// }
+	return &pb.GetAllBookingResponse{
+		Bookings: bookingList,
+	}, nil
+}
 
 // func (s *RoomService) GetRoomByID(ctx context.Context, roomID string) (*pb.Room, error) {
 // 	roomUUID, err := uuid.Parse(roomID)

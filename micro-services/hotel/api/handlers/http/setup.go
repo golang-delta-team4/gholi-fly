@@ -50,14 +50,14 @@ func registerRoomAPI(appContainer app.App, router fiber.Router) {
 	roomRouter.Get("/hotel/:hotel_id", setTransaction(appContainer.DB()), GetAllRoomsByHotelID(roomlSvcGetter))
 	roomRouter.Get("/:id", setTransaction(appContainer.DB()), GetRoomByID(roomlSvcGetter))
 	// roomRouter.Put("/:id", setTransaction(appContainer.DB()), UpdateRoomByID(roomlSvcGetter))
-	// roomRouter.Delete("/:id", setTransaction(appContainer.DB()), DeleteRoomByID(roomlSvcGetter))
+	roomRouter.Delete("/:id", setTransaction(appContainer.DB()), DeleteRoomByID(roomlSvcGetter))
 }
 
 func registerBookingAPI(appContainer app.App, router fiber.Router) {
 	bookingSvcGetter := bookingServiceGetter(appContainer)
 	bookingRouter := router.Group("/booking")
 	bookingRouter.Post("/:room_id", setTransaction(appContainer.DB()), CreateBookingByRoomID(bookingSvcGetter))
-	// bookingRouter.Get("/room/:room_id", setTransaction(appContainer.DB()), GetAllBookingsByRoomID(hotelSvcGetter))
+	bookingRouter.Get("/room/:room_id", setTransaction(appContainer.DB()), GetAllBookingsByRoomID(bookingSvcGetter))
 	// bookingRouter.Get("/user/:user_id", setTransaction(appContainer.DB()), GetAllBookingsByUserID(hotelSvcGetter))
 	// bookingRouter.Get("/:id", setTransaction(appContainer.DB()), GetBookingByID(hotelSvcGetter))
 	// bookingRouter.Put("/:id", setTransaction(appContainer.DB()), UpdateBookingByID(hotelSvcGetter))

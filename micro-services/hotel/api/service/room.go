@@ -97,3 +97,16 @@ func (s *RoomService) GetRoomByID(ctx context.Context, roomID string) (*pb.Room,
 		AgencyPrice: int32(room.AgencyPrice),
 	}, nil
 }
+
+func (s *RoomService) DeleteRoom(ctx context.Context, roomID string) (*pb.DeleteRoomResponse, error) {
+	roomUUID, err := uuid.Parse(roomID)
+	if err != nil {
+		return nil, err
+	}
+	err = s.svc.DeleteRoom(ctx, domain.RoomUUID(roomUUID))
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.DeleteRoomResponse{}, nil
+}
