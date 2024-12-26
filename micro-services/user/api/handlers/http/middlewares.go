@@ -1,7 +1,7 @@
 package http
 
 import (
-	"user-service/pkg/jwt"
+	"github.com/golang-delta-team4/gholi-fly/shared/jwt"
 
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
