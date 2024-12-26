@@ -6,6 +6,7 @@ import (
 
 	"gholi-fly-hotel/internal/booking/domain"
 	bookingPort "gholi-fly-hotel/internal/booking/port"
+	hotelDomain "gholi-fly-hotel/internal/hotel/domain"
 	roomDomain "gholi-fly-hotel/internal/room/domain"
 	"gholi-fly-hotel/pkg/adapters/storage/mapper"
 	"gholi-fly-hotel/pkg/adapters/storage/types"
@@ -22,20 +23,28 @@ func NewBookingRepo(db *gorm.DB) bookingPort.Repo {
 	return &bookingRepo{db: db}
 }
 
-func (r *bookingRepo) CreateByRoomID(ctx context.Context, bookingDomain domain.Booking, roomID roomDomain.RoomUUID) (domain.BookingUUID, error) {
+func (r *bookingRepo) CreateByHotelID(ctx context.Context, bookingDomain domain.Booking, hotelID hotelDomain.HotelUUID) (domain.BookingUUID, error) {
 	booking := mapper.BookingDomain2Storage(bookingDomain)
-	booking.RoomID = roomID
+	booking.HotelID = hotelID
+	booking.RoomIDs = bookingDomain.RoomIDs
+
 	err := r.db.Table("bookings").WithContext(ctx).Create(booking).Error
 	if err != nil {
 		return domain.BookingUUID{}, err
 	}
+
 	return domain.BookingUUID(booking.UUID), nil
 }
 
 func (r *bookingRepo) GetByID(ctx context.Context, bookingID domain.BookingUUID) (*domain.Booking, error) {
 	var booking types.Booking
 
-	err := r.db.Table("bookings").WithContext(ctx).Where("uuid = ?", bookingID).First(&booking).Error
+	err := r.db.Table("bookings").
+		Preload("Hotel").
+		WithContext(ctx).
+		Where("uuid = ?", bookingID).
+		First(&booking).Error
+
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}

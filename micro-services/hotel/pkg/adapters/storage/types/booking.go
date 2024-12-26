@@ -9,11 +9,10 @@ import (
 
 type Booking struct {
 	gorm.Model
-	UUID     uuid.UUID `gorm:"unique;primaryKey"`
-	HotelID  uuid.UUID `gorm:"type:uuid;not null;references:UUID"`
-	Hotel    Hotel     `gorm:"foreignKey:HotelID;references:UUID;constraint:OnDelete:CASCADE"`
-	RoomID   uuid.UUID `gorm:"type:uuid;not null;references:UUID"`
-	Room     Room      `gorm:"foreignKey:RoomID;references:UUID;constraint:OnDelete:CASCADE"`
+	UUID     uuid.UUID   `gorm:"unique;primaryKey"`
+	HotelID  uuid.UUID   `gorm:"type:uuid;not null;references:UUID"`
+	Hotel    Hotel       `gorm:"foreignKey:HotelID;references:UUID;constraint:OnDelete:CASCADE"`
+	RoomIDs  []uuid.UUID `gorm:"type:uuid[]"`
 	UserID   *uuid.UUID
 	AgencyID *uuid.UUID
 	CheckIn  time.Time

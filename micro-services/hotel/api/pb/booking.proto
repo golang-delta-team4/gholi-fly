@@ -14,6 +14,9 @@ message BookingCreateRequest {
     string checkIn = 1 [json_name = "checkIn"];
     string checkOut = 2 [json_name = "checkOut"];
     string hotelId = 3 [json_name = "hotelId"];
+    repeated string roomIds = 4 [json_name = "roomIds"];  // Add room IDs field
+    string userId = 5 [json_name = "userId"];             // Optional user ID
+    string agencyId = 6 [json_name = "agencyId"];        // Optional agency ID
 }
 
 message BookingCreateResponse {
@@ -32,4 +35,5 @@ message Booking {
     string checkIn = 5 [json_name = "checkIn"];
     string checkOut = 6 [json_name = "checkOut"];
     BookingStatus bookingStatus = 7 [json_name = "bookingStatus"];
+    repeated string roomIds = 8 [json_name = "roomIds"];  // Add room IDs field
 }

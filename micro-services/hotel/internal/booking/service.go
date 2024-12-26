@@ -5,6 +5,7 @@ import (
 	"errors"
 	bookingDomain "gholi-fly-hotel/internal/booking/domain"
 	"gholi-fly-hotel/internal/booking/port"
+	hotelDomain "gholi-fly-hotel/internal/hotel/domain"
 	roomDomain "gholi-fly-hotel/internal/room/domain"
 
 	"github.com/google/uuid"
@@ -29,8 +30,8 @@ func NewService(repo port.Repo) port.Service {
 }
 
 // CreateBookingByRoomID creates a new booking by room ID
-func (s *service) CreateBookingByRoomID(ctx context.Context, booking bookingDomain.Booking, roomID roomDomain.RoomUUID) (bookingDomain.BookingUUID, error) {
-	bookingID, err := s.repo.CreateByRoomID(ctx, booking, roomID)
+func (s *service) CreateBookingByHotelID(ctx context.Context, booking bookingDomain.Booking, hotelID hotelDomain.HotelUUID) (bookingDomain.BookingUUID, error) {
+	bookingID, err := s.repo.CreateByHotelID(ctx, booking, hotelID)
 	if err != nil {
 		return bookingDomain.BookingUUID{}, ErrBookingCreation
 	}

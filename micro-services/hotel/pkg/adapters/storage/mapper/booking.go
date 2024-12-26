@@ -18,7 +18,6 @@ func BookingDomain2Storage(bookingDomain domain.Booking) *types.Booking {
 		},
 		UUID:     bookingDomain.UUID,
 		HotelID:  bookingDomain.HotelID,
-		RoomID:   bookingDomain.RoomID,
 		UserID:   bookingDomain.UserID,
 		AgencyID: bookingDomain.AgencyID,
 		CheckIn:  bookingDomain.CheckIn,
@@ -37,7 +36,6 @@ func bookingDomain2Storage(bookingDomain domain.Booking) types.Booking {
 		},
 		UUID:     bookingDomain.UUID,
 		HotelID:  bookingDomain.HotelID,
-		RoomID:   bookingDomain.RoomID,
 		UserID:   bookingDomain.UserID,
 		AgencyID: bookingDomain.AgencyID,
 		CheckIn:  bookingDomain.CheckIn,
@@ -51,11 +49,16 @@ func BatchBookingDomain2Storage(domains []domain.Booking) []types.Booking {
 }
 
 func BookingStorage2Domain(booking types.Booking) *domain.Booking {
+	// roomIDs := make([]uuid.UUID, len(booking.Rooms))
+	// for i, room := range booking.Rooms {
+	// 	roomIDs[i] = room.UUID
+	// }
+
 	return &domain.Booking{
-		ID:        domain.BookingID(booking.ID),
-		UUID:      domain.BookingUUID(booking.UUID),
-		HotelID:   booking.HotelID,
-		RoomID:    booking.RoomID,
+		ID:      domain.BookingID(booking.ID),
+		UUID:    domain.BookingUUID(booking.UUID),
+		HotelID: booking.HotelID,
+		// RoomIDs:   roomIDs, // Convert from Rooms to RoomIDs
 		UserID:    booking.UserID,
 		AgencyID:  booking.AgencyID,
 		CheckIn:   booking.CheckIn,
@@ -68,11 +71,16 @@ func BookingStorage2Domain(booking types.Booking) *domain.Booking {
 }
 
 func bookingStorage2Domain(booking types.Booking) domain.Booking {
+	// roomIDs := make([]uuid.UUID, len(booking.Rooms))
+	// for i, room := range booking.Rooms {
+	// 	roomIDs[i] = room.UUID
+	// }
+
 	return domain.Booking{
-		ID:        domain.BookingID(booking.ID),
-		UUID:      domain.BookingUUID(booking.UUID),
-		HotelID:   booking.HotelID,
-		RoomID:    booking.RoomID,
+		ID:      domain.BookingID(booking.ID),
+		UUID:    domain.BookingUUID(booking.UUID),
+		HotelID: booking.HotelID,
+		// RoomIDs:   roomIDs, // Convert from Rooms to RoomIDs
 		UserID:    booking.UserID,
 		AgencyID:  booking.AgencyID,
 		CheckIn:   booking.CheckIn,

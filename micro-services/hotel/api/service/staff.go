@@ -37,7 +37,7 @@ func (s *StaffService) CreateStaff(ctx context.Context, req *pb.StaffCreateReque
 	staffId, err := s.svc.CreateStaffByHotelID(ctx, domain.Staff{
 		HotelID:   hotelUUID,
 		Name:      req.Name,
-		StaffType: uint8(req.StaffType),
+		StaffType: domain.StaffType(req.StaffType), // Use explicit type conversion
 	}, hotelUUID)
 
 	if err != nil {
@@ -64,7 +64,7 @@ func (s *StaffService) GetAllStaffs(ctx context.Context, hotelId string) (*pb.Ge
 		staffList = append(staffList, &pb.Staff{
 			Id:        h.UUID.String(),
 			Name:      h.Name,
-			StaffType: int32(h.StaffType),
+			StaffType: pb.StaffType(h.StaffType), // Convert to pb.StaffType instead of int32
 		})
 	}
 
@@ -86,6 +86,6 @@ func (s *StaffService) GetStaffByID(ctx context.Context, staffID string) (*pb.St
 	return &pb.Staff{
 		Id:        staff.UUID.String(),
 		Name:      staff.Name,
-		StaffType: int32(staff.StaffType),
+		StaffType: pb.StaffType(staff.StaffType), // Convert to pb.StaffType instead of int32
 	}, nil
 }

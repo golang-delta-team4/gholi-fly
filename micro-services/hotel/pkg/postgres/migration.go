@@ -18,7 +18,8 @@ func Migrate(db *gorm.DB) error {
 		&types.Staff{},
 		&types.Room{},
 		&types.Booking{},
-		&types.Invoice{},
+		// &types.BookingRoom{},
+		// &types.Invoice{},
 	); err != nil {
 		return fmt.Errorf("failed to migrate database: %w", err)
 	}
