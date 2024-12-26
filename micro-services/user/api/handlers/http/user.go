@@ -25,7 +25,7 @@ func SignUp(userService *service.UserService) fiber.Handler {
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
-		ok := presenter.PasswordValidation(req.Email)
+		ok := presenter.PasswordValidation(req.Password)
 		if !ok {
 			return fiber.NewError(fiber.StatusBadRequest, errors.New("invalid password").Error())
 		}
