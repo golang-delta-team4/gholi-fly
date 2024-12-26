@@ -65,6 +65,95 @@ services:
     #   retries: 5
     restart: always
 
+  gholi-maps-api:
+    container_name: gholi-maps-api-dev
+    build:
+      context: ./micro-services/maps
+      dockerfile: build/Dockerfile
+      target: dev
+    volumes:
+      - ./micro-services/maps:/gholi-fly
+    ports:
+      - "8082:8080"
+    depends_on:
+      gholi-db:
+        condition: service_healthy
+      gholi-redis:
+        condition: service_healthy
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    restart: always
+
+  gholi-transportation-api:
+    container_name: gholi-transportation-api-dev
+    build:
+      context: ./micro-services/transportCompany
+      dockerfile: build/Dockerfile
+      target: dev
+    volumes:
+      - ./micro-services/transportCompany:/gholi-fly
+    ports:
+      - "8084:8080"
+    depends_on:
+      gholi-db:
+        condition: service_healthy
+      gholi-redis:
+        condition: service_healthy
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    restart: always
+
+  gholi-vehicle-api:
+    container_name: gholi-vehicle-api-dev
+    build:
+      context: ./micro-services/vehicle
+      dockerfile: build/Dockerfile
+      target: dev
+    volumes:
+      - ./micro-services/vehicle:/gholi-fly
+    ports:
+      - "8085:8080"
+    depends_on:
+      gholi-db:
+        condition: service_healthy
+      gholi-redis:
+        condition: service_healthy
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    restart: always
+
+  # gholi-agency-api:
+  #   container_name: gholi-agency-api-dev
+  #   build:
+  #     context: ./micro-services/agency
+  #     dockerfile: build/Dockerfile
+  #     target: dev
+  #   volumes:
+  #     - ./micro-services/agency:/gholi-fly
+  #   ports:
+  #     - "8086:8080"
+  #   depends_on:
+  #     gholi-db:
+  #       condition: service_healthy
+  #     gholi-redis:
+  #       condition: service_healthy
+  #   # healthcheck:
+  #   #   test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+  #   #   interval: 10s
+  #   #   timeout: 5s
+  #   #   retries: 5
+  #   restart: always
+
+
   gholi-db:
     image: postgres:14.8
     container_name: gholi-db-dev
