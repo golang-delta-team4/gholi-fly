@@ -26,7 +26,7 @@
     FROM base AS builder
     
     COPY . .
-    RUN go build -o ./vehicle-api ./cmd/main.go
+    RUN go build -o ./transportation-api ./cmd/main.go
     
     # ------------------------ Production Stage ------------------------
     FROM alpine:latest AS prod
@@ -36,6 +36,6 @@
     
     WORKDIR /gholi-fly
     
-    COPY --from=builder /gholi-fly/vehicle-api ./vehicle-api
-    CMD ["./vehicle-api", "--config", "/etc/config.json"]
+    COPY --from=builder /gholi-fly/transportation-api ./transportation-api
+    CMD ["./transportation-api", "--config", "/etc/config.json"]
     
