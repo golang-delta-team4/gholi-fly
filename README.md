@@ -76,3 +76,4 @@ http://localhost/api/v1/
 
 - **Databases**: PostgreSQL and Redis are started automatically via Docker Compose.
 
+
