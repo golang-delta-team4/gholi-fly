@@ -12,11 +12,11 @@
     COPY go.mod go.sum ./
     RUN go mod download
     
+    RUN go install github.com/air-verse/air@v1.61.5
     # ------------------------ Development Stage ------------------------
     FROM base AS dev
     
     COPY . .
-    RUN go install github.com/air-verse/air@v1.61.5
     
     CMD ["air", "-c", ".air.toml"]
     
