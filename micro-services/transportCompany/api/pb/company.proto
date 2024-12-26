@@ -98,3 +98,12 @@ message UpdateTripRequest {
 message GetTripsResponse {
     repeated GetTripResponse trips = 1 [json_name = "trips"];
 }
+
+message BuyTicketRequest {
+    string tripId = 1 [json_name = "tripId"];
+}
+
+message BuyTicketResponse {
+    string ticketId = 1 [json_name = "ticketId"];
+    string message = 2 [json_name = "message"];
+}

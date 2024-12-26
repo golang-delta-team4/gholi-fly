@@ -9,7 +9,7 @@ import (
 
 type Ticket struct {
 	Id        uuid.UUID  `gorm:"type:uuid;primaryKey"`
-	TripID    uint       `gorm:"not null"`
+	TripID    uuid.UUID  `gorm:"not null"`
 	Trip      *Trip      `gorm:"foreignKey:TripID; constraint:OnDelete:CASCADE;"`
 	UserID    *uuid.UUID `gorm:"type:uuid;default:NULL"`
 	Price     float64
