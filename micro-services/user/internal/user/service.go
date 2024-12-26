@@ -45,6 +45,9 @@ func (us *service) SignUp(ctx context.Context, user *domain.User) (uuid.UUID, er
 		return uuid.Nil, err
 	}
 	resp, err := us.bankClient.CreateUserWallet(storageUser.UUID.String())
+	if err != nil {
+		return uuid.Nil, err
+	}
 	if resp.Status == pb.ResponseStatus_FAILED {
 		return uuid.Nil, err
 	}
