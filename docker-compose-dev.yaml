@@ -21,6 +21,28 @@ services:
       retries: 5
     restart: always
 
+  gholi-users-api:
+    container_name: gholi-users-api-dev
+    build:
+      context: ./micro-services/user
+      dockerfile: build/Dockerfile
+      target: dev
+    volumes:
+      - ./micro-services/user:/gholi-fly
+    ports:
+      - "8083:8080"
+    depends_on:
+      gholi-db:
+        condition: service_healthy
+      gholi-redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
   gholi-db:
     image: postgres:14.8
     container_name: gholi-db-dev
@@ -66,11 +88,14 @@ services:
     depends_on:
       gholi-hotels-api:
         condition: service_healthy
+      gholi-users-api:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/api/v1/hotel/health"]
       interval: 10s
       timeout: 5s
       retries: 5
+    
 
 volumes:
   gholi-db-volume:
