@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+option go_package = "gholi-fly-bank/api/pb";
+
+package factor;
+
+// Factor message
+enum FactorType {
+  FACTOR_TYPE_UNKNOWN = 0;
+  FACTOR_TYPE_SIMPLE = 1;
+  FACTOR_TYPE_AGGREGATED = 2;
+}
+
+message Factor {
+  string id = 1;                     // UUID of the factor
+  string source_service = 2;         // Service generating the factor
+  string external_id = 3;            // Unique ID in the source service
+  string booking_id = 4;             // Associated booking ID
+  uint64 total_amount = 5;           // Total amount for the factor
+  repeated Distribution distributions = 6; // Amount distribution information
+  string details = 7; // JSON-encoded details.
+  bool instant_payment = 8;          // Should the payment be made instantly?
+  bool is_paid = 9;                  // Has the factor been paid?
+  string created_at = 10;             // Timestamp when the factor was created
+  string updated_at = 11;            // Timestamp when the factor was last updated
+}
+
+message Distribution {
+  string user_id = 1;                // UUID of the user to receive the amount
+  uint64 amount = 2;                 // Amount to be transferred to this user
+}
+
+// Request to create a factor
+message CreateFactorRequest {
+  FactorType factor_type = 1;        // Type of the factor (simple or aggregated)
+  Factor factor = 2;                // Factor details
+}
+
+// Response for creating a factor
+message CreateFactorResponse {
+  ResponseStatus status = 1;         // SUCCESS or FAILURE
+  string message = 2;                // Optional response message
+}
+
+// Request to apply and distribute a factor
+message ApplyFactorRequest {
+  string factor_id = 1;              // UUID of the factor to be applied
+}
+
+// Response for applying a factor
+message ApplyFactorResponse {
+  ResponseStatus status = 1;         // SUCCESS or FAILURE
+  string message = 2;                // Optional response message
+}
+
+// Request to get factors by ID or filters
+message GetFactorsRequest {
+  string factor_id = 1;              // Optional specific factor ID
+  string booking_id = 2;             // Optional filter by booking ID
+  bool is_paid = 3;                  // Optional filter by payment status
+}
+
+// Response for getting factors
+message GetFactorsResponse {
+  ResponseStatus status = 1;         // SUCCESS or FAILURE
+  repeated Factor factors = 2;       // List of matching factors
+}
+
+// Response status
+enum ResponseStatus {
+  SUCCESS = 0;
+  FAILURE = 1;
+}
+
+// Factor service definition
+service FactorService {
+  rpc CreateFactor(CreateFactorRequest) returns (CreateFactorResponse);
+  rpc ApplyFactor(ApplyFactorRequest) returns (ApplyFactorResponse);
+  rpc GetFactors(GetFactorsRequest) returns (GetFactorsResponse);
+}
