@@ -9,21 +9,21 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func CreateBookingByRoomID(svcGetter ServiceGetter[*service.BookingService]) fiber.Handler {
+func CreateBookingByHotelID(svcGetter ServiceGetter[*service.BookingService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		roomID := c.Params("room_id")
+		hotelID := c.Params("hotel_id")
 		svc := svcGetter(c.UserContext())
 		var req pb.BookingCreateRequest
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.ErrBadRequest
 		}
 
-		resp, err := svc.CreateBooking(c.UserContext(), &req, roomID)
+		resp, err := svc.CreateBooking(c.UserContext(), &req, hotelID)
 		if err != nil {
 			if errors.Is(err, service.ErrBookingCreationValidation) || errors.Is(err, service.ErrBookingCreationDuplicate) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())
 			}
-
+			// log.Error("HEEEEEEEEREEEEEE", err)
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 

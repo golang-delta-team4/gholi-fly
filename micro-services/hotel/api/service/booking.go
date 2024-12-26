@@ -30,15 +30,22 @@ var (
 	ErrBookingNotFound           = booking.ErrBookingNotFound
 )
 
-func (s *BookingService) CreateBooking(ctx context.Context, req *pb.BookingCreateRequest, roomId string) (*pb.BookingCreateResponse, error) {
-	roomUUID, err := uuid.Parse(roomId)
+func (s *BookingService) CreateBooking(ctx context.Context, req *pb.BookingCreateRequest, hotelId string) (*pb.BookingCreateResponse, error) {
+	hotelUUID, err := uuid.Parse(hotelId)
 	if err != nil {
 		return nil, err
 	}
-	hotelUUID, err := uuid.Parse(req.HotelId)
-	if err != nil {
-		return nil, err
+
+	// Parse all room IDs
+	roomUUIDs := make([]uuid.UUID, 0, len(req.RoomIds))
+	for _, roomID := range req.RoomIds {
+		roomUUID, err := uuid.Parse(roomID)
+		if err != nil {
+			return nil, ErrBookingCreationValidation
+		}
+		roomUUIDs = append(roomUUIDs, roomUUID)
 	}
+
 	checkIn, err := time.Parse("2006-01-02", req.CheckIn)
 	if err != nil {
 		return nil, err
@@ -47,12 +54,28 @@ func (s *BookingService) CreateBooking(ctx context.Context, req *pb.BookingCreat
 	if err != nil {
 		return nil, err
 	}
-	bookingId, err := s.svc.CreateBookingByRoomID(ctx, domain.Booking{
+	if checkIn.After(checkOut) {
+		return nil, ErrBookingCreationValidation
+	}
+
+	userUUID, err := uuid.Parse("43ab4a09-b060-4e74-860b-8ab6f1fd1a03")
+	if err != nil {
+		return nil, ErrBookingCreationValidation
+	}
+	agencyUUID, err := uuid.Parse("43ab4a09-b060-4e74-860b-9ab6f1fd1a03")
+	if err != nil {
+		return nil, ErrBookingCreationValidation
+	}
+
+	bookingId, err := s.svc.CreateBookingByHotelID(ctx, domain.Booking{
 		CheckIn:  checkIn,
 		CheckOut: checkOut,
 		HotelID:  hotelUUID,
-		Status:   1,
-	}, roomUUID)
+		RoomIDs:  roomUUIDs,
+		UserID:   &userUUID, // Changed to pointer
+		AgencyID: &agencyUUID,
+		Status:   uint8(pb.BookingStatus_BOOKING_PENDING),
+	}, hotelUUID)
 
 	if err != nil {
 		return nil, err
@@ -75,15 +98,20 @@ func (s *BookingService) GetAllBookingsByRoomID(ctx context.Context, roomID stri
 
 	var bookingList []*pb.Booking
 	for _, r := range bookings {
-		bookingList = append(bookingList, &pb.Booking{
-			Id:      r.UUID.String(),
-			HotelId: r.HotelID.String(),
-			// UserId:   r.UserID.String(),
-			// AgencyId: r.AgencyID.String(),
-			CheckIn:  r.CheckIn.Format("2006-01-02"),
-			CheckOut: r.CheckOut.Format("2006-01-02"),
-			// BookingStatus: int32(r.Status),
-		})
+		booking := &pb.Booking{
+			Id:            r.UUID.String(),
+			HotelId:       r.HotelID.String(),
+			CheckIn:       r.CheckIn.Format("2006-01-02"),
+			CheckOut:      r.CheckOut.Format("2006-01-02"),
+			BookingStatus: pb.BookingStatus(r.Status),
+		}
+		if r.UserID != nil {
+			booking.UserId = r.UserID.String()
+		}
+		if r.AgencyID != nil {
+			booking.AgencyId = r.AgencyID.String()
+		}
+		bookingList = append(bookingList, booking)
 	}
 
 	return &pb.GetAllBookingResponse{

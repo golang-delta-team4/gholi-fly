@@ -26,7 +26,7 @@ type Booking struct {
 	ID        BookingID
 	UUID      BookingUUID
 	HotelID   hotelDomain.HotelUUID
-	RoomID    roomDomain.RoomUUID
+	RoomIDs   []roomDomain.RoomUUID
 	UserID    *uuid.UUID
 	AgencyID  *uuid.UUID
 	CheckIn   time.Time

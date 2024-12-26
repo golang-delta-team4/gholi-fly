@@ -27,5 +27,5 @@ message GetAllStaffsResponse {
 message Staff {
     string id = 1 [json_name = "id"];
     string name = 2 [json_name = "name"];
-    int32 staffType = 3 [json_name = "staffType"];
+    StaffType staffType = 3 [json_name = "staffType"];
 }
