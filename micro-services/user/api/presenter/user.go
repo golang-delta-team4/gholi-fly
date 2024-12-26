@@ -34,5 +34,16 @@ func EmailValidation(email string) error {
 	return nil
 }
 
+func PasswordValidation(password string) bool {
+	uppercaseRegex := regexp.MustCompile(`[A-Z]`)
+	lowercaseRegex := regexp.MustCompile(`[a-z]`)
+	digitRegex := regexp.MustCompile(`[0-9]`)
+	specialCharRegex := regexp.MustCompile(`[#!?@$%^&*\\-]`)
+	minLength := len(password) >= 8
+	return uppercaseRegex.MatchString(password) &&
+		lowercaseRegex.MatchString(password) &&
+		digitRegex.MatchString(password) &&
+		specialCharRegex.MatchString(password) &&
+		minLength
 
-
+}
