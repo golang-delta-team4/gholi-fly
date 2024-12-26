@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: build/Dockerfile
+    ports:
+      - "8080:8088"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=vehicle_user
+      - DB_PASSWORD=password123
+      - DB_NAME=vehicle_db
+    depends_on:
+      - postgres
+    volumes:
+      - ./config.json:/app/config.json 
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: vehicle_user
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: vehicle_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
