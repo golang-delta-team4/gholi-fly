@@ -103,7 +103,16 @@ message BuyTicketRequest {
     string tripId = 1 [json_name = "tripId"];
 }
 
+message BuyAgencyTicketRequest {
+    string tripId = 1 [json_name = "tripId"];
+    string agencyId = 2 [json_name = "agencyId"];
+}
+
 message BuyTicketResponse {
     string ticketId = 1 [json_name = "ticketId"];
     string message = 2 [json_name = "message"];
+}
+
+message CancelTicketResponse {
+    string message = 1 [json_name = "message"];
 }

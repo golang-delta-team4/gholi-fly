@@ -12,7 +12,7 @@ type Invoice struct {
 	IssuedDate time.Time `gorm:"not null"`
 	Info       string    `gorm:"type:text"`
 	TotalPrice float64
-	Status     string `gorm:"default:'pending'"`
+	Status     uint8 `gorm:"default:0"`
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	DeletedAt  gorm.DeletedAt `gorm:"index"`

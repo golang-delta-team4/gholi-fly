@@ -12,6 +12,7 @@ type Ticket struct {
 	TripID    uuid.UUID  `gorm:"not null"`
 	Trip      *Trip      `gorm:"foreignKey:TripID; constraint:OnDelete:CASCADE;"`
 	UserID    *uuid.UUID `gorm:"type:uuid;default:NULL"`
+	AgencyID  *uuid.UUID `gorm:"type:uuid;default:NULL"`
 	Price     float64
 	Status    string `gorm:"default:'pending'"`
 	InvoiceId uuid.UUID

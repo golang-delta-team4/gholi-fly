@@ -8,6 +8,8 @@ import (
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/config"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company"
 	companyPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company/port"
+	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/invoice"
+	invoicePort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/invoice/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/ticket"
 	ticketPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/ticket/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip"
@@ -82,7 +84,12 @@ func (a *app) TicketService(ctx context.Context) ticketPort.Service {
 }
 
 func (a *app) ticketServiceWithDB(db *gorm.DB) ticketPort.Service {
-	return ticket.NewService(storage.NewTicketRepo(db, false, a.redisProvider), a.tripServiceWithDB(db))
+	return ticket.NewService(storage.NewTicketRepo(db, false, a.redisProvider),
+		a.tripServiceWithDB(db), a.invoiceServiceWithDB(db))
+}
+
+func (a *app) invoiceServiceWithDB(db *gorm.DB) invoicePort.Service {
+	return invoice.NewService(storage.NewInvoiceRepo(db, false, a.redisProvider))
 }
 
 func (a *app) Config() config.Config {
