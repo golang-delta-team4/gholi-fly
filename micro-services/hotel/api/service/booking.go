@@ -66,23 +66,28 @@ func (s *BookingService) CreateBooking(ctx context.Context, req *pb.BookingCreat
 	if err != nil {
 		return nil, ErrBookingCreationValidation
 	}
+	reservationId := uuid.New()
+	for _, roomId := range roomUUIDs {
+		_, err := s.svc.CreateBookingByHotelID(ctx, domain.Booking{
+			CheckIn:       checkIn,
+			CheckOut:      checkOut,
+			HotelID:       hotelUUID,
+			RoomID:        roomId,
+			UserID:        &userUUID, // Changed to pointer
+			AgencyID:      &agencyUUID,
+			ReservationID: reservationId,
+			IsPayed:       false,
+			Status:        uint8(pb.BookingStatus_BOOKING_PENDING),
+		}, hotelUUID)
 
-	bookingId, err := s.svc.CreateBookingByHotelID(ctx, domain.Booking{
-		CheckIn:  checkIn,
-		CheckOut: checkOut,
-		HotelID:  hotelUUID,
-		RoomIDs:  roomUUIDs,
-		UserID:   &userUUID, // Changed to pointer
-		AgencyID: &agencyUUID,
-		Status:   uint8(pb.BookingStatus_BOOKING_PENDING),
-	}, hotelUUID)
+		if err != nil {
+			return nil, err
+		}
 
-	if err != nil {
-		return nil, err
 	}
 
 	return &pb.BookingCreateResponse{
-		BookingId: bookingId.String(),
+		ReservationId: reservationId.String(),
 	}, nil
 }
 

@@ -2,7 +2,6 @@ package domain
 
 import (
 	hotelDomain "gholi-fly-hotel/internal/hotel/domain"
-	roomDomain "gholi-fly-hotel/internal/room/domain"
 	"time"
 
 	"github.com/google/uuid"
@@ -23,16 +22,18 @@ const (
 )
 
 type Booking struct {
-	ID        BookingID
-	UUID      BookingUUID
-	HotelID   hotelDomain.HotelUUID
-	RoomIDs   []roomDomain.RoomUUID
-	UserID    *uuid.UUID
-	AgencyID  *uuid.UUID
-	CheckIn   time.Time
-	CheckOut  time.Time
-	Status    BookingStatus
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt time.Time
+	ID            BookingID
+	UUID          BookingUUID
+	HotelID       hotelDomain.HotelUUID
+	RoomID        uuid.UUID
+	UserID        *uuid.UUID
+	AgencyID      *uuid.UUID
+	ReservationID uuid.UUID
+	CheckIn       time.Time
+	CheckOut      time.Time
+	Status        BookingStatus
+	IsPayed       bool
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	DeletedAt     time.Time
 }
