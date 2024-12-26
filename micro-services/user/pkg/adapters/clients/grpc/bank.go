@@ -7,6 +7,7 @@ import (
 	bankClientPort "user-service/pkg/adapters/clients/grpc/port"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type GRPCBankClient struct {
@@ -20,7 +21,7 @@ func NewGRPCBankClient(host string, port int) bankClientPort.GRPCBankClient {
 
 func (g *GRPCBankClient) CreateUserWallet(userUUID string) (*pb.CreateWalletResponse, error) {
 
-	conn, err := grpc.Dial(fmt.Sprintf("%v:%v", g.host, g.port))
+	conn, err := grpc.Dial(fmt.Sprintf("%v:%v", g.host, g.port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}
