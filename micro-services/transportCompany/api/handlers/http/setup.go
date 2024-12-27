@@ -17,7 +17,7 @@ func Run(appContainer app.App, cfg config.ServerConfig) error {
 	api := router.Group(
 		"/api/v1/transport-company",
 		setUserContext,
-		//newAuthMiddleware([]byte(cfg.Secret)),
+		newAuthMiddleware([]byte(cfg.Secret)),
 	)
 
 	registerCompanyAPI(appContainer, cfg, api)

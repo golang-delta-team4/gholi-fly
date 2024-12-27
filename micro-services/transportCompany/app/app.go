@@ -14,6 +14,7 @@ import (
 	ticketPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/ticket/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip"
 	tripPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/port"
+	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/storage"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/storage/types"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/cache"
@@ -85,7 +86,7 @@ func (a *app) TicketService(ctx context.Context) ticketPort.Service {
 
 func (a *app) ticketServiceWithDB(db *gorm.DB) ticketPort.Service {
 	return ticket.NewService(storage.NewTicketRepo(db, false, a.redisProvider),
-		a.tripServiceWithDB(db), a.invoiceServiceWithDB(db))
+		a.tripServiceWithDB(db), a.invoiceServiceWithDB(db), grpc.NewGRPCBankClient(a.cfg.Bank.Host, int(a.cfg.Bank.Port)))
 }
 
 func (a *app) invoiceServiceWithDB(db *gorm.DB) invoicePort.Service {
