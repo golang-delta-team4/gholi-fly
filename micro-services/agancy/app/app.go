@@ -83,8 +83,14 @@ func (a *app) setDB() error {
 		DBName: a.cfg.DB.Database,
 	})
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to connect to database: %w", err)
 	}
+
+	// Apply migrations
+	if err := postgres.Migrate(db); err != nil {
+		return fmt.Errorf("failed to migrate database: %w", err)
+	}
+
 	a.db = db
 	return nil
 }
