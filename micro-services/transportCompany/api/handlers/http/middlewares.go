@@ -1,39 +1,16 @@
 package http
 
 import (
-	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/jwt"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/logger"
-	"github.com/google/uuid"
 
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/context"
+
+	"github.com/golang-delta-team4/gholi-fly-shared/jwt"
 
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
-
-//func newAuthMiddleware(secret []byte) fiber.Handler {
-// 	return jwtware.New(jwtware.Config{
-// 		SigningKey:  jwtware.SigningKey{Key: secret},
-// 		Claims:      &jwt.UserClaims{},
-// 		TokenLookup: "header:Authorization",
-// 		SuccessHandler: func(ctx *fiber.Ctx) error {
-// 			userClaims := userClaims(ctx)
-// 			if userClaims == nil {
-// 				return fiber.ErrUnauthorized
-// 			}
-
-// 			logger := context.GetLogger(ctx.UserContext())
-// 			context.SetLogger(ctx.UserContext(), logger.With("user_id", userClaims.UserID))
-
-// 			return ctx.Next()
-// 		},
-// 		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
-// 			return fiber.NewError(fiber.StatusUnauthorized, err.Error())
-// 		},
-// 		AuthScheme: "Bearer",
-// 	})
-// }
 
 func newAuthMiddleware(secret []byte) fiber.Handler {
 	return jwtware.New(jwtware.Config{
@@ -41,16 +18,11 @@ func newAuthMiddleware(secret []byte) fiber.Handler {
 		Claims:      &jwt.UserClaims{},
 		TokenLookup: "header:Authorization",
 		SuccessHandler: func(ctx *fiber.Ctx) error {
-			ctx.Locals("user_id", uuid.MustParse("f28e4b35-00e8-46e7-817f-b4f5908f3146"))
-			return ctx.Next()
-			userClaims := userClaims(ctx)
+			userClaims := jwt.GetUserClaims(ctx)
 			if userClaims == nil {
 				return fiber.ErrUnauthorized
 			}
-
-			logger := context.GetLogger(ctx.UserContext())
-			context.SetLogger(ctx.UserContext(), logger.With("user_id", userClaims.UserID))
-
+			ctx.Locals("UserUUID", userClaims.UserUUID)
 			return ctx.Next()
 		},
 		ErrorHandler: func(ctx *fiber.Ctx, err error) error {

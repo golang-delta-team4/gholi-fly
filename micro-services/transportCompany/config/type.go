@@ -1,9 +1,10 @@
 package config
 
 type Config struct {
-	DB     DBConfig     `json:"db"`
-	Server ServerConfig `json:"server"`
-	Redis  RedisConfig  `json:"redis"`
+	DB     DBConfig       `json:"db"`
+	Server ServerConfig   `json:"server"`
+	Redis  RedisConfig    `json:"redis"`
+	Bank   BankGRPCConfig `json:"bank"`
 }
 
 type DBConfig struct {
@@ -21,6 +22,11 @@ type ServerConfig struct {
 }
 
 type RedisConfig struct {
+	Host string `json:"host"`
+	Port uint   `json:"port"`
+}
+
+type BankGRPCConfig struct {
 	Host string `json:"host"`
 	Port uint   `json:"port"`
 }
