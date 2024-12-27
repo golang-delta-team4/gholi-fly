@@ -2,20 +2,21 @@ package http
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/api/pb"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/api/service"
 )
 
-func CreateCompany(svcGetter ServiceGetter[*service.CompanyService]) fiber.Handler {
+func CreateTechnicalTeam(svcGetter ServiceGetter[*service.TechnicalTeamService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		svc := svcGetter(c.UserContext())
-		var req pb.CreateCompanyRequest
+		var req pb.CreateTechnicalTeamRequest
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
-		response, err := svc.Create(c.UserContext(), &req)
+		response, err := svc.CreateTechnicalTeam(c.UserContext(), &req)
 
 		if err != nil {
 			if errors.Is(err, service.ErrCompanyCreationValidation) {
@@ -29,11 +30,11 @@ func CreateCompany(svcGetter ServiceGetter[*service.CompanyService]) fiber.Handl
 	}
 }
 
-func GetCompanyById(svcGetter ServiceGetter[*service.CompanyService]) fiber.Handler {
+func GetTechnicalTeamById(svcGetter ServiceGetter[*service.TechnicalTeamService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		svc := svcGetter(c.UserContext())
-		companyId := c.Params("id")
-		response, err := svc.GetCompanyById(c.UserContext(), companyId)
+		teamId := c.Params("id")
+		response, err := svc.GetTechnicalTeamById(c.UserContext(), teamId)
 		if err != nil {
 			if errors.Is(err, service.ErrCompanyCreationValidation) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())
@@ -46,11 +47,15 @@ func GetCompanyById(svcGetter ServiceGetter[*service.CompanyService]) fiber.Hand
 	}
 }
 
-func GetByOwnerId(svcGetter ServiceGetter[*service.CompanyService]) fiber.Handler {
+func GetTechnicalTeams(svcGetter ServiceGetter[*service.TechnicalTeamService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		svc := svcGetter(c.UserContext())
-		companyId := c.Params("ownerId")
-		response, err := svc.GetByOwnerId(c.UserContext(), companyId)
+
+		pageSize, _ := strconv.Atoi(c.Query("page-size"))
+		pageNumber, _ := strconv.Atoi(c.Query("page-number"))
+
+		response, err := svc.GetTechnicalTeamById(c.UserContext(), pageSize, pageNumber)
+
 		if err != nil {
 			if errors.Is(err, service.ErrCompanyCreationValidation) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())
@@ -63,15 +68,16 @@ func GetByOwnerId(svcGetter ServiceGetter[*service.CompanyService]) fiber.Handle
 	}
 }
 
-func UpdateCompany(svcGetter ServiceGetter[*service.CompanyService]) fiber.Handler {
+func SetTechTeamToTrip(svcGetter ServiceGetter[*service.TechnicalTeamService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		svc := svcGetter(c.UserContext())
-		companyId := c.Params("id")
-		var req pb.UpdateCompanyRequest
+		tripId := c.Params("tripID")
+		var req pb.SetTechnicalTeamToTripRequest
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
-		err := svc.UpdateCompany(c.UserContext(), &req, companyId)
+		err := svc.SetTechTeamToTrip(c.UserContext(), &req, tripId)
+
 		if err != nil {
 			if errors.Is(err, service.ErrCompanyCreationValidation) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())
@@ -80,15 +86,19 @@ func UpdateCompany(svcGetter ServiceGetter[*service.CompanyService]) fiber.Handl
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 
-		return nil
+		return c.SendStatus(fiber.StatusOK)
 	}
 }
 
-func DeleteCompany(svcGetter ServiceGetter[*service.CompanyService]) fiber.Handler {
+func AddTechnicalTeamMember(svcGetter ServiceGetter[*service.TechnicalTeamService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		svc := svcGetter(c.UserContext())
-		companyId := c.Params("id")
-		err := svc.DeleteCompany(c.UserContext(), companyId)
+		var req pb.AddTechnicalTeamMemberRequest
+		if err := c.BodyParser(&req); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+		err := svc.AddTechnicalTeamMember(c.UserContext(), &req)
+
 		if err != nil {
 			if errors.Is(err, service.ErrCompanyCreationValidation) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())
@@ -97,6 +107,6 @@ func DeleteCompany(svcGetter ServiceGetter[*service.CompanyService]) fiber.Handl
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 
-		return nil
+		return c.SendStatus(fiber.StatusOK)
 	}
 }
