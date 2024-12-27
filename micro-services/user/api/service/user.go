@@ -105,8 +105,8 @@ func (us *UserService) AuthorizeUser(ctx context.Context, req *pb.UserAuthorizat
 	return us.service.AuthorizeUser(ctx, &domain.UserAuthorize{UserUUID: uuid, Route: strings.ToLower(req.Route), Method: strings.ToLower(req.Method)})
 }
 
-func (us *UserService) GetUserByUUID(ctx context.Context, req *pb.GetUserByUUIDRequest) (*domain.User, error) {
-	uuid, err := uuid.Parse(req.UserUUID)
+func (us *UserService) GetUserByUUID(ctx context.Context, userUUID string) (*domain.User, error) {
+	uuid, err := uuid.Parse(userUUID)
 	if err != nil {
 		return nil, errors.New("user uuid invalid")
 	}

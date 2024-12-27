@@ -91,6 +91,21 @@ func Refresh(userService *service.UserService) fiber.Handler {
 	}
 }
 
+func GetMe(userService *service.UserService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		userUUID := c.Locals("UserUUID")
+		if userUUID == nil {
+			return fiber.NewError(fiber.StatusBadRequest, "invalid access token")
+		}
+		user, err := userService.GetUserByUUID(c.UserContext(), userUUID.(uuid.UUID).String())
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+
+		return c.JSON(presenter.GetUserResponse{Email: user.Email, FirstName: user.FirstName, LastName: user.LastName})
+	}
+}
+
 func validate(req any) map[string]string {
 	validate := validator.New()
 	err := validate.Struct(req)
