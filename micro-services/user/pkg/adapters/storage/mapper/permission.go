@@ -9,5 +9,6 @@ func PermissionDomain2Storage(permission domain.Permission) *types.Permission {
 	return &types.Permission{
 		Route:  permission.Route,
 		Method: permission.Method,
+		UUID: permission.UUID,
 	}
 }

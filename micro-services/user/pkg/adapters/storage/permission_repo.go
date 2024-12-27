@@ -16,7 +16,7 @@ func NewPermissionRepo(db *gorm.DB) permissionPort.Repo {
 	return &permissionRepo{db: db}
 }
 
-func (pr *permissionRepo) Create(ctx context.Context, permission types.Permission) error {
+func (pr *permissionRepo) Create(ctx context.Context, permission []types.Permission) error {
 	return pr.db.Create(&permission).Error
 }
 

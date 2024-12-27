@@ -34,7 +34,7 @@ func (ps *service) CreatePermission(ctx context.Context, permission *domain.Perm
 	uuid := uuid.New()
 	permissionType := mapper.PermissionDomain2Storage(*permission)
 	permissionType.UUID = uuid
-	err = ps.repo.Create(ctx, *permissionType)
+	err = ps.repo.Create(ctx, []types.Permission{*permissionType})
 	return uuid, err
 }
 
@@ -44,4 +44,20 @@ func (ps *service) GetPermissionsByUUID(ctx context.Context, permissions []domai
 		typedPermission = append(typedPermission, types.Permission{UUID: permission.UUID})
 	}
 	return ps.repo.GetPermissionsByUUID(ctx, typedPermission)
+}
+
+func (ps *service) CreatePermissions(ctx context.Context, permissions []domain.Permission) ([]domain.Permission, error) {
+	var permissionTypes []types.Permission
+	// var permissionsWithUUID []domain.Permission
+	for _, permission := range permissions {
+		uuid := uuid.New()
+		permission.UUID = uuid
+		permissionType := mapper.PermissionDomain2Storage(permission)
+		permissionTypes = append(permissionTypes, *permissionType)
+	}
+	err := ps.repo.Create(ctx, permissionTypes)
+	if err != nil {
+		return nil, err
+	}
+	return permissions, nil
 }

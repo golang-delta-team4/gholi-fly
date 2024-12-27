@@ -6,7 +6,7 @@ import (
 )
 
 type Repo interface {
-	Create(ctx context.Context, permission types.Permission) error
+	Create(ctx context.Context, permission []types.Permission) error
 	CheckPermissionExistence(ctx context.Context, route string, method string) (bool, error)
 	GetPermissionsByUUID(ctx context.Context, permissions []types.Permission) ([]types.Permission, error)
 }
