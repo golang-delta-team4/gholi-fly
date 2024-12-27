@@ -9,6 +9,10 @@ import (
 
 type AgencyID uuid.UUID
 
+func (id AgencyID) String() string {
+	return uuid.UUID(id).String()
+}
+
 type Agency struct {
 	ID               AgencyID
 	Name             string

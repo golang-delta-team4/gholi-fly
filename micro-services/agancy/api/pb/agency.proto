@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package agency;
+
+option go_package = "gholi-fly-agancy/api/pb/agency";
+
+// Message for creating an agency
+message CreateAgencyRequest {
+  string name = 1;
+  string owner_id = 2; // UUID of the owner
+  string wallet_id = 3; // UUID of the wallet
+  double profit_percentage = 4;
+}
+
+// Response for creating an agency
+message CreateAgencyResponse {
+  string id = 1; // UUID of the newly created agency
+}
+
+// Message for getting an agency by ID
+message GetAgencyByIDRequest {
+  string id = 1; // UUID of the agency
+}
+
+// Response for getting an agency by ID
+message GetAgencyByIDResponse {
+  string id = 1;
+  string name = 2;
+  string owner_id = 3;
+  string wallet_id = 4;
+  double profit_percentage = 5;
+  string created_at = 6; // ISO8601 timestamp
+  string updated_at = 7; // ISO8601 timestamp
+}
+
+// Message for updating an agency
+message UpdateAgencyRequest {
+  string id = 1; // UUID of the agency
+  string name = 2;
+  string owner_id = 3;
+  string wallet_id = 4;
+  double profit_percentage = 5;
+}
+
+// Response for successful update
+message UpdateAgencyResponse {}
+
+// Message for deleting an agency
+message DeleteAgencyRequest {
+  string id = 1; // UUID of the agency
+}
+
+// Response for successful deletion
+message DeleteAgencyResponse {}
