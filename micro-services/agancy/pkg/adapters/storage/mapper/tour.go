@@ -18,9 +18,12 @@ func TourDomain2Storage(tourDomain domain.Tour) *types.Tour {
 		EndDate:             tourDomain.EndDate,
 		SourceLocation:      tourDomain.SourceLocation,
 		DestinationLocation: tourDomain.DestinationLocation,
-		ForwardTicketID:     tourDomain.ForwardTicketID,
-		ReturnTicketID:      tourDomain.ReturnTicketID,
-		HotelBookingID:      tourDomain.HotelBookingID,
+		TripID:              tourDomain.TripID,
+		TripAgencyPrice:     tourDomain.TripAgencyPrice,
+		HotelID:             tourDomain.HotelID,
+		HotelAgencyPrice:    tourDomain.HotelAgencyPrice,
+		Capacity:            tourDomain.Capacity,
+		IsPublished:         tourDomain.IsPublished,
 		CreatedAt:           tourDomain.CreatedAt,
 		UpdatedAt:           tourDomain.UpdatedAt,
 	}
@@ -35,15 +38,18 @@ func tourDomain2Storage(tourDomain domain.Tour) types.Tour {
 		EndDate:             tourDomain.EndDate,
 		SourceLocation:      tourDomain.SourceLocation,
 		DestinationLocation: tourDomain.DestinationLocation,
-		ForwardTicketID:     tourDomain.ForwardTicketID,
-		ReturnTicketID:      tourDomain.ReturnTicketID,
-		HotelBookingID:      tourDomain.HotelBookingID,
+		TripID:              tourDomain.TripID,
+		TripAgencyPrice:     tourDomain.TripAgencyPrice,
+		HotelID:             tourDomain.HotelID,
+		HotelAgencyPrice:    tourDomain.HotelAgencyPrice,
+		Capacity:            tourDomain.Capacity,
+		IsPublished:         tourDomain.IsPublished,
 		CreatedAt:           tourDomain.CreatedAt,
 		UpdatedAt:           tourDomain.UpdatedAt,
 	}
 }
 
-func BatchtourDomain2Storage(domains []domain.Tour) []types.Tour {
+func BatchTourDomain2Storage(domains []domain.Tour) []types.Tour {
 	return fp.Map(domains, tourDomain2Storage)
 }
 
@@ -57,9 +63,12 @@ func TourStorage2Domain(tour types.Tour) *domain.Tour {
 		EndDate:             tour.EndDate,
 		SourceLocation:      tour.SourceLocation,
 		DestinationLocation: tour.DestinationLocation,
-		ForwardTicketID:     tour.ForwardTicketID,
-		ReturnTicketID:      tour.ReturnTicketID,
-		HotelBookingID:      tour.HotelBookingID,
+		TripID:              tour.TripID,
+		TripAgencyPrice:     tour.TripAgencyPrice,
+		HotelID:             tour.HotelID,
+		HotelAgencyPrice:    tour.HotelAgencyPrice,
+		Capacity:            tour.Capacity,
+		IsPublished:         tour.IsPublished,
 		CreatedAt:           tour.CreatedAt,
 		UpdatedAt:           tour.UpdatedAt,
 	}
@@ -74,14 +83,17 @@ func tourStorage2Domain(tour types.Tour) domain.Tour {
 		EndDate:             tour.EndDate,
 		SourceLocation:      tour.SourceLocation,
 		DestinationLocation: tour.DestinationLocation,
-		ForwardTicketID:     tour.ForwardTicketID,
-		ReturnTicketID:      tour.ReturnTicketID,
-		HotelBookingID:      tour.HotelBookingID,
+		TripID:              tour.TripID,
+		TripAgencyPrice:     tour.TripAgencyPrice,
+		HotelID:             tour.HotelID,
+		HotelAgencyPrice:    tour.HotelAgencyPrice,
+		Capacity:            tour.Capacity,
+		IsPublished:         tour.IsPublished,
 		CreatedAt:           tour.CreatedAt,
 		UpdatedAt:           tour.UpdatedAt,
 	}
 }
 
-func BatchtourStorage2Domain(tours []types.Tour) []domain.Tour {
+func BatchTourStorage2Domain(tours []types.Tour) []domain.Tour {
 	return fp.Map(tours, tourStorage2Domain)
 }
