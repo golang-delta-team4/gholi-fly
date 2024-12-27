@@ -11,27 +11,32 @@ import (
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/ticket/domain"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/ticket/port"
 	tripPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/port"
+	adaptersPb "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc/pb"
+	grpcPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc/port"
 	"github.com/google/uuid"
 )
 
 var (
 	ErrBuyTicket    = errors.New("error on buy new ticket")
-	ErrCancelTicket = errors.New("error on buy new ticket")
+	ErrCancelTicket = errors.New("error on cancel ticket")
 )
 
 type service struct {
 	repo           port.Repo
 	tripService    tripPort.Service
 	invoiceService invoicePort.Service
+	bankGrpc       grpcPort.GRPCBankClient
 }
 
 func NewService(repo port.Repo,
 	tripService tripPort.Service,
-	invoiceService invoicePort.Service) port.Service {
+	invoiceService invoicePort.Service,
+	bankGrpc grpcPort.GRPCBankClient) port.Service {
 	return &service{
 		repo:           repo,
 		tripService:    tripService,
 		invoiceService: invoiceService,
+		bankGrpc:       bankGrpc,
 	}
 }
 
@@ -95,7 +100,16 @@ func (s *service) BuyAgencyTicket(ctx context.Context, ticket domain.Ticket) (uu
 		return uuid.Nil, fmt.Errorf("%w %s", ErrBuyTicket, "trip is started")
 	}
 	// bank
-	// user
+	s.bankGrpc.CreateFactor(&adaptersPb.CreateFactorRequest{
+		Factor: &adaptersPb.Factor{
+			SourceService: "transportCompany",
+			TotalAmount:   uint64(trip.AgencyPrice),
+			Distributions: []*adaptersPb.Distribution{&adaptersPb.Distribution{
+				WalletId: "",
+			}},
+		},
+	})
+	//TODO: check user exist
 
 	invoiceId, err := s.invoiceService.CreateInvoice(ctx, invoiceDomain.Invoice{
 		IssuedDate: time.Now(),
@@ -122,7 +136,7 @@ func (s *service) CancelTicket(ctx context.Context, ticketId uuid.UUID) error {
 		return fmt.Errorf("%w %s", ErrBuyTicket, "trip is started")
 	}
 
-	// give  back bank
+	// TODO: Cancel factor
 	err = s.repo.CancelTicket(ctx, ticketId)
 	if err != nil {
 		return fmt.Errorf("%w %s", ErrBuyTicket, err)
