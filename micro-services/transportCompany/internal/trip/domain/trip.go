@@ -75,5 +75,8 @@ func (t *Trip) Validate() error {
 	if t.Profit < 0 {
 		return errors.New("Profit can't be negative")
 	}
+	if t.StartDate.Before(time.Now()) {
+		return errors.New("StartDate can't be before now")
+	}
 	return nil
 }

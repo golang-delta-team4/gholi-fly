@@ -9,6 +9,7 @@ type Ticket struct {
 	TripID    uuid.UUID
 	UserID    *uuid.UUID
 	AgencyID  *uuid.UUID
+	Count     uint
 	Price     float64
 	Status    string
 	InvoiceId uuid.UUID
