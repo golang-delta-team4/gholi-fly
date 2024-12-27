@@ -2,10 +2,12 @@ package storage
 
 import (
 	"context"
+	"fmt"
 
 	"gholi-fly-maps/internal/paths/domain"
 	"gholi-fly-maps/pkg/adapters/storage/mapper"
 	"gholi-fly-maps/pkg/adapters/storage/types"
+
 	"gorm.io/gorm"
 )
 
@@ -59,4 +61,25 @@ func (r *PathRepo) Update(ctx context.Context, path *domain.Path) error {
 // Delete removes a path by its ID.
 func (r *PathRepo) Delete(ctx context.Context, id string) error {
 	return r.db.Delete(&types.Path{}, "id = ?", id).Error
+}
+func (r *PathRepo) FilterPaths(ctx context.Context, filters map[string]interface{}) ([]domain.Path, error) {
+	query := r.db.Model(&types.Path{})
+
+	// Apply filters dynamically
+	for key, value := range filters {
+		query = query.Where(fmt.Sprintf("%s = ?", key), value)
+	}
+
+	var dbPaths []types.Path
+	if err := query.Find(&dbPaths).Error; err != nil {
+		return nil, err
+	}
+
+	// Convert database paths to domain paths
+	var domainPaths []domain.Path
+	for _, p := range dbPaths {
+		domainPaths = append(domainPaths, *mapper.PathToDomain(&p))
+	}
+
+	return domainPaths, nil
 }

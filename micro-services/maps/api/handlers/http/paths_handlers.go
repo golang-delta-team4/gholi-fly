@@ -88,6 +88,7 @@ func (h *PathHandler) UpdatePath(w http.ResponseWriter, r *http.Request) {
 		"message": "Path updated successfully",
 	})
 }
+
 // DeletePath handles the request to delete a path.
 func (h *PathHandler) DeletePath(w http.ResponseWriter, r *http.Request) {
 	// Extract path ID from the URL
@@ -112,12 +113,47 @@ func (h *PathHandler) DeletePath(w http.ResponseWriter, r *http.Request) {
 		"message": "Path deleted successfully",
 	})
 }
+func (h *PathHandler) FilterPaths(w http.ResponseWriter, r *http.Request) {
+	// Collect filters from query parameters
+	filters := make(map[string]interface{})
+
+	if id := r.URL.Query().Get("id"); id != "" {
+		filters["id"] = id
+	}
+	if sourceTerminalID := r.URL.Query().Get("source_terminal_id"); sourceTerminalID != "" {
+		filters["source_terminal_id"] = sourceTerminalID
+	}
+	if destinationTerminalID := r.URL.Query().Get("destination_terminal_id"); destinationTerminalID != "" {
+		filters["destination_terminal_id"] = destinationTerminalID
+	}
+	if distanceKM := r.URL.Query().Get("distance_km"); distanceKM != "" {
+		filters["distance_km"] = distanceKM
+	}
+	if routeCode := r.URL.Query().Get("route_code"); routeCode != "" {
+		filters["route_code"] = routeCode
+	}
+	if vehicleType := r.URL.Query().Get("vehicle_type"); vehicleType != "" {
+		filters["vehicle_type"] = vehicleType
+	}
+
+	// Call service layer
+	paths, err := h.service.FilterPaths(r.Context(), filters)
+	if err != nil {
+		http.Error(w, "Failed to filter paths", http.StatusInternalServerError)
+		return
+	}
+
+	// Send response
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(paths)
+}
 
 // RegisterPathRoutes registers path-related routes.
 func RegisterPathRoutes(r chi.Router, service port.PathService) {
 	handler := NewPathHandler(service)
 	r.Get("/paths/all", handler.GetAllPaths)
 	r.Post("/paths/new", handler.CreatePath)
+	r.Get("/paths/filter", handler.FilterPaths)
 	r.Put("/paths/update/{id}", handler.UpdatePath)
 	r.Delete("/paths/delete/{id}", handler.DeletePath)
 
