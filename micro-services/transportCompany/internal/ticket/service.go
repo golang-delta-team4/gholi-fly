@@ -11,7 +11,6 @@ import (
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/ticket/domain"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/ticket/port"
 	tripPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/port"
-	adaptersPb "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc/pb"
 	grpcPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc/port"
 	"github.com/google/uuid"
 )
@@ -61,24 +60,26 @@ func (s *service) BuyTicket(ctx context.Context, ticket domain.Ticket) (uuid.UUI
 		return uuid.Nil, fmt.Errorf("%w %s", ErrBuyTicket, "trip is started")
 	}
 	// bank
-	response, err := s.bankGrpc.CreateFactor(&adaptersPb.CreateFactorRequest{
-		Factor: &adaptersPb.Factor{
-			SourceService: "transportCompany",
-			TotalAmount:   uint64(trip.AgencyPrice),
-			Distributions: []*adaptersPb.Distribution{&adaptersPb.Distribution{
-				WalletId: "",
-			}},
-		},
-	})
-	if err != nil {
-		return uuid.Nil, fmt.Errorf("%w %s", ErrBuyTicket, err)
-	}
-	fmt.Println(response)
+	// response, err := s.bankGrpc.CreateFactor(&adaptersPb.CreateFactorRequest{
+	// 	Factor: &adaptersPb.Factor{
+	// 		SourceService: "transportCompany",
+	// 		TotalAmount:   uint64(trip.AgencyPrice),
+	// 		Distributions: []*adaptersPb.Distribution{&adaptersPb.Distribution{
+	// 			WalletId: "",
+	// 		}},
+	// 	},
+	// })
+	// if err != nil {
+	// 	return uuid.Nil, fmt.Errorf("%w %s", ErrBuyTicket, err)
+	// }
+	// fmt.Println(response)
 	// user
 
+	totalPrice := float64(ticket.Count) * trip.AgencyPrice
 	invoiceId, err := s.invoiceService.CreateInvoice(ctx, invoiceDomain.Invoice{
 		IssuedDate: time.Now(),
 		Status:     invoiceDomain.Paid,
+		TotalPrice: totalPrice,
 	})
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("%w %s", ErrBuyTicket, err)
@@ -113,15 +114,19 @@ func (s *service) BuyAgencyTicket(ctx context.Context, ticket domain.Ticket) (uu
 		return uuid.Nil, 0, fmt.Errorf("%w %s", ErrBuyTicket, "trip is started")
 	}
 	// bank
-	s.bankGrpc.CreateFactor(&adaptersPb.CreateFactorRequest{
-		Factor: &adaptersPb.Factor{
-			SourceService: "transportCompany",
-			TotalAmount:   uint64(trip.AgencyPrice),
-			Distributions: []*adaptersPb.Distribution{&adaptersPb.Distribution{
-				WalletId: "",
-			}},
-		},
-	})
+	// response, err := s.bankGrpc.CreateFactor(&adaptersPb.CreateFactorRequest{
+	// 	Factor: &adaptersPb.Factor{
+	// 		SourceService: "transportCompany",
+	// 		TotalAmount:   uint64(trip.AgencyPrice),
+	// 		Distributions: []*adaptersPb.Distribution{&adaptersPb.Distribution{
+	// 			WalletId: "",
+	// 		}},
+	// 	},
+	// })
+	// if err != nil {
+	// 	return uuid.Nil, 0, fmt.Errorf("%w %s", ErrBuyTicket, err)
+	// }
+	// fmt.Println(response)
 	//TODO: check user exist
 
 	totalPrice := float64(ticket.Count) * trip.AgencyPrice
