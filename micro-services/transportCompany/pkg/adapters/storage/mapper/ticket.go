@@ -14,6 +14,7 @@ func TicketDomain2Storage(ticketDomain domain.Ticket) *types.Ticket {
 		Price:     ticketDomain.Price,
 		Status:    ticketDomain.Status,
 		InvoiceId: ticketDomain.InvoiceId,
+		Count:     ticketDomain.Count,
 	}
 }
 
@@ -26,5 +27,6 @@ func TicketStorage2Domain(ticketStorage types.Ticket) *domain.Ticket {
 		Price:     ticketStorage.Price,
 		Status:    ticketStorage.Status,
 		InvoiceId: ticketStorage.InvoiceId,
+		Count:     ticketStorage.Count,
 	}
 }
