@@ -40,7 +40,7 @@ func (h *grpcUserHandler) GetUserByEmail(ctx context.Context, req *pb.GetUserByE
 }
 
 func (h *grpcUserHandler) GetUserByUUID(ctx context.Context, req *pb.GetUserByUUIDRequest) (*pb.GetUserResponse, error) {
-	user, err := h.userService.GetUserByUUID(ctx, req)
+	user, err := h.userService.GetUserByUUID(ctx, req.UserUUID)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to check user authorization: %v", err)
 	}
