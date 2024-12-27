@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/golang-delta-team4/gholi-fly/shared/jwt"
+	"github.com/golang-delta-team4/gholi-fly-shared/jwt"
 
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
@@ -13,7 +13,7 @@ func newAuthMiddleware(secret []byte) fiber.Handler {
 		Claims:      &jwt.UserClaims{},
 		TokenLookup: "header:Authorization",
 		SuccessHandler: func(ctx *fiber.Ctx) error {
-			userClaims := userClaims(ctx)
+			userClaims := jwt.GetUserClaims(ctx)
 			if userClaims == nil {
 				return fiber.ErrUnauthorized
 			}

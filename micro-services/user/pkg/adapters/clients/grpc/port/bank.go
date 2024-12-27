@@ -1,9 +1,9 @@
 package port
 
 import (
-	"user-service/pkg/adapters/clients/grpc/pb"
+	bankPB "github.com/golang-delta-team4/gholi-fly-shared/pkg/protobuf/bank"
 )
 
 type GRPCBankClient interface {
-	CreateUserWallet(userUUID string) (*pb.CreateWalletResponse, error)
+	CreateUserWallet(userUUID string) (*bankPB.CreateWalletResponse, error)
 }

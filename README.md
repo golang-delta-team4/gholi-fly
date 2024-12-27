@@ -48,6 +48,8 @@ docker-compose -f docker-compose-dev.yaml up --build
 - **Terminal Route Service**: `http://localhost:8082`
 - **User**: `http://localhost:8083` 
 - **Transportation**: `http://localhost:8084`
+- **Vehicle**: `http://localhost:8085`
+- **Agency**: `http://localhost:8086`
 
 - **NGINX (Proxy)**: `http://localhost:8888`  
 

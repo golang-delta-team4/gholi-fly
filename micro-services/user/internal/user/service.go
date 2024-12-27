@@ -6,10 +6,10 @@ import (
 	"time"
 	"user-service/internal/user/domain"
 	userPort "user-service/internal/user/port"
-	"user-service/pkg/adapters/clients/grpc/pb"
 	bankClientPort "user-service/pkg/adapters/clients/grpc/port"
 	"user-service/pkg/adapters/storage/mapper"
 	"user-service/pkg/adapters/storage/types"
+	bankPB "github.com/golang-delta-team4/gholi-fly-shared/pkg/protobuf/bank"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -45,7 +45,10 @@ func (us *service) SignUp(ctx context.Context, user *domain.User) (uuid.UUID, er
 		return uuid.Nil, err
 	}
 	resp, err := us.bankClient.CreateUserWallet(storageUser.UUID.String())
-	if resp.Status == pb.ResponseStatus_FAILED {
+	if err != nil {
+		return uuid.Nil, err
+	}
+	if resp.Status == bankPB.ResponseStatus_FAILED {
 		return uuid.Nil, err
 	}
 	return storageUser.UUID, nil
