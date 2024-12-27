@@ -5,6 +5,5 @@ import (
 )
 
 type GRPCBankClient interface {
-	CreateUserWallet(userUUID string) (*pb.CreateWalletResponse, error)
 	CreateFactor(rq *pb.CreateFactorRequest) (*pb.CreateFactorResponse, error)
 }

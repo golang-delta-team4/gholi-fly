@@ -55,7 +55,7 @@ func (s *TicketService) BuyAgencyTicket(ctx context.Context, req *pb.BuyAgencyTi
 		return nil, fmt.Errorf("%w %w", ErrBuyTicket, err)
 	}
 
-	ticketId, err := s.svc.BuyAgencyTicket(ctx, domain.Ticket{
+	ticketId, totalPrice, err := s.svc.BuyAgencyTicket(ctx, domain.Ticket{
 		AgencyID: &agencyID,
 		TripID:   tripId,
 	})
@@ -64,7 +64,8 @@ func (s *TicketService) BuyAgencyTicket(ctx context.Context, req *pb.BuyAgencyTi
 	}
 
 	return &pb.BuyTicketResponse{
-		TicketId: ticketId.String(),
+		TicketId:   ticketId.String(),
+		TotalPrice: uint64(totalPrice),
 	}, nil
 }
 
