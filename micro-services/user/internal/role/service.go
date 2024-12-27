@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	permissionDomain "user-service/internal/permission/domain"
 	permissionPort "user-service/internal/permission/port"
 	"user-service/internal/role/domain"
 	rolePort "user-service/internal/role/port"
@@ -83,5 +84,21 @@ func (s *service) AssignRole(ctx context.Context, userUUID uuid.UUID, roles []do
 		}
 	}
 	return nil
-	
+
+}
+
+func (s *service) GrantResourceAccess(ctx context.Context, ownerUUID uuid.UUID, permissions []permissionDomain.Permission, roleName string) error {
+	permissionsWithUUID, err := s.permissionService.CreatePermissions(ctx, permissions)
+	if err != nil {
+		return err
+	}
+	roleUUID, err := s.CreateRole(ctx, &domain.Role{Name: roleName, Permissions: permissionsWithUUID})
+	if err != nil {
+		return err
+	}
+	err = s.AssignRole(ctx, ownerUUID, []domain.Role{{UUID: roleUUID}})
+	if err != nil {
+		return err
+	}
+	return nil
 }
