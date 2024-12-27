@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"strings"
 	rolePB "user-service/api/pb/role"
 	"user-service/api/service"
 	permissionDomain "user-service/internal/permission/domain"
@@ -29,7 +30,7 @@ func (h *grpcRoleHandler) GrantResourceAccess(ctx context.Context, req *rolePB.G
 	}
 	var permissions []permissionDomain.Permission
 	for _, permission := range req.Permissions {
-		permissions = append(permissions, permissionDomain.Permission{Route: permission.Route, Method: permission.Method})
+		permissions = append(permissions, permissionDomain.Permission{Route: strings.ToLower(permission.Route), Method: strings.ToLower(permission.Method)})
 	}
 	err = h.roleService.GrantResourceAccess(ctx, ownerUUID, permissions, req.RoleName)
 	if err != nil {

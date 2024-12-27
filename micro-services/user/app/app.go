@@ -1,6 +1,8 @@
 package app
 
 import (
+	"context"
+	"log"
 	"user-service/config"
 	"user-service/internal/permission"
 	permissionPort "user-service/internal/permission/port"
@@ -76,6 +78,10 @@ func NewApp(cfg config.Config) (App, error) {
 	a.userService = user.NewService(storage.NewUserRepo(a.db), grpc.NewGRPCBankClient(cfg.BankGRPCConfig.Host, int(cfg.BankGRPCConfig.Port)))
 	a.permissionService = permission.NewService(storage.NewPermissionRepo(a.db))
 	a.roleService = role.NewService(storage.NewRoleRepo(a.db), a.permissionService, a.userService)
+	err := a.roleService.CreateSuperAdminRole(context.Background())
+	if err != nil {
+		log.Println(err)
+	}
 	return a, nil
 }
 

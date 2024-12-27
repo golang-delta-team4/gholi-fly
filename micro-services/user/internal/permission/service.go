@@ -61,3 +61,7 @@ func (ps *service) CreatePermissions(ctx context.Context, permissions []domain.P
 	}
 	return permissions, nil
 }
+
+func (ps *service) GetAllPermissions(ctx context.Context) ([]types.Permission, error) {
+	return ps.repo.GetAllPermissions(ctx)
+}

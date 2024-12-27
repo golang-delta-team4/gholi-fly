@@ -102,3 +102,15 @@ func (s *service) GrantResourceAccess(ctx context.Context, ownerUUID uuid.UUID, 
 	}
 	return nil
 }
+
+func (s *service) CreateSuperAdminRole(ctx context.Context) (error) {
+	permissions, err := s.permissionService.GetAllPermissions(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = s.repo.Create(ctx, &types.Role{Name: "SuperAdmin", Permissions: permissions})
+	if err != nil {
+		return err
+	}
+	return nil
+}

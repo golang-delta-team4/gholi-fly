@@ -40,3 +40,12 @@ func (pr *permissionRepo) GetPermissionsByUUID(ctx context.Context, permissionsU
 	}
 	return permissions, nil
 }
+
+func (pr *permissionRepo) GetAllPermissions(ctx context.Context) ([]types.Permission, error) {
+	var permissions []types.Permission
+	err := pr.db.Model(&types.Permission{}).Find(&permissions).Error
+	if err != nil {
+		return nil, err
+	}
+	return permissions, nil
+}
