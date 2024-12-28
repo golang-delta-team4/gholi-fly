@@ -2,6 +2,7 @@ package http
 
 import (
 	"errors"
+	"user-service/api/handlers/shared"
 	"user-service/api/presenter"
 	"user-service/api/service"
 	"user-service/internal/user"
@@ -11,8 +12,9 @@ import (
 	"github.com/google/uuid"
 )
 
-func SignUp(userService *service.UserService) fiber.Handler {
+func SignUp(svcGetter shared.ServiceGetter[*service.UserService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
 		var req presenter.UserSignUpRequest
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.ErrBadRequest
@@ -29,7 +31,7 @@ func SignUp(userService *service.UserService) fiber.Handler {
 		if !ok {
 			return fiber.NewError(fiber.StatusBadRequest, errors.New("invalid password").Error())
 		}
-		resp, err := userService.SignUp(c.UserContext(), &req)
+		resp, err := svc.SignUp(c.UserContext(), &req)
 		if err != nil {
 			if errors.Is(err, &service.ErrUserCreationValidation{}) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())
@@ -40,8 +42,9 @@ func SignUp(userService *service.UserService) fiber.Handler {
 	}
 }
 
-func SignIn(userService *service.UserService) fiber.Handler {
+func SignIn(svcGetter shared.ServiceGetter[*service.UserService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
 		var req presenter.UserSignInRequest
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.ErrBadRequest
@@ -54,7 +57,7 @@ func SignIn(userService *service.UserService) fiber.Handler {
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
-		accessToken, refreshToken, err := userService.SignIn(c.UserContext(), &req)
+		accessToken, refreshToken, err := svc.SignIn(c.UserContext(), &req)
 		if err != nil {
 			if errors.Is(err, user.ErrEmailOrPasswordMismatch) {
 				return fiber.NewError(fiber.StatusUnauthorized, err.Error())
@@ -68,9 +71,9 @@ func SignIn(userService *service.UserService) fiber.Handler {
 	}
 }
 
-func Refresh(userService *service.UserService) fiber.Handler {
+func Refresh(svcGetter shared.ServiceGetter[*service.UserService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-
+		svc := svcGetter(c.UserContext())
 		userUUID := c.Locals("UserUUID")
 		if userUUID == nil {
 			return fiber.NewError(fiber.StatusBadRequest, "invalid access token")
@@ -79,7 +82,7 @@ func Refresh(userService *service.UserService) fiber.Handler {
 		if token == "" {
 			return fiber.NewError(fiber.StatusBadRequest, "refresh token required")
 		}
-		accessToken, refreshToken, err := userService.Refresh(c.UserContext(), userUUID.(uuid.UUID), token)
+		accessToken, refreshToken, err := svc.Refresh(c.UserContext(), userUUID.(uuid.UUID), token)
 		if err != nil {
 			if errors.Is(err, service.ErrInvalidRefreshToken) {
 				return fiber.NewError(fiber.StatusForbidden, err.Error())
@@ -91,13 +94,14 @@ func Refresh(userService *service.UserService) fiber.Handler {
 	}
 }
 
-func GetMe(userService *service.UserService) fiber.Handler {
+func GetMe(svcGetter shared.ServiceGetter[*service.UserService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
 		userUUID := c.Locals("UserUUID")
 		if userUUID == nil {
 			return fiber.NewError(fiber.StatusBadRequest, "invalid access token")
 		}
-		user, err := userService.GetUserByUUID(c.UserContext(), userUUID.(uuid.UUID).String())
+		user, err := svc.GetUserByUUID(c.UserContext(), userUUID.(uuid.UUID).String())
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}

@@ -16,8 +16,9 @@ import (
 
 // Run initializes and starts the gRPC server.
 func Run(app app.App, cfg config.Config) error {
-	userService := service.NewUserService(app.UserService(), cfg.Server.AuthExpMinute, cfg.Server.AuthRefreshMinute, cfg.Server.Secret)
-	roleService := service.NewRoleService(app.RoleService())
+	
+	userService := service.NewUserService(app.UserService(context.Background()), cfg.Server.AuthExpMinute, cfg.Server.AuthRefreshMinute, cfg.Server.Secret)
+	roleService := service.NewRoleService(app.RoleService(context.Background()))
 	// Create gRPC server with interceptors
 	server := grpc.NewServer()
 

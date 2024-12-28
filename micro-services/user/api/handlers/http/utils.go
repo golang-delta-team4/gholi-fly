@@ -1,7 +1,6 @@
 package http
 
 import (
-
 	"github.com/gofiber/fiber/v2"
 	goJwt "github.com/golang-jwt/jwt/v5"
 )
