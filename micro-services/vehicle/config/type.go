@@ -1,9 +1,12 @@
 package config
 
 type Config struct {
-	DB     DBConfig     `json:"db"`
-	Server ServerConfig `json:"server"`
-	Redis  RedisConfig  `json:"redis"`
+	DB          DBConfig     `json:"db"`
+	Server      ServerConfig `json:"server"`
+	Redis       RedisConfig  `json:"redis"`
+	TripService struct {
+		URL string `json:"url"`
+	} `json:"tripService"`
 }
 
 type DBConfig struct {
