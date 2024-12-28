@@ -21,7 +21,7 @@ func NewGRPCRoleClient(host string, port int) roleClientPort.GRPCRoleClient {
 }
 
 func (g *GRPCRoleClient) CreateRole(req *rolePB.GrantResourceAccessRequest) (*rolePB.GrantResourceAccessResponse, error) {
-	conn, err := grpc.Dial(fmt.Sprintf("%v:%v", g.host, g.port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(fmt.Sprintf("%v:%v", g.host, g.port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}

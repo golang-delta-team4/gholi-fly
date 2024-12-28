@@ -3,7 +3,8 @@ package app
 import (
 	"context"
 	"fmt"
-	"log"
+	// "log"
+	clientPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc/port"
 
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/config"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company"
@@ -16,7 +17,9 @@ import (
 	tripPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/storage"
-	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/storage/types"
+	// "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/storage/types"
+
+	// "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/storage/types"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/cache"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/postgres"
 
@@ -34,6 +37,7 @@ type app struct {
 	tripService    tripPort.Service
 	ticketService  ticketPort.Service
 	redisProvider  cache.Provider
+	userGRPCClient clientPort.GRPCUserClient
 }
 
 func (a *app) DB() *gorm.DB {
@@ -53,7 +57,7 @@ func (a *app) CompanyService(ctx context.Context) companyPort.Service {
 }
 
 func (a *app) companyServiceWithDB(db *gorm.DB) companyPort.Service {
-	return company.NewService(storage.NewCompanyRepo(db, false, a.redisProvider))
+	return company.NewService(storage.NewCompanyRepo(db, false, a.redisProvider), grpc.NewGRPCRoleClient(a.cfg.Role.Host, int(a.cfg.Role.Port)))
 }
 
 func (a *app) TripService(ctx context.Context) tripPort.Service {
@@ -93,6 +97,10 @@ func (a *app) invoiceServiceWithDB(db *gorm.DB) invoicePort.Service {
 	return invoice.NewService(storage.NewInvoiceRepo(db, false, a.redisProvider))
 }
 
+func (a *app) UserGRPCService() clientPort.GRPCUserClient {
+	return a.userGRPCClient
+}
+
 func (a *app) Config() config.Config {
 	return a.cfg
 }
@@ -107,10 +115,10 @@ func (a *app) setDB() error {
 		Schema: a.cfg.DB.Schema,
 	})
 
-	migrateErr := db.AutoMigrate(&types.Company{}, &types.Ticket{}, &types.Invoice{}, &types.TechnicalTeam{}, &types.TechnicalTeamMemeber{}, &types.Trip{}, &types.VehicleRequest{})
-	if migrateErr != nil {
-		log.Fatalf("Failed to migrate : %v", migrateErr)
-	}
+	// migrateErr := db.AutoMigrate(&types.Company{}, &types.Ticket{}, &types.Invoice{}, &types.TechnicalTeam{}, &types.TechnicalTeamMemeber{}, &types.Trip{}, &types.VehicleRequest{})
+	// if migrateErr != nil {
+	// 	log.Fatalf("Failed to migrate : %v", migrateErr)
+	// }
 	if err != nil {
 		return err
 	}
@@ -133,7 +141,7 @@ func NewApp(cfg config.Config) (App, error) {
 	}
 
 	a.setRedis()
-
+	a.userGRPCClient = grpc.NewGRPCUserClient(a.cfg.User.Host, int(a.cfg.User.Port))
 	//return a, a.registerOutboxHandlers()
 
 	return a, nil
