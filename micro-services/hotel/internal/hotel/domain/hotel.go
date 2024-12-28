@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"errors"
 	"time"
 
 	roomDomain "gholi-fly-hotel/internal/room/domain"
@@ -32,4 +33,18 @@ type Hotel struct {
 type HotelFilters struct {
 	Name string
 	City string
+}
+
+func (h *Hotel) Validate() error {
+	if h.Name == "" {
+		return errors.New("hotel name cant be empty")
+	}
+	if h.City == "" {
+		return errors.New("city cant cant be empty")
+	}
+	if h.OwnerID == uuid.Nil {
+		return errors.New("owner id cant be nil")
+	}
+
+	return nil
 }

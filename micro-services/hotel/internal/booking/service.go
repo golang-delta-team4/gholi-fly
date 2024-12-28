@@ -15,7 +15,7 @@ import (
 var (
 	ErrBookingCreation           = errors.New("error on creating booking")
 	ErrBookingCreationValidation = errors.New("error on creating booking: validation failed")
-	ErrBookingCreationDuplicate  = errors.New("booking already exists in this days")
+	ErrBookingCreationDuplicate  = errors.New("booking already exists in these days")
 	ErrBookingNotFound           = errors.New("booking not found")
 	ErrInvalidSourceService      = errors.New("invalid source service")
 )
