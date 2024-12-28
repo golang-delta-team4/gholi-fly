@@ -54,7 +54,7 @@ func GetTechnicalTeams(svcGetter ServiceGetter[*service.TechnicalTeamService]) f
 		pageSize, _ := strconv.Atoi(c.Query("page-size"))
 		pageNumber, _ := strconv.Atoi(c.Query("page-number"))
 
-		response, err := svc.GetTechnicalTeamById(c.UserContext(), pageSize, pageNumber)
+		response, err := svc.GetTechnicalTeams(c.UserContext(), pageSize, pageNumber)
 
 		if err != nil {
 			if errors.Is(err, service.ErrCompanyCreationValidation) {
@@ -71,12 +71,12 @@ func GetTechnicalTeams(svcGetter ServiceGetter[*service.TechnicalTeamService]) f
 func SetTechTeamToTrip(svcGetter ServiceGetter[*service.TechnicalTeamService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		svc := svcGetter(c.UserContext())
-		tripId := c.Params("tripID")
+
 		var req pb.SetTechnicalTeamToTripRequest
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
-		err := svc.SetTechTeamToTrip(c.UserContext(), &req, tripId)
+		err := svc.SetTechTeamToTrip(c.UserContext(), &req)
 
 		if err != nil {
 			if errors.Is(err, service.ErrCompanyCreationValidation) {

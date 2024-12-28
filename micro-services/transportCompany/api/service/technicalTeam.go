@@ -54,7 +54,6 @@ func (s *TechnicalTeamService) GetTechnicalTeamById(ctx context.Context, technic
 	}
 
 	team, err := s.svc.GetById(ctx, teamId)
-
 	if err != nil {
 		return nil, err
 	}
@@ -67,4 +66,56 @@ func (s *TechnicalTeamService) GetTechnicalTeamById(ctx context.Context, technic
 		CompanyId:   team.CompanyId.String(),
 		MembersId:   team.Members,
 	}, nil
+}
+
+func (s *TechnicalTeamService) GetTechnicalTeams(ctx context.Context, pageSize int, pageNumber int) (*pb.GetTechnicalTeamsResponse, error) {
+	teams, err := s.svc.GetAll(ctx, pageSize, pageNumber)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var response []*pb.GetTechnicalTeamResponse
+	for _, team := range teams {
+		response = append(response, &pb.GetTechnicalTeamResponse{
+			Id:          team.Id.String(),
+			Name:        team.Name,
+			Description: team.Description,
+			TripType:    team.TripType,
+			CompanyId:   team.CompanyId.String(),
+			MembersId:   team.Members,
+		})
+	}
+	return &pb.GetTechnicalTeamsResponse{
+		Teams: response,
+	}, nil
+}
+
+func (s *TechnicalTeamService) SetTechTeamToTrip(ctx context.Context, req *pb.SetTechnicalTeamToTripRequest) error {
+	tripId, err := uuid.Parse(req.TripId)
+	if err != nil {
+		return fmt.Errorf("%w %w", ErrTechnicalCreationValidation, err)
+	}
+	teamId, err := uuid.Parse(req.TechnicalTeamId)
+	if err != nil {
+		return fmt.Errorf("%w %w", ErrTechnicalCreationValidation, err)
+	}
+	return s.svc.SetToTrip(ctx, teamId, tripId)
+}
+
+func (s *TechnicalTeamService) AddTechnicalTeamMember(ctx context.Context, req *pb.AddTechnicalTeamMemberRequest) error {
+	userId, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return fmt.Errorf("%w %w", ErrTechnicalCreationValidation, err)
+	}
+	teamId, err := uuid.Parse(req.TechnicalTeamId)
+	if err != nil {
+		return fmt.Errorf("%w %w", ErrTechnicalCreationValidation, err)
+	}
+	err = s.svc.SetMember(ctx, teamId, domain.TechnicalTeamMember{
+		UserId:   userId,
+		TeamId:   teamId,
+		Position: req.Position,
+	})
+	return err
 }
