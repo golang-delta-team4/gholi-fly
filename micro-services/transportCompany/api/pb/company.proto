@@ -150,3 +150,7 @@ message GetTechnicalTeamResponse {
     string tripType = 5 [json_name = "tripType"];
     repeated string membersId = 6  [json_name = "membersId"];
 }
+
+message GetTechnicalTeamsResponse {
+    repeated GetTechnicalTeamResponse teams = 1 [json_name = "teams"];
+}
