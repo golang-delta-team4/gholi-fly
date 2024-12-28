@@ -58,6 +58,7 @@ func (s *TicketService) BuyAgencyTicket(ctx context.Context, req *pb.BuyAgencyTi
 	ticketId, totalPrice, err := s.svc.BuyAgencyTicket(ctx, domain.Ticket{
 		AgencyID: &agencyID,
 		TripID:   tripId,
+		Count:    uint(req.TicketCount),
 	})
 	if err != nil {
 		return nil, err
