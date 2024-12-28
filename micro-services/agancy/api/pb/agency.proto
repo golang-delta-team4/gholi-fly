@@ -4,6 +4,10 @@ package agency;
 
 option go_package = "gholi-fly-agancy/api/pb/agency";
 
+/*
+  agency messages
+*/
+
 // Message for creating an agency
 message CreateAgencyRequest {
   string name = 1;
@@ -52,3 +56,88 @@ message DeleteAgencyRequest {
 
 // Response for successful deletion
 message DeleteAgencyResponse {}
+
+/*
+  tour messages
+*/
+
+// Message for creating a tour
+message CreateTourRequest {
+  string name = 1;
+  string description = 2;
+  string start_date = 3; // ISO8601 timestamp
+  string end_date = 4; // ISO8601 timestamp
+  string source_location = 5;
+  string destination_location = 6;
+  string trip_id = 7; // UUID of the trip
+  uint64 ticket_count = 8;
+  uint64 trip_agency_price = 9;
+  string hotel_id = 10; // UUID of the hotel
+  string check_in = 11; // ISO8601 timestamp
+  string check_out = 12; // ISO8601 timestamp
+  repeated string room_ids = 13;
+  uint64 hotel_agency_price = 14;
+  uint32 capacity = 15;
+  bool is_published = 16;
+}
+
+// Response for creating a tour
+message CreateTourResponse {
+  string id = 1; // UUID of the newly created tour
+}
+
+// Message for getting a tour by ID
+message GetTourByIDRequest {
+  string id = 1; // UUID of the tour
+}
+
+// Response for getting a tour by ID
+message GetTourByIDResponse {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string start_date = 4; // ISO8601 timestamp
+  string end_date = 5; // ISO8601 timestamp
+  string source_location = 6;
+  string destination_location = 7;
+  string trip_id = 8; // UUID of the trip
+  uint64 trip_agency_price = 9;
+  string hotel_id = 10; // UUID of the hotel
+  uint64 hotel_agency_price = 11;
+  uint32 capacity = 12;
+  bool is_published = 13;
+  string created_at = 14; // ISO8601 timestamp
+  string updated_at = 15; // ISO8601 timestamp
+}
+
+// Message for updating a tour
+message UpdateTourRequest {
+  string id = 1; // UUID of the tour
+  string name = 2;
+  string description = 3;
+  string start_date = 4; // ISO8601 timestamp
+  string end_date = 5; // ISO8601 timestamp
+  string source_location = 6;
+  string destination_location = 7;
+  string trip_id = 8; // UUID of the trip
+  uint64 ticket_count = 9;
+  uint64 trip_agency_price = 10;
+  string hotel_id = 11; // UUID of the hotel
+  string check_in = 12; // ISO8601 timestamp
+  string check_out = 13; // ISO8601 timestamp
+  repeated string room_ids = 14;
+  uint64 hotel_agency_price = 15;
+  uint32 capacity = 16;
+  bool is_published = 17;
+}
+
+// Response for successful update
+message UpdateTourResponse {}
+
+// Message for deleting a tour
+message DeleteTourRequest {
+  string id = 1; // UUID of the tour
+}
+
+// Response for successful deletion
+message DeleteTourResponse {}

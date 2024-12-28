@@ -10,7 +10,7 @@ import (
 	"gholi-fly-agancy/config"
 )
 
-func Run(appContainer app.App, cfg config.ServerConfig) error {
+func Run(appContainer app.App, cfg config.Config) error {
 	// Initialize Fiber router
 	router := fiber.New()
 	router.Use(recover.New())
@@ -19,17 +19,20 @@ func Run(appContainer app.App, cfg config.ServerConfig) error {
 	api := router.Group(
 		"/api/v1/agency",
 		setUserContext,
-		newAuthMiddleware([]byte(cfg.Secret)),
+		newAuthMiddleware([]byte(cfg.Server.Secret)),
 	)
 
 	// Register Agency API
-	registerAgencyAPI(appContainer, cfg, api)
+	registerAgencyAPI(appContainer, api)
+
+	// Register Tour API
+	registerTourAPI(appContainer, cfg, api)
 
 	// Start the server
-	return router.Listen(fmt.Sprintf(":%d", cfg.HttpPort))
+	return router.Listen(fmt.Sprintf(":%d", cfg.Server.HttpPort))
 }
 
-func registerAgencyAPI(appContainer app.App, cfg config.ServerConfig, router fiber.Router) {
+func registerAgencyAPI(appContainer app.App, router fiber.Router) {
 	agencyServiceGetter := agencyServiceGetter(appContainer)
 
 	// Create agency (transactional)
@@ -43,4 +46,22 @@ func registerAgencyAPI(appContainer app.App, cfg config.ServerConfig, router fib
 
 	// Delete agency by ID (non-transactional)
 	router.Delete("/:id", DeleteAgency(agencyServiceGetter))
+}
+func registerTourAPI(appContainer app.App, cfg config.Config, router fiber.Router) {
+	tourServiceGetter := tourServiceGetter(appContainer)
+
+	// Create tour (transactional)
+	router.Post("/tour/:agencyID", setTransaction(appContainer.DB()), CreateTour(tourServiceGetter, cfg))
+
+	// Get tour by ID (non-transactional)
+	router.Get("/tour/:id", GetTour(tourServiceGetter))
+
+	// Update tour by ID (transactional)
+	router.Patch("/tour/:id", setTransaction(appContainer.DB()), UpdateTour(tourServiceGetter))
+
+	// Delete tour by ID (non-transactional)
+	router.Delete("/tour/:id", DeleteTour(tourServiceGetter))
+
+	// List tours by agency (non-transactional)
+	router.Get("/agency/:agencyID/tours", ListToursByAgency(tourServiceGetter))
 }
