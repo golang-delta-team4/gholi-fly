@@ -67,8 +67,9 @@ func (s *BookingService) CreateBooking(ctx context.Context, req *pb.BookingCreat
 		return nil, ErrBookingCreationValidation
 	}
 	reservationId := uuid.New()
+	totalPrice := 0
 	for _, roomId := range roomUUIDs {
-		_, err := s.svc.CreateBookingByHotelID(ctx, domain.Booking{
+		_, price, err := s.svc.CreateBookingByHotelID(ctx, domain.Booking{
 			CheckIn:       checkIn,
 			CheckOut:      checkOut,
 			HotelID:       hotelUUID,
@@ -83,12 +84,13 @@ func (s *BookingService) CreateBooking(ctx context.Context, req *pb.BookingCreat
 		if err != nil {
 			return nil, err
 		}
+		totalPrice += int(price)
 
 	}
 
 	return &pb.BookingCreateResponse{
 		ReservationId: reservationId.String(),
-		TotalPrice:    620000,
+		TotalPrice:    int64(totalPrice),
 	}, nil
 }
 

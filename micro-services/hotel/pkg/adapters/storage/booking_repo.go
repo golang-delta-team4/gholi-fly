@@ -23,14 +23,20 @@ func NewBookingRepo(db *gorm.DB) bookingPort.Repo {
 	return &bookingRepo{db: db}
 }
 
-func (r *bookingRepo) CreateByHotelID(ctx context.Context, bookingDomain domain.Booking, hotelID hotelDomain.HotelUUID) (domain.BookingUUID, error) {
+func (r *bookingRepo) CreateByHotelID(ctx context.Context, bookingDomain domain.Booking, hotelID hotelDomain.HotelUUID) (domain.BookingUUID, roomDomain.RoomPrice, error) {
 	booking := mapper.BookingDomain2Storage(bookingDomain)
 	booking.HotelID = hotelID
+	var room types.Room
 	err := r.db.Table("bookings").WithContext(ctx).Create(booking).Error
 	if err != nil {
-		return domain.BookingUUID{}, err
+		return domain.BookingUUID{}, 0, err
 	}
-	return domain.BookingUUID(booking.UUID), nil
+
+	err = r.db.Table("rooms").WithContext(ctx).Where("uuid = ?", booking.RoomID).First(&room).Error
+	if err != nil {
+		return domain.BookingUUID{}, 0, err
+	}
+	return domain.BookingUUID(booking.UUID), room.BasePrice, nil
 }
 
 func (r *bookingRepo) GetByID(ctx context.Context, bookingID domain.BookingUUID) (*domain.Booking, error) {

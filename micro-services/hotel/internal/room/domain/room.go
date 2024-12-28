@@ -7,8 +7,9 @@ import (
 )
 
 type (
-	RoomID   = uint
-	RoomUUID = uuid.UUID
+	RoomID    = uint
+	RoomUUID  = uuid.UUID
+	RoomPrice = uint
 )
 
 type Room struct {
@@ -17,8 +18,8 @@ type Room struct {
 	HotelID     uuid.UUID
 	RoomNumber  uint
 	Floor       uint
-	BasePrice   uint
-	AgencyPrice uint
+	BasePrice   RoomPrice
+	AgencyPrice RoomPrice
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   time.Time
