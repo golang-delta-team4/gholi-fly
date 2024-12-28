@@ -30,12 +30,15 @@ func NewService(repo port.Repo) port.Service {
 }
 
 // CreateBookingByRoomID creates a new booking by room ID
-func (s *service) CreateBookingByHotelID(ctx context.Context, booking bookingDomain.Booking, hotelID hotelDomain.HotelUUID) (bookingDomain.BookingUUID, error) {
-	bookingID, err := s.repo.CreateByHotelID(ctx, booking, hotelID)
-	if err != nil {
-		return bookingDomain.BookingUUID{}, ErrBookingCreation
+func (s *service) CreateBookingByHotelID(ctx context.Context, booking bookingDomain.Booking, hotelID hotelDomain.HotelUUID) (bookingDomain.BookingUUID, roomDomain.RoomPrice, error) {
+	if err := booking.Validate(); err != nil {
+		return uuid.Nil, 0, ErrBookingCreationValidation
 	}
-	return bookingID, nil
+	bookingID, price, err := s.repo.CreateByHotelID(ctx, booking, hotelID)
+	if err != nil {
+		return bookingDomain.BookingUUID{}, 0, ErrBookingCreation
+	}
+	return bookingID, price, nil
 }
 
 // GetAllBookingsByRoomID returns all bookings by room ID

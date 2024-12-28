@@ -10,7 +10,7 @@ import (
 )
 
 type Repo interface {
-	CreateByHotelID(ctx context.Context, booking bookingDomain.Booking, hotelID hotelDomain.HotelUUID) (bookingDomain.BookingUUID, error)
+	CreateByHotelID(ctx context.Context, booking bookingDomain.Booking, hotelID hotelDomain.HotelUUID) (bookingDomain.BookingUUID, roomDomain.RoomPrice, error)
 	GetByRoomID(ctx context.Context, roomID roomDomain.RoomUUID) ([]bookingDomain.Booking, error)
 	GetByUserID(ctx context.Context, userID uuid.UUID) ([]bookingDomain.Booking, error)
 	GetByID(ctx context.Context, bookingID bookingDomain.BookingUUID) (*bookingDomain.Booking, error)
