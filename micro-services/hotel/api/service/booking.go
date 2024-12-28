@@ -88,6 +88,7 @@ func (s *BookingService) CreateBooking(ctx context.Context, req *pb.BookingCreat
 
 	return &pb.BookingCreateResponse{
 		ReservationId: reservationId.String(),
+		TotalPrice:    620000,
 	}, nil
 }
 

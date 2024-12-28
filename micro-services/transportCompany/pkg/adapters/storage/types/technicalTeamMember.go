@@ -5,10 +5,10 @@ import (
 	"gorm.io/gorm"
 )
 
-type TechnicalTeamMemeber struct {
+type TechnicalTeamMember struct {
 	gorm.Model
-	TechnicalTeamId int64         `gorm:"not null;unique;"`
-	UserId          uuid.UUID     `gorm:"type:uuid;not null;unique;"`
+	TechnicalTeamId uuid.UUID     `gorm:"not null;"`
+	UserId          uuid.UUID     `gorm:"not null;"`
 	Position        string        `gorm:"not null"`
 	TechnicalTeam   TechnicalTeam `gorm:"foreignKey:TechnicalTeamId;constraint:OnDelete:CASCADE;"`
 }

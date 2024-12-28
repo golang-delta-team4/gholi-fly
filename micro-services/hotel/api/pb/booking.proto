@@ -21,6 +21,7 @@ message BookingCreateRequest {
 
 message BookingCreateResponse {
     string reservationId = 1 [json_name = "reservationId"];
+    int64 totalPrice = 2 [json_name = "totalPrice"];
 }
 
 message GetAllBookingResponse {

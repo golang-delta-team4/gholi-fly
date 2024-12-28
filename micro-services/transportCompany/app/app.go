@@ -11,6 +11,8 @@ import (
 	companyPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/invoice"
 	invoicePort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/invoice/port"
+	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/technicalTeam"
+	technicalTeamPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/technicalTeam/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/ticket"
 	ticketPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/ticket/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip"
@@ -36,6 +38,7 @@ type app struct {
 	companyService companyPort.Service
 	tripService    tripPort.Service
 	ticketService  ticketPort.Service
+	technicalTeam  technicalTeamPort.Service
 	redisProvider  cache.Provider
 	userGRPCClient clientPort.GRPCUserClient
 }
@@ -93,6 +96,22 @@ func (a *app) ticketServiceWithDB(db *gorm.DB) ticketPort.Service {
 		a.tripServiceWithDB(db), a.invoiceServiceWithDB(db), grpc.NewGRPCBankClient(a.cfg.Bank.Host, int(a.cfg.Bank.Port)))
 }
 
+func (a *app) TechnicalTeamService(ctx context.Context) technicalTeamPort.Service {
+	db := appCtx.GetDB(ctx)
+	if db == nil {
+		if a.technicalTeam == nil {
+			a.technicalTeam = a.technicalTeamServiceWithDB(a.db)
+		}
+		return a.technicalTeam
+	}
+
+	return a.technicalTeamServiceWithDB(db)
+}
+
+func (a *app) technicalTeamServiceWithDB(db *gorm.DB) technicalTeamPort.Service {
+	return technicalTeam.NewService(storage.NewTechnicalTeamRepo(db, false, a.redisProvider))
+}
+
 func (a *app) invoiceServiceWithDB(db *gorm.DB) invoicePort.Service {
 	return invoice.NewService(storage.NewInvoiceRepo(db, false, a.redisProvider))
 }
@@ -115,10 +134,11 @@ func (a *app) setDB() error {
 		Schema: a.cfg.DB.Schema,
 	})
 
-	// migrateErr := db.AutoMigrate(&types.Company{}, &types.Ticket{}, &types.Invoice{}, &types.TechnicalTeam{}, &types.TechnicalTeamMemeber{}, &types.Trip{}, &types.VehicleRequest{})
-	// if migrateErr != nil {
-	// 	log.Fatalf("Failed to migrate : %v", migrateErr)
-	// }
+	migrateErr := db.AutoMigrate(&types.Company{}, &types.Ticket{}, &types.Invoice{}, &types.TechnicalTeam{}, &types.TechnicalTeamMember{}, &types.Trip{}, &types.VehicleRequest{})
+	if migrateErr != nil {
+		log.Fatalf("Failed to migrate : %v", migrateErr)
+	}
+  
 	if err != nil {
 		return err
 	}
