@@ -9,6 +9,10 @@ import (
 
 type TourID uuid.UUID
 
+func (id TourID) String() string {
+	return uuid.UUID(id).String()
+}
+
 type Tour struct {
 	ID                  TourID
 	Name                string

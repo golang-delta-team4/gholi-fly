@@ -106,7 +106,7 @@ func (a *app) setDB() error {
 		DBName: a.cfg.DB.Database,
 		Schema: a.cfg.DB.Schema,
 	})
-
+	db = db.Debug()
 	migrateErr := db.AutoMigrate(&types.Company{}, &types.Ticket{}, &types.Invoice{}, &types.TechnicalTeam{}, &types.TechnicalTeamMemeber{}, &types.Trip{}, &types.VehicleRequest{})
 	if migrateErr != nil {
 		log.Fatalf("Failed to migrate : %v", migrateErr)
