@@ -32,18 +32,18 @@ func registerCompanyAPI(appContainer app.App, cfg config.ServerConfig, router fi
 	router.Post("/company", setTransaction(appContainer.DB()), CreateCompany(companyServiceGetter))
 	router.Get("/company/:id", setTransaction(appContainer.DB()), GetCompanyById(companyServiceGetter))
 	router.Get("/get-company-by-ownerid/:ownerId", setTransaction(appContainer.DB()), GetByOwnerId(companyServiceGetter))
-	router.Patch("/company/:id", setTransaction(appContainer.DB()), UpdateCompany(companyServiceGetter))
-	router.Delete("/company/:id", setTransaction(appContainer.DB()), DeleteCompany(companyServiceGetter))
+	router.Patch("/company/:id", newAuthorizationMiddlewareDirect(appContainer.UserGRPCService()), setTransaction(appContainer.DB()), UpdateCompany(companyServiceGetter))
+	router.Delete("/company/:id", newAuthorizationMiddlewareDirect(appContainer.UserGRPCService()), setTransaction(appContainer.DB()), DeleteCompany(companyServiceGetter))
 }
 
 func registerTripApi(appContainer app.App, cfg config.ServerConfig, router fiber.Router) {
 	tripServiceGetter := tripServiceGetter(appContainer, cfg)
-	router.Post("/trip", setTransaction(appContainer.DB()), CreateTrip(tripServiceGetter))
+	router.Post("/trip", setTransaction(appContainer.DB()), CreateTrip(tripServiceGetter, appContainer.UserGRPCService()))
 	router.Get("/trip/:id", setTransaction(appContainer.DB()), GetTripById(tripServiceGetter))
 	router.Get("/agency-trip/:id", setTransaction(appContainer.DB()), GetAgencyTripById(tripServiceGetter))
 	router.Get("/trip", setTransaction(appContainer.DB()), GetTrips(tripServiceGetter))
 	router.Get("/agency-trip", setTransaction(appContainer.DB()), GetAgencyTrips(tripServiceGetter))
-	router.Patch("/trip/:id", setTransaction(appContainer.DB()), UpdateTrip(tripServiceGetter))
+	router.Patch("/trip/:id", setTransaction(appContainer.DB()), UpdateTrip(tripServiceGetter, appContainer.UserGRPCService()))
 	router.Delete("/trip/:id", setTransaction(appContainer.DB()), DeleteTrip(tripServiceGetter))
 }
 

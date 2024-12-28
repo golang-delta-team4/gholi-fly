@@ -5,5 +5,5 @@ import (
 )
 
 type GRPCUserClient interface {
-	CreateRole(rq *userPB.UserAuthorizationRequest) (*userPB.UserAuthorizationResponse, error)
+	CheckUserAuthorization(rq *userPB.UserAuthorizationRequest) (*userPB.UserAuthorizationResponse, error)
 }
