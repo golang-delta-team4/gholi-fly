@@ -74,7 +74,7 @@ func (s *BookingService) CreateBooking(ctx context.Context, req *pb.BookingCreat
 			CheckOut:      checkOut,
 			HotelID:       hotelUUID,
 			RoomID:        roomId,
-			UserID:        &userUUID, // Changed to pointer
+			UserID:        &userUUID,
 			AgencyID:      &agencyUUID,
 			ReservationID: reservationId,
 			IsPayed:       false,

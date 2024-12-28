@@ -23,7 +23,6 @@ func CreateBookingByHotelID(svcGetter ServiceGetter[*service.BookingService]) fi
 			if errors.Is(err, service.ErrBookingCreationValidation) || errors.Is(err, service.ErrBookingCreationDuplicate) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())
 			}
-			// log.Error("HEEEEEEEEREEEEEE", err)
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 
