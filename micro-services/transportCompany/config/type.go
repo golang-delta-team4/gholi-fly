@@ -5,6 +5,8 @@ type Config struct {
 	Server ServerConfig   `json:"server"`
 	Redis  RedisConfig    `json:"redis"`
 	Bank   BankGRPCConfig `json:"bank"`
+	User   UserGRPCConfig `json:"user"`
+	Role   RoleGRPCConfig `json:"role"`
 }
 
 type DBConfig struct {
@@ -27,6 +29,16 @@ type RedisConfig struct {
 }
 
 type BankGRPCConfig struct {
+	Host string `json:"host"`
+	Port uint   `json:"port"`
+}
+
+type UserGRPCConfig struct {
+	Host string `json:"host"`
+	Port uint   `json:"port"`
+}
+
+type RoleGRPCConfig struct {
 	Host string `json:"host"`
 	Port uint   `json:"port"`
 }
