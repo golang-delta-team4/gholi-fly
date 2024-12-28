@@ -2,6 +2,7 @@ package http
 
 import (
 	"errors"
+	"user-service/api/handlers/shared"
 	"user-service/api/presenter"
 	"user-service/api/service"
 	"user-service/internal/role"
@@ -10,8 +11,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func CreateRole(roleService *service.RoleService) fiber.Handler {
+func CreateRole(svcGetter shared.ServiceGetter[*service.RoleService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
 		var req presenter.CreateRoleRequest
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.ErrBadRequest
@@ -20,7 +22,7 @@ func CreateRole(roleService *service.RoleService) fiber.Handler {
 		if validationError != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"errors": validationError})
 		}
-		resp, err := roleService.Create(c.UserContext(), &req)
+		resp, err := svc.Create(c.UserContext(), &req)
 		if err != nil {
 			if errors.Is(err, &service.ErrInvalidUUID{}) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())	
@@ -34,8 +36,9 @@ func CreateRole(roleService *service.RoleService) fiber.Handler {
 	}
 }
 
-func AssignRole(roleService *service.RoleService) fiber.Handler {
+func AssignRole(svcGetter shared.ServiceGetter[*service.RoleService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
 		var req presenter.AssignRoleRequest
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.ErrBadRequest
@@ -44,7 +47,7 @@ func AssignRole(roleService *service.RoleService) fiber.Handler {
 		if validationError != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"errors": validationError})
 		}
-		err := roleService.Assign(c.UserContext(), &req)
+		err := svc.Assign(c.UserContext(), &req)
 		if err != nil {
 			if errors.Is(err, &role.ErrRoleNotFound{}) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())	

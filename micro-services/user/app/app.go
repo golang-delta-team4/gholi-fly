@@ -11,8 +11,10 @@ import (
 	"user-service/internal/user"
 	userPort "user-service/internal/user/port"
 	"user-service/pkg/adapters/clients/grpc"
+	grpcPort "user-service/pkg/adapters/clients/grpc/port"
 	"user-service/pkg/adapters/storage"
 	"user-service/pkg/adapters/storage/types"
+	appCtx "user-service/pkg/context"
 	"user-service/pkg/postgres"
 
 	"gorm.io/gorm"
@@ -24,6 +26,7 @@ type app struct {
 	userService       userPort.Service
 	permissionService permissionPort.Service
 	roleService       rolePort.Service
+	bankClient        grpcPort.GRPCBankClient
 }
 
 func (a *app) DB() *gorm.DB {
@@ -75,6 +78,7 @@ func NewApp(cfg config.Config) (App, error) {
 	if err := a.setDB(); err != nil {
 		return nil, err
 	}
+	a.bankClient = grpc.NewGRPCBankClient(cfg.BankGRPCConfig.Host, int(cfg.BankGRPCConfig.Port))
 	a.userService = user.NewService(storage.NewUserRepo(a.db), grpc.NewGRPCBankClient(cfg.BankGRPCConfig.Host, int(cfg.BankGRPCConfig.Port)))
 	a.permissionService = permission.NewService(storage.NewPermissionRepo(a.db))
 	a.roleService = role.NewService(storage.NewRoleRepo(a.db), a.permissionService, a.userService)
@@ -93,14 +97,50 @@ func NewMustApp(cfg config.Config) App {
 	return app
 }
 
-func (a *app) UserService() userPort.Service {
-	return a.userService
+func (a *app) roleServiceWithDB(db *gorm.DB) rolePort.Service {
+	return role.NewService(storage.NewRoleRepo(db), a.permissionService, a.userService)
 }
 
-func (a *app) PermissionService() permissionPort.Service {
-	return a.permissionService
+func (a *app) RoleService(ctx context.Context) rolePort.Service {
+	db := appCtx.GetDB(ctx)
+	if db == nil {
+		if a.roleService == nil {
+			a.roleService = a.roleServiceWithDB(a.db)
+		}
+		return a.roleService
+	}
+
+	return a.roleServiceWithDB(db)
 }
 
-func (a *app) RoleService() rolePort.Service {
-	return a.roleService
+func (a *app) userServiceWithDB(db *gorm.DB) userPort.Service {
+	return user.NewService(storage.NewUserRepo(db), a.bankClient)
+}
+
+func (a *app) UserService(ctx context.Context) userPort.Service {
+	db := appCtx.GetDB(ctx)
+	if db == nil {
+		if a.userService == nil {
+			a.userService = a.userServiceWithDB(a.db)
+		}
+		return a.userService
+	}
+
+	return a.userServiceWithDB(db)
+}
+
+func (a *app) permissionServiceWithDB(db *gorm.DB) permissionPort.Service {
+	return permission.NewService(storage.NewPermissionRepo(db))
+}
+
+func (a *app) PermissionService(ctx context.Context) permissionPort.Service {
+	db := appCtx.GetDB(ctx)
+	if db == nil {
+		if a.permissionService == nil {
+			a.permissionService = a.permissionServiceWithDB(a.db)
+		}
+		return a.permissionService
+	}
+
+	return a.permissionServiceWithDB(db)
 }
