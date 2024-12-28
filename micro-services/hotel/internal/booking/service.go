@@ -7,6 +7,7 @@ import (
 	"gholi-fly-hotel/internal/booking/port"
 	hotelDomain "gholi-fly-hotel/internal/hotel/domain"
 	roomDomain "gholi-fly-hotel/internal/room/domain"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -14,7 +15,7 @@ import (
 var (
 	ErrBookingCreation           = errors.New("error on creating booking")
 	ErrBookingCreationValidation = errors.New("error on creating booking: validation failed")
-	ErrBookingCreationDuplicate  = errors.New("booking already exists")
+	ErrBookingCreationDuplicate  = errors.New("booking already exists in this days")
 	ErrBookingNotFound           = errors.New("booking not found")
 	ErrInvalidSourceService      = errors.New("invalid source service")
 )
@@ -36,6 +37,9 @@ func (s *service) CreateBookingByHotelID(ctx context.Context, booking bookingDom
 	}
 	bookingID, price, err := s.repo.CreateByHotelID(ctx, booking, hotelID)
 	if err != nil {
+		if strings.Contains(err.Error(), ErrBookingCreationDuplicate.Error()) {
+			return bookingDomain.BookingUUID{}, 0, ErrBookingCreationDuplicate
+		}
 		return bookingDomain.BookingUUID{}, 0, ErrBookingCreation
 	}
 	return bookingID, price, nil

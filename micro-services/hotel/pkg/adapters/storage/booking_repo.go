@@ -26,16 +26,27 @@ func NewBookingRepo(db *gorm.DB) bookingPort.Repo {
 func (r *bookingRepo) CreateByHotelID(ctx context.Context, bookingDomain domain.Booking, hotelID hotelDomain.HotelUUID) (domain.BookingUUID, roomDomain.RoomPrice, error) {
 	booking := mapper.BookingDomain2Storage(bookingDomain)
 	booking.HotelID = hotelID
+	reservationId := booking.ReservationID
+
 	var room types.Room
-	err := r.db.Table("bookings").WithContext(ctx).Create(booking).Error
+	err := r.db.Table("rooms").WithContext(ctx).Where("uuid = ?", booking.RoomID).First(&room).Error
 	if err != nil {
 		return domain.BookingUUID{}, 0, err
 	}
 
-	err = r.db.Table("rooms").WithContext(ctx).Where("uuid = ?", booking.RoomID).First(&room).Error
+	var existingBooking types.Booking
+	err = r.db.Table("bookings").WithContext(ctx).Where("room_id = ? AND reservation_id != ?", booking.RoomID, reservationId).First(&existingBooking).Error
+	if err == nil {
+		return domain.BookingUUID{}, 0, errors.New("booking already exists in this days")
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return domain.BookingUUID{}, 0, err
+	}
+
+	err = r.db.Table("bookings").WithContext(ctx).Create(booking).Error
 	if err != nil {
 		return domain.BookingUUID{}, 0, err
 	}
+
 	return domain.BookingUUID(booking.UUID), room.BasePrice, nil
 }
 

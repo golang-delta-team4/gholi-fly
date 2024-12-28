@@ -56,7 +56,10 @@ func (b *Booking) Validate() error {
 		return errors.New("check out can't be zero")
 	}
 	if b.CheckOut.Before(b.CheckIn) {
-		return errors.New("check in can't be before CheckOut")
+		return errors.New("check in can't be before check out")
+	}
+	if b.CheckOut.Before(time.Now()) {
+		return errors.New("check in can't be in past")
 	}
 	if b.Status <= 0 {
 		return errors.New("status not defined")
