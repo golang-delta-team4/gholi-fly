@@ -11,6 +11,7 @@ import (
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/ticket/domain"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/ticket/port"
 	tripPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/port"
+	adaptersPb "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc/pb"
 	grpcPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc/port"
 	"github.com/google/uuid"
 )
@@ -60,25 +61,32 @@ func (s *service) BuyTicket(ctx context.Context, ticket domain.Ticket) (uuid.UUI
 		return uuid.Nil, fmt.Errorf("%w %s", ErrBuyTicket, "trip is started")
 	}
 	// bank
-	// response, err := s.bankGrpc.CreateFactor(&adaptersPb.CreateFactorRequest{
-	// 	Factor: &adaptersPb.Factor{
-	// 		SourceService: "transportCompany",
-	// 		TotalAmount:   uint64(trip.AgencyPrice),
-	// 		Distributions: []*adaptersPb.Distribution{&adaptersPb.Distribution{
-	// 			WalletId: "",
-	// 		}},
-	// 	},
-	// })
-	// if err != nil {
-	// 	return uuid.Nil, fmt.Errorf("%w %s", ErrBuyTicket, err)
-	// }
-	// fmt.Println(response)
-	// user
-
+	walletResponse, err := s.bankGrpc.GetWallets(&adaptersPb.GetWalletsRequest{
+		OwnerId: ticket.UserID.String(),
+		Type:    3,
+	})
+	if err != nil {
+		return uuid.Nil, fmt.Errorf("%w %s", ErrBuyTicket, err)
+	}
 	totalPrice := float64(ticket.Count) * trip.AgencyPrice
+	response, err := s.bankGrpc.CreateFactor(&adaptersPb.CreateFactorRequest{
+		Factor: &adaptersPb.Factor{
+			SourceService: "transportCompany",
+			TotalAmount:   uint64(trip.AgencyPrice),
+			Distributions: []*adaptersPb.Distribution{&adaptersPb.Distribution{
+				WalletId: walletResponse.Wallets[0].Id,
+				Amount:   uint64(totalPrice),
+			}},
+		},
+	})
+	if err != nil {
+		return uuid.Nil, fmt.Errorf("%w %w %s", ErrBuyTicket, err, response.Message)
+	}
+
 	invoiceId, err := s.invoiceService.CreateInvoice(ctx, invoiceDomain.Invoice{
 		IssuedDate: time.Now(),
 		Status:     invoiceDomain.Paid,
+		Info:       response.Factor.Id,
 		TotalPrice: totalPrice,
 	})
 	if err != nil {
@@ -89,7 +97,9 @@ func (s *service) BuyTicket(ctx context.Context, ticket domain.Ticket) (uuid.UUI
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("%w %s", ErrBuyTicket, err)
 	}
-
+	s.bankGrpc.ApplyFactor(&adaptersPb.ApplyFactorRequest{
+		FactorId: response.Factor.Id,
+	})
 	return ticketId, nil
 }
 
@@ -114,22 +124,24 @@ func (s *service) BuyAgencyTicket(ctx context.Context, ticket domain.Ticket) (uu
 		return uuid.Nil, 0, fmt.Errorf("%w %s", ErrBuyTicket, "trip is started")
 	}
 	// bank
-	// response, err := s.bankGrpc.CreateFactor(&adaptersPb.CreateFactorRequest{
-	// 	Factor: &adaptersPb.Factor{
-	// 		SourceService: "transportCompany",
-	// 		TotalAmount:   uint64(trip.AgencyPrice),
-	// 		Distributions: []*adaptersPb.Distribution{&adaptersPb.Distribution{
-	// 			WalletId: "",
-	// 		}},
-	// 	},
-	// })
-	// if err != nil {
-	// 	return uuid.Nil, 0, fmt.Errorf("%w %s", ErrBuyTicket, err)
-	// }
-	// fmt.Println(response)
-	//TODO: check user exist
-
+	walletResponse, err := s.bankGrpc.GetWallets(&adaptersPb.GetWalletsRequest{
+		OwnerId: ticket.UserID.String(),
+	})
 	totalPrice := float64(ticket.Count) * trip.AgencyPrice
+	response, err := s.bankGrpc.CreateFactor(&adaptersPb.CreateFactorRequest{
+		Factor: &adaptersPb.Factor{
+			SourceService: "transportCompany",
+			TotalAmount:   uint64(trip.AgencyPrice),
+			Distributions: []*adaptersPb.Distribution{&adaptersPb.Distribution{
+				WalletId: walletResponse.Wallets[0].Id,
+				Amount:   uint64(totalPrice),
+			}},
+		},
+	})
+	if err != nil {
+		return uuid.Nil, 0, fmt.Errorf("%w %w %s", ErrBuyTicket, err, response.Message)
+	}
+
 	invoiceId, err := s.invoiceService.CreateInvoice(ctx, invoiceDomain.Invoice{
 		IssuedDate: time.Now(),
 		Status:     invoiceDomain.Paid,
@@ -143,7 +155,9 @@ func (s *service) BuyAgencyTicket(ctx context.Context, ticket domain.Ticket) (uu
 	if err != nil {
 		return uuid.Nil, 0, fmt.Errorf("%w %s", ErrBuyTicket, err)
 	}
-
+	s.bankGrpc.ApplyFactor(&adaptersPb.ApplyFactorRequest{
+		FactorId: response.Factor.Id,
+	})
 	return ticketId, totalPrice, nil
 }
 

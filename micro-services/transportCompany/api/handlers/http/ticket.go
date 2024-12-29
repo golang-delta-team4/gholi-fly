@@ -12,7 +12,7 @@ import (
 func BuyTicket(svcGetter ServiceGetter[*service.TicketService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		svc := svcGetter(c.UserContext())
-		userID, ok := c.Locals("user_id").(uuid.UUID)
+		userID, ok := c.Locals("UserUUID").(uuid.UUID)
 		if !ok {
 			return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
 		}
