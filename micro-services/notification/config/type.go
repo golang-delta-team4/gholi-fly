@@ -1,10 +1,11 @@
 package config
 
 type Config struct {
-	DB     DBConfig     `json:"db"`
-	Server ServerConfig `json:"server"`
-	SMTP   SMTPConfig   `json:"smtp"`
-	NATS   NATSConfig   `json:"nats"`
+	DB       DBConfig       `json:"db"`
+	Server   ServerConfig   `json:"server"`
+	SMTP     SMTPConfig     `json:"smtp"`
+	NATS     NATSConfig     `json:"nats"`
+	UserGRPC UserGRPCConfig `json:"userGrpc"`
 }
 
 type DBConfig struct {
@@ -29,6 +30,11 @@ type SMTPConfig struct {
 }
 
 type NATSConfig struct {
+	Host string `json:"host"`
+	Port uint   `json:"port"`
+}
+
+type UserGRPCConfig struct {
 	Host string `json:"host"`
 	Port uint   `json:"port"`
 }

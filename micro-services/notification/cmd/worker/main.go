@@ -65,7 +65,7 @@ func main() {
 		// (B) Send the email via emailService
 		if err := emailService.SendEmail(
 			[]string{evt.Email},
-			"Hello From Gholi",
+			"Gholi Fly",
 			"notif.html",
 			emailData,
 		); err != nil {

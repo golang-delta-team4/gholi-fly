@@ -30,7 +30,7 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 
-	svc := &notification.Service{DB: db}
+	svc := &notification.Service{DB: db, Config: config}
 	pb.RegisterNotificationServiceServer(grpcServer, svc)
 
 	address := fmt.Sprintf(":%d", config.Server.Port)
