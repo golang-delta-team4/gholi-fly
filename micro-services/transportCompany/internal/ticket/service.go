@@ -148,18 +148,43 @@ func (s *service) BuyAgencyTicket(ctx context.Context, ticket domain.Ticket) (uu
 }
 
 func (s *service) CancelTicket(ctx context.Context, ticketId uuid.UUID) error {
-	trip, err := s.tripService.GetTripById(ctx, ticketId)
+	ticket, err := s.repo.GetTicket(ctx, ticketId)
 	if err != nil {
-		return fmt.Errorf("%w %s", ErrBuyTicket, err)
+		return fmt.Errorf("%w %s", ErrCancelTicket, err)
+	}
+	trip, err := s.tripService.GetTripById(ctx, ticket.TripID)
+	if err != nil {
+		return fmt.Errorf("%w %s", ErrCancelTicket, err)
 	}
 	if trip.StartDate.Before(time.Now()) {
-		return fmt.Errorf("%w %s", ErrBuyTicket, "trip is started")
+		return fmt.Errorf("%w %s", ErrCancelTicket, "trip is started")
 	}
 
 	// TODO: Cancel factor
-	err = s.repo.CancelTicket(ctx, ticketId)
+	err = s.repo.CancelTicket(ctx, ticketId, ticket.TripID)
 	if err != nil {
-		return fmt.Errorf("%w %s", ErrBuyTicket, err)
+		return fmt.Errorf("%w %s", ErrCancelTicket, err)
+	}
+	return nil
+}
+
+func (s *service) CancelAgencyTicket(ctx context.Context, ticketId uuid.UUID) error {
+	ticket, err := s.repo.GetTicket(ctx, ticketId)
+	if err != nil {
+		return fmt.Errorf("%w %s", ErrCancelTicket, err)
+	}
+	trip, err := s.tripService.GetTripById(ctx, ticket.TripID)
+	if err != nil {
+		return fmt.Errorf("%w %s", ErrCancelTicket, err)
+	}
+	if trip.StartDate.Before(time.Now()) {
+		return fmt.Errorf("%w %s", ErrCancelTicket, "trip is started")
+	}
+
+	// TODO: Cancel factor
+	err = s.repo.CancelAgencyTicket(ctx, ticketId, ticket.TripID, ticket.Count)
+	if err != nil {
+		return fmt.Errorf("%w %s", ErrCancelTicket, err)
 	}
 	return nil
 }

@@ -166,7 +166,6 @@ func NewApp(cfg config.Config) (App, error) {
 
 	a.setRedis()
 	a.userGRPCClient = grpc.NewGRPCUserClient(a.cfg.User.Host, int(a.cfg.User.Port))
-	//return a, a.registerOutboxHandlers()
 
 	return a, nil
 }
@@ -178,16 +177,3 @@ func NewMustApp(cfg config.Config) App {
 	}
 	return app
 }
-
-// func (a *app) registerOutboxHandlers() error {
-// 	scheduler, err := gocron.NewScheduler()
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	common.RegisterOutboxRunner(a.notifServiceWithDB(a.db), scheduler)
-
-// 	scheduler.Start()
-
-// 	return nil
-// }
