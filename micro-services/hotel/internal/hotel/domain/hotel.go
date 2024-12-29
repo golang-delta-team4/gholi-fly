@@ -12,6 +12,7 @@ import (
 type (
 	HotelID   = uint
 	HotelUUID = uuid.UUID
+	OwnerUUID = uuid.UUID
 )
 
 func HotelUUIDFromString(s string) (HotelUUID, error) {
@@ -21,7 +22,7 @@ func HotelUUIDFromString(s string) (HotelUUID, error) {
 
 type Hotel struct {
 	UUID      HotelUUID
-	OwnerID   uuid.UUID
+	OwnerID   OwnerUUID
 	Name      string
 	City      string
 	Rooms     []roomDomain.Room
