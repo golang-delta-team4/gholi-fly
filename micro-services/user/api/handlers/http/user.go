@@ -33,6 +33,9 @@ func SignUp(svcGetter shared.ServiceGetter[*service.UserService]) fiber.Handler 
 		}
 		resp, err := svc.SignUp(c.UserContext(), &req)
 		if err != nil {
+			if errors.Is(err, user.ErrEmailNotUnique) {
+				return fiber.NewError(fiber.StatusBadRequest, err.Error())
+			}
 			if errors.Is(err, &service.ErrUserCreationValidation{}) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())
 			}

@@ -9,13 +9,16 @@ import (
 	bankClientPort "user-service/pkg/adapters/clients/grpc/port"
 	"user-service/pkg/adapters/storage/mapper"
 	"user-service/pkg/adapters/storage/types"
+
 	bankPB "github.com/golang-delta-team4/gholi-fly-shared/pkg/protobuf/bank"
+	"github.com/jackc/pgx/v5/pgconn"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 var (
+	ErrEmailNotUnique 		   = errors.New("the email address is already registered.")
 	ErrUserNotFound            = errors.New("user not found")
 	ErrEmailOrPasswordMismatch = errors.New("email or password mismatch")
 )
@@ -42,11 +45,16 @@ func (us *service) SignUp(ctx context.Context, user *domain.User) (uuid.UUID, er
 	}
 	err = us.repo.Create(ctx, *storageUser)
 	if err != nil {
+		if pgErr, ok := err.(*pgconn.PgError); ok { //gorm does not have any sentinel error for this error type
+			if pgErr.Code == "23505" {
+				return uuid.Nil, ErrEmailNotUnique
+			}
+		}
 		return uuid.Nil, err
 	}
 	resp, err := us.bankClient.CreateUserWallet(storageUser.UUID.String())
 	if err != nil {
-		return uuid.Nil, err
+		return uuid.Nil, errors.New("failed to create user wallet")
 	}
 	if resp.Status == bankPB.ResponseStatus_FAILED {
 		return uuid.Nil, err
