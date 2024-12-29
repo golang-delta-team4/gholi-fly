@@ -28,6 +28,11 @@ type GetUserResponse struct {
 	Email     string `json:"email"`
 }
 
+type PaginationQuery struct {
+    Page int `query:"page" default:"1" validate:"gt=0"`
+    Size int `query:"size" default:"10" validate:"gt=0"`
+}
+
 func EmailValidation(email string) error {
 	emailRegex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 	emailMatched, err := regexp.MatchString(emailRegex, email)

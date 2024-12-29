@@ -113,6 +113,31 @@ func GetMe(svcGetter shared.ServiceGetter[*service.UserService]) fiber.Handler {
 	}
 }
 
+func GetAllUsers(svcGetter shared.ServiceGetter[*service.UserService]) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
+		var req presenter.PaginationQuery
+		if err := c.QueryParser(&req); err != nil {
+			return fiber.ErrBadRequest
+		}
+		validationError := validate(req)
+		if validationError != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"errors": validationError})
+		}
+		resp, err := svc.GetAllUsers(c.UserContext(), req)
+		if err != nil {
+			if errors.Is(err, user.ErrEmailOrPasswordMismatch) {
+				return fiber.NewError(fiber.StatusUnauthorized, err.Error())
+			}
+			if errors.Is(err, user.ErrUserNotFound) {
+				return fiber.NewError(fiber.StatusNotFound, err.Error())
+			}
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		return c.JSON(fiber.Map{"usersList": resp})
+	}
+}
+
 func validate(req any) map[string]string {
 	validate := validator.New()
 	err := validate.Struct(req)

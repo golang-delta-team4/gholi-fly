@@ -126,3 +126,13 @@ func createToken(userUUID uuid.UUID, expMin uint, secret []byte) (string, time.T
 	}
 	return token, expirationTime, nil
 }
+
+func (us *UserService) GetAllUsers(ctx context.Context, query presenter.PaginationQuery) ([]domain.User, error) {
+	if query.Page == 0 {
+		query.Page = 1
+	} 
+	if query.Size == 0 {
+		query.Size = 10
+	}
+	return us.service.GetAllUsers(ctx, query)
+}

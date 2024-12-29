@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"time"
+	"user-service/api/presenter"
 	"user-service/internal/user/domain"
 	userPort "user-service/internal/user/port"
 	bankClientPort "user-service/pkg/adapters/clients/grpc/port"
@@ -157,4 +158,13 @@ func (us *service) GetUserByEmail(ctx context.Context, email string) (*domain.Us
 		return nil, err
 	}
 	return mapper.Storage2Domain(*user), nil
+}
+
+func (us *service) GetAllUsers(ctx context.Context, query presenter.PaginationQuery) ([]domain.User, error) {
+	users, err := us.repo.GetAllUsers(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	storageUsers := mapper.StorageList2DomainList(users)
+	return storageUsers, nil
 }

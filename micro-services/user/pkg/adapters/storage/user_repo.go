@@ -2,6 +2,8 @@ package storage
 
 import (
 	"context"
+	"fmt"
+	"user-service/api/presenter"
 	userPort "user-service/internal/user/port"
 	"user-service/pkg/adapters/storage/types"
 
@@ -84,4 +86,14 @@ func (ur *userRepo) GetUserByEmail(ctx context.Context, email string) (*types.Us
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (ur *userRepo) GetAllUsers(ctx context.Context, query presenter.PaginationQuery) ([]types.User, error) {
+		var users []types.User
+		err := ur.db.Model(&types.User{}).Preload("UserRoles.Role").Limit(query.Size).Offset((query.Page-1)*query.Page).Where("deleted_at is null").Find(&users).Error
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+		return users, nil
 }
