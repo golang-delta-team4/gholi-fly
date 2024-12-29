@@ -16,6 +16,21 @@ func NewVehicleHandler(service port.VehicleService) *VehicleHandler {
 	return &VehicleHandler{service: service}
 }
 
+func (h *VehicleHandler) MatchVehicle(c *fiber.Ctx) error {
+    var tripRequest domain.TripRequest
+    if err := c.BodyParser(&tripRequest); err != nil {
+        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request payload"})
+    }
+
+    vehicle, err := h.service.MatchVehicle(c.Context(), &tripRequest)
+    if err != nil {
+        return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})
+    }
+
+    return c.Status(fiber.StatusOK).JSON(vehicle)
+}
+
+
 func (h *VehicleHandler) CreateVehicle(c *fiber.Ctx) error {
 	log.Println("Incoming request to create vehicle")
 
@@ -43,5 +58,6 @@ func (h *VehicleHandler) CreateVehicle(c *fiber.Ctx) error {
 
 func RegisterVehicleRoutes(app *fiber.App, service port.VehicleService) {
 	handler := NewVehicleHandler(service)
-	app.Post("/vehicles", handler.CreateVehicle)
+    app.Post("/api/v1/vehicles", handler.CreateVehicle)
+    app.Post("/api/v1/vehicles/match", handler.MatchVehicle)
 }

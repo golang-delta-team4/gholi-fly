@@ -14,4 +14,6 @@ type VehicleService interface {
 	GetAllVehicles(ctx context.Context) ([]domain.Vehicle, error)
 	UpdateVehicle(ctx context.Context, vehicle *domain.Vehicle) error
 	DeleteVehicle(ctx context.Context, id uuid.UUID) error
+	ProcessTripRequest(ctx context.Context) (*domain.TripRequest, error) 
+	MatchVehicle(ctx context.Context, tripRequest *domain.TripRequest) (*domain.Vehicle, error)
 }
