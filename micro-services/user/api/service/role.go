@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"user-service/api/presenter"
 	permissionDomain "user-service/internal/permission/domain"
+	"user-service/internal/role/domain"
 	roleDomain "user-service/internal/role/domain"
 	rolePort "user-service/internal/role/port"
 
@@ -47,3 +48,12 @@ func (ps *RoleService) GrantResourceAccess(ctx context.Context, ownerUUID uuid.U
 	return ps.service.GrantResourceAccess(ctx, ownerUUID, permissions, roleName)
 }
 
+func (us *RoleService) GetAllRoles(ctx context.Context, query presenter.PaginationQuery) ([]domain.Role, error) {
+	if query.Page == 0 {
+		query.Page = 1
+	} 
+	if query.Size == 0 {
+		query.Size = 10
+	}
+	return us.service.GetAllRoles(ctx, query)
+}
