@@ -10,6 +10,7 @@ import (
 
 type Repo interface {
 	Create(ctx context.Context, role *types.Role) (uint, error)
+	Delete(ctx context.Context, role types.Role) (error)
 	AssignRole(ctx context.Context, userRole types.UserRole) error
 	GetRole(ctx context.Context, roleUUID uuid.UUID) (*types.Role, error)
 	GetAllRoles(ctx context.Context, query presenter.PaginationQuery) ([]types.Role, error)

@@ -124,3 +124,13 @@ func (us *service) GetAllRoles(ctx context.Context, query presenter.PaginationQu
 	storageRoles := mapper.RoleStorageList2DomainList(roles)
 	return storageRoles, nil
 }
+
+func (us *service) DeleteRole(ctx context.Context, roleUUID uuid.UUID) error {
+	role, err := us.repo.GetRole(ctx, roleUUID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return &ErrRoleNotFound{roleUUID}
+		}
+	}
+	return us.repo.Delete(ctx, *role)
+}
