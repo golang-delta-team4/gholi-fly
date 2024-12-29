@@ -17,7 +17,7 @@ func Run(appContainer app.App, cfg config.ServerConfig) error {
 	api := router.Group(
 		"/api/v1/transport-company",
 		setUserContext,
-		newAuthMiddleware([]byte(cfg.Secret)),
+		//newAuthMiddleware([]byte(cfg.Secret)),
 	)
 
 	registerCompanyAPI(appContainer, cfg, api)
@@ -57,6 +57,7 @@ func registerTicketApi(appContainer app.App, cfg config.ServerConfig, router fib
 	router.Post("/ticket/buy", setTransaction(appContainer.DB()), BuyTicket(ticketServiceGetter))
 	router.Post("/ticket/agency-buy", setTransaction(appContainer.DB()), BuyAgencyTicket(ticketServiceGetter))
 	router.Post("/ticket/cancel/:id", setTransaction(appContainer.DB()), CancelTicket(ticketServiceGetter))
+	router.Post("/agency-ticket/cancel/:id", setTransaction(appContainer.DB()), CancelAgencyTicket(ticketServiceGetter))
 }
 
 func registerTechnicalTeamApi(appContainer app.App, cfg config.ServerConfig, router fiber.Router) {

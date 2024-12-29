@@ -83,3 +83,17 @@ func (s *TicketService) CancelTicket(ctx context.Context, ticketId string) (*pb.
 
 	return &pb.CancelTicketResponse{}, nil
 }
+
+func (s *TicketService) CancelAgencyTicket(ctx context.Context, ticketId string) (*pb.CancelTicketResponse, error) {
+	ticketUId, err := uuid.Parse(ticketId)
+	if err != nil {
+		return nil, fmt.Errorf("error on parse ticket id: %w", err)
+	}
+
+	err = s.svc.CancelAgencyTicket(ctx, ticketUId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.CancelTicketResponse{}, nil
+}
