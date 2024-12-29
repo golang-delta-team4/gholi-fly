@@ -6,6 +6,7 @@ type Config struct {
 	Redis            RedisConfig      `json:"redis"`
 	HotelService     HotelService     `json:"hotelService"`
 	TransportService TransportService `json:"transportService"`
+	Logger           LoggerConfig     `json:"logger"`
 }
 
 type DBConfig struct {
@@ -38,4 +39,13 @@ type HotelService struct {
 type TransportService struct {
 	Host string `json:"host"`
 	Port uint   `json:"port"`
+}
+
+type LoggerConfig struct {
+	LogFilePath string `json:"logFilePath"`
+	MaxSize     int    `json:"maxSize"`
+	MaxBackups  int    `json:"maxBackups"`
+	MaxAge      int    `json:"maxAge"`
+	Compress    bool   `json:"compress"`
+	Level       string `json:"level"`
 }

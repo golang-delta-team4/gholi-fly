@@ -14,7 +14,12 @@ func Run(appContainer app.App, cfg config.Config) error {
 	// Initialize Fiber router
 	router := fiber.New()
 	router.Use(recover.New())
-
+	// Initialize and use LoggerMiddleware
+	loggerMiddleware, err := LoggerMiddleware(cfg.Logger)
+	if err != nil {
+		return err
+	}
+	router.Use(loggerMiddleware)
 	// Apply global middlewares
 	api := router.Group(
 		"/api/v1/agency",

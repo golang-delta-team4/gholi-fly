@@ -1,12 +1,14 @@
 package http
 
 import (
+	"gholi-fly-agancy/config"
 	"gholi-fly-agancy/pkg/context"
 	"gholi-fly-agancy/pkg/logger"
 
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-delta-team4/gholi-fly-shared/jwt"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -55,4 +57,24 @@ func setTransaction(db *gorm.DB) fiber.Handler {
 
 		return nil
 	}
+}
+
+func LoggerMiddleware(cfg config.LoggerConfig) (fiber.Handler, error) {
+	logService, err := logger.NewLoggerService(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	return func(c *fiber.Ctx) error {
+		reqID := uuid.New().String()
+
+		// Attach logger for the specific service to the user context
+		ctx := logService.AttachLoggerToContext(c.UserContext(), c, reqID)
+
+		// Update Fiber's user context
+		c.SetUserContext(ctx)
+
+		// Continue to the next middleware/handler
+		return c.Next()
+	}, nil
 }

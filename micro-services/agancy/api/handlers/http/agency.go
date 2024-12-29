@@ -31,6 +31,9 @@ func CreateAgency(svcGetter ServiceGetter[*service.AgencyService]) fiber.Handler
 }
 func GetAgency(svcGetter ServiceGetter[*service.AgencyService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		logger := GetLogger(c)
+		defer logger.Sync()
+		logger.Info("im here 🙋🏻‍♂️")
 		svc := svcGetter(c.UserContext())
 
 		id := c.Params("id")
