@@ -1,6 +1,7 @@
 package http
 
 import (
+	"context"
 	"errors"
 	"user-service/api/handlers/shared"
 	"user-service/api/presenter"
@@ -136,6 +137,14 @@ func GetAllUsers(svcGetter shared.ServiceGetter[*service.UserService]) fiber.Han
 		}
 		return c.JSON(fiber.Map{"usersList": resp})
 	}
+}
+
+func UserAuthorization(userService *service.UserService,ctx context.Context, req presenter.UserAuthorization) (bool, error) {
+	ok, err := userService.AuthorizeUser(ctx, req)
+	if err != nil {
+		return false, fiber.NewError(fiber.StatusInternalServerError, "failed to check user authorization: %v", err.Error())
+	}
+	return ok, nil
 }
 
 func validate(req any) map[string]string {

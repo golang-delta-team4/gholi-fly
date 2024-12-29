@@ -3,8 +3,10 @@ package grpc
 import (
 	"context"
 	"user-service/api/pb"
+	"user-service/api/presenter"
 	"user-service/api/service"
 
+	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -21,7 +23,8 @@ func NewGRPCUserHandler(ctx context.Context, userService *service.UserService) *
 }
 
 func (h *grpcUserHandler) UserAuthorization(ctx context.Context, req *pb.UserAuthorizationRequest) (*pb.UserAuthorizationResponse, error) {
-	ok, err := h.userService.AuthorizeUser(ctx, req)
+	userUUID, err := uuid.Parse(req.UserUUID)
+	ok, err := h.userService.AuthorizeUser(ctx, presenter.UserAuthorization{UserUUID: userUUID, Route: req.Route, Method: req.Method})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to check user authorization: %v", err)
 	}
