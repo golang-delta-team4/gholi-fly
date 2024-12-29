@@ -44,3 +44,9 @@ func (r *VehicleRepo) Update(ctx context.Context, vehicle *domain.Vehicle) error
 func (r *VehicleRepo) Delete(ctx context.Context, id uuid.UUID) error {
 	return r.db.WithContext(ctx).Delete(&domain.Vehicle{}, "id = ?", id).Error
 }
+
+func (r *VehicleRepo) ProcessTripRequest(ctx context.Context) (*domain.TripRequest, error) {
+
+	// implementation
+	return nil, nil
+}
