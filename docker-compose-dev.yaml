@@ -52,7 +52,7 @@ services:
     volumes:
       - ./micro-services/user:/gholi-fly
     ports:
-      - "8083:8080"
+      - "8083:8083"
     depends_on:
       gholi-db:
         condition: service_healthy
@@ -138,7 +138,8 @@ services:
       dockerfile: build/Dockerfile
       target: dev
     volumes:
-      - ./micro-services/agency:/gholi-fly
+      - ./micro-services/agancy:/gholi-fly
+      - ./Logs:/gholi-fly/Logs
     ports:
       - "8086:8080"
     depends_on:
@@ -207,7 +208,46 @@ services:
       timeout: 5s
       retries: 5
     
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    restart: always
+    volumes:
+      - ./Logs:/var/log/my-service
+      - ./promtail-config.yaml:/etc/promtail/promtail-config.yaml
+    command: -config.file=/etc/promtail/promtail-config.yaml
+    depends_on:
+      - loki
+
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    restart: always
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+      - loki-data:/data
+    command: -config.file=/etc/loki/local-config.yaml
+
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+    depends_on:
+      - loki
+    
+
 
 volumes:
   gholi-db-volume:
   gholi-redis-volume:
+  loki-data:
+  grafana-data:
