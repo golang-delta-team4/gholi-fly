@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"user-service/api/presenter"
 	permissionDomain "user-service/internal/permission/domain"
 	permissionPort "user-service/internal/permission/port"
 	"user-service/internal/role/domain"
@@ -113,4 +114,13 @@ func (s *service) CreateSuperAdminRole(ctx context.Context) (error) {
 		return err
 	}
 	return nil
+}
+
+func (us *service) GetAllRoles(ctx context.Context, query presenter.PaginationQuery) ([]domain.Role, error) {
+	roles, err := us.repo.GetAllRoles(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	storageRoles := mapper.RoleStorageList2DomainList(roles)
+	return storageRoles, nil
 }
