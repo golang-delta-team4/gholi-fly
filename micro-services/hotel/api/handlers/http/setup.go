@@ -13,7 +13,10 @@ import (
 func Run(appContainer app.App, cfg config.ServerConfig) error {
 	router := fiber.New()
 	router.Use(recover.New())
-	api := router.Group("/api/v1/hotel", setUserContext)
+	api := router.Group("/api/v1/hotel",
+		setUserContext,
+		newAuthMiddleware([]byte(cfg.Secret)),
+	)
 	registerGlobalRoutes(api)
 
 	registerHotelAPI(appContainer, api)
