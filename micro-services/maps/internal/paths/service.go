@@ -81,3 +81,7 @@ func (s *service) DeletePath(ctx context.Context, id uuid.UUID) error {
 	// Delegate to the repository to delete the path
 	return s.repo.Delete(ctx, id.String())
 }
+
+func (s *service) FilterPaths(ctx context.Context, filters map[string]interface{}) ([]domain.Path, error) {
+	return s.repo.FilterPaths(ctx, filters)
+}
