@@ -9,6 +9,7 @@ import (
 	"user-service/pkg/adapters/storage/types"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type service struct {
@@ -48,12 +49,21 @@ func (ps *service) GetPermissionsByUUID(ctx context.Context, permissions []domai
 
 func (ps *service) CreatePermissions(ctx context.Context, permissions []domain.Permission) ([]domain.Permission, error) {
 	var permissionTypes []types.Permission
-	// var permissionsWithUUID []domain.Permission
 	for _, permission := range permissions {
-		uuid := uuid.New()
-		permission.UUID = uuid
 		permissionType := mapper.PermissionDomain2Storage(permission)
-		permissionTypes = append(permissionTypes, *permissionType)
+		err := ps.repo.Get(ctx, *permissionType)
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				uuid := uuid.New()
+				permissionType.UUID = uuid
+				permissionTypes = append(permissionTypes, *permissionType)
+				continue
+			}
+			return nil, err
+		}
+	}
+	if len(permissionTypes) == 0 {
+		return nil, ErrAlreadyExists
 	}
 	err := ps.repo.Create(ctx, permissionTypes)
 	if err != nil {

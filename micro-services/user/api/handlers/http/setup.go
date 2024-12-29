@@ -1,6 +1,7 @@
 package http
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"user-service/api/handlers/shared"
@@ -20,7 +21,7 @@ func Run(appContainer app.App, cfg config.Config) error {
 		return c.Status(http.StatusAccepted).JSON("Hello World")
 	})
 	userGroup := api.Group("users")
-	userGroup.Get("", setTransaction(appContainer.DB()), GetAllUsers(userServiceGetter))
+	userGroup.Get("", newAuthMiddleware([]byte(cfg.Server.Secret)),newAuthorizationMiddlewareDirect(userServiceGetter(context.Background())),setTransaction(appContainer.DB()), GetAllUsers(userServiceGetter))
 	userGroup.Post("/sign-up", setTransaction(appContainer.DB()), SignUp(userServiceGetter))
 	userGroup.Get("/me", newAuthMiddleware([]byte(cfg.Server.Secret)), GetMe(userServiceGetter))
 	userGroup.Post("/sign-in", SignIn(userServiceGetter))

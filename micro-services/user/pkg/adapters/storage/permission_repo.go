@@ -20,6 +20,11 @@ func (pr *permissionRepo) Create(ctx context.Context, permission []types.Permiss
 	return pr.db.Create(&permission).Error
 }
 
+func (pr *permissionRepo) Get(ctx context.Context, permission types.Permission) error {
+	err := pr.db.Model(&types.Permission{}).Where("route = ? and method = ?", permission.Route, permission.Method).First(&permission).Error
+	return err
+}
+
 func (pr *permissionRepo) CheckPermissionExistence(ctx context.Context, route string, method string) (bool, error) {
 	var total int
 	err := pr.db.Model(&types.Permission{}).Select("count(route)").Where("route = ? and method = ?", route, method).Find(&total).Error

@@ -1,12 +1,16 @@
 package http
 
 import (
+	"strings"
+	"user-service/api/presenter"
+	"user-service/api/service"
 	"user-service/pkg/context"
 	"user-service/pkg/logger"
 
 	"gorm.io/gorm"
 
 	"github.com/golang-delta-team4/gholi-fly-shared/jwt"
+	"github.com/google/uuid"
 
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
@@ -56,5 +60,27 @@ func setTransaction(db *gorm.DB) fiber.Handler {
 		}
 
 		return nil
+	}
+}
+
+func newAuthorizationMiddlewareDirect(userService *service.UserService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		userUUID := c.Locals("UserUUID")
+		if userUUID == nil {
+			return fiber.ErrUnauthorized
+		}
+		routeDetail := strings.Split(c.Path(), "/")
+		lastPart := strings.Split(routeDetail[len(routeDetail)-1], "?")
+		ok, err := UserAuthorization(userService, c.UserContext(), presenter.UserAuthorization{
+			UserUUID: userUUID.(uuid.UUID),
+			Route:    strings.Join(routeDetail[3:len(routeDetail)-1], "/")+"/"+lastPart[0],
+			Method:   c.Method()})
+		if err != nil {
+			return err
+		}
+		if ok {
+			return c.Next()
+		}
+		return fiber.ErrForbidden
 	}
 }

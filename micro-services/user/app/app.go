@@ -5,6 +5,7 @@ import (
 	"log"
 	"user-service/config"
 	"user-service/internal/permission"
+	"user-service/internal/permission/domain"
 	permissionPort "user-service/internal/permission/port"
 	"user-service/internal/role"
 	rolePort "user-service/internal/role/port"
@@ -84,7 +85,11 @@ func NewApp(cfg config.Config) (App, error) {
 	a.roleService = role.NewService(storage.NewRoleRepo(a.db), a.permissionService, a.userService)
 	err := a.roleService.CreateSuperAdminRole(context.Background())
 	if err != nil {
-		log.Println(err)
+		log.Printf("error creating super admin: %v\n", err)
+	}
+	_, err = a.permissionService.CreatePermissions(context.Background(), seedPermissions())
+	if err != nil {
+		log.Printf("error seeding permissions: %v\n", err)
 	}
 	return a, nil
 }
@@ -143,4 +148,35 @@ func (a *app) PermissionService(ctx context.Context) permissionPort.Service {
 	}
 
 	return a.permissionServiceWithDB(db)
+}
+
+func seedPermissions() []domain.Permission {
+	permissions := []domain.Permission{
+		{
+			Route:  "/users",
+			Method: "GET",
+		},
+		{
+			Route:  "/permissions",
+			Method: "POST",
+		},
+		{
+			Route:  "/roles",
+			Method: "POST",
+		},
+		{
+			Route:  "/roles",
+			Method: "GET",
+		},
+		{
+			Route:  "/roles/assign",
+			Method: "POST",
+		},
+		{
+			Route:  "/roles/:id",
+			Method: "DELETE",
+		},
+	}
+	
+	return permissions
 }
