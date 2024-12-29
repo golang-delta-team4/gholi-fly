@@ -3,6 +3,7 @@ package port
 import (
 	"context"
 	"time"
+	"user-service/api/presenter"
 	"user-service/internal/user/domain"
 
 	"github.com/google/uuid"
@@ -18,4 +19,5 @@ type Service interface {
 	GetUserByUUID(ctx context.Context, userUUID uuid.UUID) (*domain.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*domain.User, error)
 	AuthorizeUser(ctx context.Context, userAuthorization *domain.UserAuthorize) (bool, error)
+	GetAllUsers(ctx context.Context, query presenter.PaginationQuery) ([]domain.User, error)
 }
