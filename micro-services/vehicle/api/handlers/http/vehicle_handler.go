@@ -17,28 +17,41 @@ func NewVehicleHandler(service port.VehicleService) *VehicleHandler {
 }
 
 func (h *VehicleHandler) MatchVehicle(c *fiber.Ctx) error {
-    var tripRequest domain.TripRequest
-    if err := c.BodyParser(&tripRequest); err != nil {
-        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request payload"})
-    }
+	// Parse query parameters using Fiber's QueryParser
+	var tripRequest domain.TripRequest
+	if err := c.QueryParser(&tripRequest); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid query parameters"})
+	}
 
-    vehicle, err := h.service.MatchVehicle(c.Context(), &tripRequest)
-    if err != nil {
-        return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})
-    }
+	// Validate the parsed TripRequest
+	if tripRequest.TripType == "" || tripRequest.MinPassengers <= 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Missing or invalid required parameters"})
+	}
 
-    return c.Status(fiber.StatusOK).JSON(vehicle)
+	vehicle, err := h.service.MatchVehicle(c.Context(), &tripRequest)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(vehicle)
 }
-
 
 func (h *VehicleHandler) CreateVehicle(c *fiber.Ctx) error {
 	log.Println("Incoming request to create vehicle")
 
+	// Parse body using Fiber's BodyParser
 	var vehicle domain.Vehicle
 	if err := c.BodyParser(&vehicle); err != nil {
 		log.Printf("Error parsing body: %v", err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request payload",
+		})
+	}
+
+	// Validate required fields
+	if vehicle.UniqueCode == "" || vehicle.Capacity <= 0 || vehicle.YearOfManufacture <= 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Missing or invalid required fields",
 		})
 	}
 
@@ -55,9 +68,10 @@ func (h *VehicleHandler) CreateVehicle(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(vehicle)
 }
 
-
 func RegisterVehicleRoutes(app *fiber.App, service port.VehicleService) {
 	handler := NewVehicleHandler(service)
-    app.Post("/api/v1/vehicles", handler.CreateVehicle)
-    app.Post("/api/v1/vehicles/match", handler.MatchVehicle)
+
+	// Register routes with Fiber
+	app.Post("/api/v1/vehicles", handler.CreateVehicle)
+	app.Post("/api/v1/vehicles/match", handler.MatchVehicle)
 }
