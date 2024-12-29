@@ -1,8 +1,8 @@
 package mapper
 
 import (
-	"user-service/internal/user/domain"
 	roleDomain "user-service/internal/role/domain"
+	"user-service/internal/user/domain"
 	"user-service/pkg/adapters/storage/types"
 )
 
@@ -30,7 +30,9 @@ func StorageList2DomainList(users []types.User) []domain.User {
 	for _, user := range users {
 		var roles []roleDomain.Role
 		for _, role := range user.UserRoles {
-			roles = append(roles, roleDomain.Role{Name: role.Role.Name, UUID: role.Role.UUID})
+			if role.Role != nil {
+				roles = append(roles, roleDomain.Role{Name: role.Role.Name, UUID: role.Role.UUID})
+			}
 		}
 		domainUsers = append(domainUsers, domain.User{
 			UUID:      user.UUID,

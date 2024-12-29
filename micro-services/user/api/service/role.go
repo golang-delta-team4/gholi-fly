@@ -44,6 +44,10 @@ func (ps *RoleService) Assign(ctx context.Context, assignRolePresenter *presente
 	return ps.service.AssignRole(ctx, assignRolePresenter.UserUUID, roles)
 }
 
+func (ps *RoleService) DeleteRole(ctx context.Context, roleUUID uuid.UUID) (error) {
+	return ps.service.DeleteRole(ctx, roleUUID)
+}
+
 func (ps *RoleService) GrantResourceAccess(ctx context.Context, ownerUUID uuid.UUID, permissions []permissionDomain.Permission, roleName string) (error) {
 	return ps.service.GrantResourceAccess(ctx, ownerUUID, permissions, roleName)
 }

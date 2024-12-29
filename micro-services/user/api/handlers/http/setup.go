@@ -31,5 +31,6 @@ func Run(appContainer app.App, cfg config.Config) error {
 	roleGroup.Post("/", CreateRole(roleServiceGetter))
 	roleGroup.Get("", GetAllRoles(roleServiceGetter))
 	roleGroup.Post("/assign", AssignRole(roleServiceGetter))
+	roleGroup.Delete("/:id", DeleteRole(roleServiceGetter))
 	return app.Listen(fmt.Sprintf(":%d", cfg.Server.HttpPort))
 }

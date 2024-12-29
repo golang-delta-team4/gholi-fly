@@ -49,3 +49,8 @@ func (ur *roleRepo) GetAllRoles(ctx context.Context, query presenter.PaginationQ
 	}
 	return roles, nil
 }
+
+func (ur *roleRepo) Delete(ctx context.Context, role types.Role) (error) {
+	return ur.db.Model(&types.Role{}).Delete(&role).Error
+	
+}
