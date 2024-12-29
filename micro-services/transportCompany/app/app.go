@@ -3,8 +3,11 @@ package app
 import (
 	"context"
 	"fmt"
+	"log"
+
 	// "log"
 	clientPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc/port"
+	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/storage/types"
 
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/config"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company"
@@ -19,6 +22,7 @@ import (
 	tripPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/storage"
+
 	// "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/storage/types"
 
 	// "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/storage/types"
@@ -138,7 +142,7 @@ func (a *app) setDB() error {
 	if migrateErr != nil {
 		log.Fatalf("Failed to migrate : %v", migrateErr)
 	}
-  
+
 	if err != nil {
 		return err
 	}

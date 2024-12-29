@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/logger"
