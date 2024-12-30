@@ -13,6 +13,6 @@ type NotificationHistory struct {
 	Email     string    `gorm:"email"`
 	Event     string    `gorm:"event"`
 	Message   string    `gorm:"message"`
-	Is_read   bool      `gorm:"is_read"`
+	IsRead    bool      `gorm:"is_read"`
 	CreatedAt time.Time
 }
