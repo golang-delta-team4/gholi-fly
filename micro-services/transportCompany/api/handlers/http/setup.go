@@ -49,7 +49,7 @@ func registerTripApi(appContainer app.App, cfg config.ServerConfig, router fiber
 
 	// router.Patch("/cancel-trip/:id", setTransaction(appContainer.DB()), CancelTrip(tripServiceGetter))
 	// router.Patch("/finish-trip/:id", setTransaction(appContainer.DB()), FinishTrip(tripServiceGetter))
-	// router.Patch("/confirm-trip/:id", setTransaction(appContainer.DB()), ConfirmTrip(tripServiceGetter))
+	router.Patch("/confirm-trip/:id", setTransaction(appContainer.DB()), ConfirmTrip(tripServiceGetter))
 }
 
 func registerTicketApi(appContainer app.App, cfg config.ServerConfig, router fiber.Router) {

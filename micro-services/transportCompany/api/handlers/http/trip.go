@@ -155,3 +155,21 @@ func DeleteTrip(svcGetter ServiceGetter[*service.TripService]) fiber.Handler { /
 		return c.SendStatus(fiber.StatusNoContent)
 	}
 }
+
+func ConfirmTrip(svcGetter ServiceGetter[*service.TripService]) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
+		tripId := c.Params("id")
+		userID, ok := c.Locals("UserUUID").(uuid.UUID)
+		if !ok {
+			return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
+		}
+		err := svc.ConfirmTrip(c.UserContext(), tripId, userID)
+
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+
+		return c.SendStatus(fiber.StatusNoContent)
+	}
+}
