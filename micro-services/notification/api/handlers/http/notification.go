@@ -2,6 +2,7 @@ package http
 
 import (
 	"log"
+	"notification-nats/api/pb"
 	"notification-nats/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -45,7 +46,21 @@ func (h *Handler) GetNotificationsByUserID(c *fiber.Ctx) error {
 			JSON(fiber.Map{"error": "Failed to update is_read"})
 	}
 
-	return c.JSON(fiber.Map{
-		"notifications": notifications,
+	var notificationList []*pb.Notification
+	for _, r := range notifications {
+		notificationList = append(notificationList, &pb.Notification{
+			Id:        r.ID,
+			UserId:    r.UserID.String(),
+			Name:      r.Name,
+			Message:   r.Message,
+			Email:     r.Email,
+			EventName: r.Event,
+			IsRead:    r.IsRead,
+			CreatedAt: r.CreatedAt.String(),
+		})
+	}
+
+	return c.JSON(&pb.GetNotificationResponse{
+		Notifications: notificationList,
 	})
 }

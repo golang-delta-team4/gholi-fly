@@ -12,7 +12,7 @@ import (
 )
 
 func GetUserByUUID(userUUID string, cfg config.Config) (*userPB.GetUserResponse, error) {
-	conn, err := grpc.Dial(fmt.Sprintf("%v:%v", cfg.UserGRPC.Host, cfg.UserGRPC.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(fmt.Sprintf("%v:%v", cfg.UserGRPC.Host, cfg.UserGRPC.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}

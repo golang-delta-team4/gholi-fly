@@ -56,7 +56,7 @@ func (p *OutboxProcesser) HandleOutboxMessage() {
 			Email:     m.Email,
 			Event:     m.EventName,
 			Message:   m.Message,
-			Is_read:   false,
+			IsRead:    false,
 			CreatedAt: time.Now(),
 		}
 		if err := p.DB.Create(&record).Error; err != nil {

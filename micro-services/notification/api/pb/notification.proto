@@ -25,6 +25,7 @@ message Notification {
   string message = 5 [json_name = "message"];
   string eventName = 6 [json_name = "event_name"];
   string createdAt = 7 [json_name = "created_at"];
+  bool isRead = 8 [json_name = "is_read"];
 }
 
 message GetNotificationResponse {
