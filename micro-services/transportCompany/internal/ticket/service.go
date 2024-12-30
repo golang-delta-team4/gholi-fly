@@ -125,7 +125,7 @@ func (s *service) BuyAgencyTicket(ctx context.Context, ticket domain.Ticket) (uu
 	}
 	// bank
 	walletResponse, err := s.bankGrpc.GetWallets(&adaptersPb.GetWalletsRequest{
-		OwnerId: ticket.UserID.String(),
+		OwnerId: ticket.OwnerOfAgencyId.String(),
 	})
 	totalPrice := float64(ticket.Count) * trip.AgencyPrice
 	response, err := s.bankGrpc.CreateFactor(&adaptersPb.CreateFactorRequest{
