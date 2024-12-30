@@ -18,7 +18,9 @@ type DBConfig struct {
 }
 
 type ServerConfig struct {
-	Port uint `json:"port"`
+	HttpPort uint   `json:"httpPort"`
+	GRPCPort uint   `json:"grpcPort"`
+	Secret   string `mapstructure:"secret"`
 }
 
 type SMTPConfig struct {

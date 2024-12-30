@@ -1,23 +1,15 @@
-package shared
+package outbox
 
 import (
 	"encoding/json"
 	"log"
+	"time"
 
-	"github.com/google/uuid"
+	"notification-nats/models"
+
 	"github.com/nats-io/nats.go"
 	"gorm.io/gorm"
 )
-
-type OutBoxMessage struct {
-	ID          string    `gorm:"id" json:"id"`
-	EventName   string    `gorm:"event_name" json:"event_name"`
-	UserID      uuid.UUID `gorm:"user_id" json:"user_id"`
-	Name        string    `gorm:"name" json:"name"`
-	Email       string    `gorm:"email" json:"email"`
-	Message     string    `gorm:"message" json:"message"`
-	IsProcessed bool      `gorm:"is_processed" json:"is_processed"`
-}
 
 type OutboxProcesser struct {
 	DB        *gorm.DB
@@ -26,7 +18,7 @@ type OutboxProcesser struct {
 }
 
 func (p *OutboxProcesser) HandleOutboxMessage() {
-	messages := make([]OutBoxMessage, 0)
+	messages := make([]models.OutBoxMessage, 0)
 	err := p.DB.
 		Where("is_processed = ?", false).
 		Find(&messages).Error
@@ -56,10 +48,26 @@ func (p *OutboxProcesser) HandleOutboxMessage() {
 		}
 
 		processedID = append(processedID, m.ID)
+
+		record := models.NotificationHistory{
+			ID:        m.ID,
+			UserID:    m.UserID,
+			Name:      m.Name,
+			Email:     m.Email,
+			Event:     m.EventName,
+			Message:   m.Message,
+			Is_read:   false,
+			CreatedAt: time.Now(),
+		}
+		if err := p.DB.Create(&record).Error; err != nil {
+			log.Println("Archiving error:", err)
+			// Decide if you want to skip processing, or just log and continue
+			continue
+		}
 	}
 
 	// Update processed messages in database
-	err = p.DB.Model(&OutBoxMessage{}).
+	err = p.DB.Model(&models.OutBoxMessage{}).
 		Where("id IN ?", processedID).
 		UpdateColumn("is_processed", true).Error
 	if err != nil {

@@ -11,8 +11,8 @@ import (
 	"github.com/nats-io/nats.go"
 
 	"notification-nats/config"
-	"notification-nats/email"
-	"notification-nats/queue"
+	"notification-nats/internal/email"
+	"notification-nats/internal/queue"
 )
 
 type OutboxEvent struct {
