@@ -15,9 +15,12 @@ import (
 	staffPort "gholi-fly-agancy/internal/staff/port"
 	"gholi-fly-agancy/internal/tour"
 	tourPort "gholi-fly-agancy/internal/tour/port"
+	tourEvent "gholi-fly-agancy/internal/tour_event"
+	tourEventPort "gholi-fly-agancy/internal/tour_event/port"
 	"gholi-fly-agancy/pkg/adapters/storage"
 	"gholi-fly-agancy/pkg/postgres"
 
+	"github.com/go-co-op/gocron/v2"
 	"gorm.io/gorm"
 )
 
@@ -28,6 +31,7 @@ type app struct {
 	staffService       staffPort.StaffService
 	factorService      factorPort.FactorService
 	tourService        tourPort.TourService
+	tourEventService   tourEventPort.TourEventService
 	reservationService reservationPort.ReservationService
 }
 
@@ -90,7 +94,7 @@ func (a *app) setDB() error {
 	if err := postgres.Migrate(db); err != nil {
 		return fmt.Errorf("failed to migrate database: %w", err)
 	}
-
+	db = db.Debug()
 	a.db = db
 	return nil
 }
@@ -100,7 +104,8 @@ func NewApp(cfg config.Config) (App, error) {
 	if err := a.setDB(); err != nil {
 		return nil, err
 	}
-	return a, nil
+	a.tourEventService = tourEvent.NewService(storage.NewTourEventRepo(a.db))
+	return a, a.registerSagaRunner()
 }
 
 func NewMustApp(cfg config.Config) App {
@@ -109,4 +114,23 @@ func NewMustApp(cfg config.Config) App {
 		panic(fmt.Sprintf("failed to initialize app: %v", err))
 	}
 	return app
+}
+func (a *app) TourEventService(ctx context.Context) tourEventPort.TourEventService {
+	if a.tourEventService == nil {
+		a.tourEventService = tourEvent.NewService(storage.NewTourEventRepo(a.db))
+	}
+	return a.tourEventService
+}
+func (a *app) registerSagaRunner() error {
+	scheduler, err := gocron.NewScheduler()
+	if err != nil {
+		return err
+	}
+
+	a.tourEventService.RegisterSagaRunner(scheduler)
+
+	scheduler.Start()
+
+	return nil
+
 }
