@@ -107,6 +107,7 @@ message BuyAgencyTicketRequest {
     string tripId = 1 [json_name = "tripId"];
     string agencyId = 2 [json_name = "agencyId"];
     uint64 ticketCount = 3 [json_name = "ticketCount"];
+    string ownerOfAgencyId = 4 [json_name = "ownerOfAgencyId"];
 }
 
 message BuyTicketResponse {

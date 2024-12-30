@@ -55,10 +55,16 @@ func (s *TicketService) BuyAgencyTicket(ctx context.Context, req *pb.BuyAgencyTi
 		return nil, fmt.Errorf("%w %w", ErrBuyTicket, err)
 	}
 
+	ownerOfAgencyId, err := uuid.Parse(req.OwnerOfAgencyId)
+	if err != nil {
+		return nil, fmt.Errorf("%w %w", ErrBuyTicket, err)
+	}
+
 	ticketId, totalPrice, err := s.svc.BuyAgencyTicket(ctx, domain.Ticket{
-		AgencyID: &agencyID,
-		TripID:   tripId,
-		Count:    uint(req.TicketCount),
+		AgencyID:        &agencyID,
+		TripID:          tripId,
+		Count:           uint(req.TicketCount),
+		OwnerOfAgencyId: ownerOfAgencyId,
 	})
 	if err != nil {
 		return nil, err
