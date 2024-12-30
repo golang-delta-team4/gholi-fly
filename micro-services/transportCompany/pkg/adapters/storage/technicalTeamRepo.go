@@ -62,9 +62,9 @@ func (r *technicalTeamRepo) SetToTrip(ctx context.Context, teamId uuid.UUID, tri
 	return r.db.Table("trips").WithContext(ctx).Where("id = ?", tripId).Update("technical_team_id", teamId).Error
 }
 
-func (r *technicalTeamRepo) IsUserTechnicalTeamMemeber(ctx context.Context, teamId uuid.UUID, userId uuid.UUID) (bool, error) {
-	var technicalTeam types.TechnicalTeam
-	result := r.db.Where("technical_team_id = ? AND user_id = ?", teamId, userId).Take(&technicalTeam)
+func (r *technicalTeamRepo) IsUserTechnicalTeamMember(ctx context.Context, teamId uuid.UUID, userId uuid.UUID) (bool, error) {
+	var technicalTeamMember types.TechnicalTeamMember
+	result := r.db.Table("technical_team_members").WithContext(ctx).Where("technical_team_id = ? AND user_id = ?", teamId, userId).Take(&technicalTeamMember)
 
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
