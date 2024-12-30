@@ -210,7 +210,7 @@ services:
 
   gholi-nats:
     image: nats:2.9-alpine
-    container_name: gholi-nats_server
+    container_name: gholi-nats-server
     command: [
       "-js",          
       "--store_dir",  
@@ -231,6 +231,7 @@ services:
     volumes:
       - ./micro-services/notification/config.json:/app/config.json:ro 
     ports:
+      - "8089:8080"
       - "50051:50051"
     command: ["./app", "--config", "/app/config.json"]
 
@@ -254,7 +255,7 @@ services:
       dockerfile: build/Dockerfile
     volumes:
       - ./micro-services/notification/config.json:/app/config.json:ro 
-      - ./micro-services/notification/email/template:/app/template
+      - ./micro-services/notification/internal/email/template:/app/template
     command: [ "./worker", "--config", "/app/config.json"]
     
 

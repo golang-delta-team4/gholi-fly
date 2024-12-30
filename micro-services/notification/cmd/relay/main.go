@@ -5,13 +5,15 @@ import (
 	"log"
 	"notification-nats/config"
 	"notification-nats/database"
-	"notification-nats/queue"
-	"notification-nats/shared"
+	shared "notification-nats/internal/outbox"
+	"notification-nats/internal/queue"
+	"notification-nats/models"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/robfig/cron/v3"
+	"gorm.io/gorm"
 )
 
 var configPath = flag.String("config", "config.json", "service configuration file")
@@ -46,11 +48,21 @@ func main() {
 	}
 
 	// 5. Set up cron to run every 10s
+	// a) handle outbox every 10s
 	c := cron.New()
 	_, err = c.AddFunc("@every 10s", jobProcessor.HandleOutboxMessage)
 	if err != nil {
 		log.Fatal("register handler error", err)
 	}
+
+	// b) New job: clean up processed outbox messages every 4 hours
+	_, err = c.AddFunc("@every 4h", func() {
+		cleanupProcessedOutboxMessages(db)
+	})
+	if err != nil {
+		log.Fatal("register cleanup error", err)
+	}
+
 	log.Println("Start processing outbox messages")
 	c.Start()
 	defer c.Stop()
@@ -59,4 +71,15 @@ func main() {
 	kill := make(chan os.Signal, 1)
 	signal.Notify(kill, syscall.SIGINT, syscall.SIGTERM)
 	<-kill
+}
+
+func cleanupProcessedOutboxMessages(db *gorm.DB) {
+	// Danger: this will permanently remove the rows!
+	// Make sure you REALLY want them gone from outbox table.
+	if err := db.Where("is_processed = ?", true).
+		Delete(&models.OutBoxMessage{}).Error; err != nil {
+		log.Println("cleanup processed error:", err)
+	} else {
+		log.Println("Cleaned up processed outbox messages...")
+	}
 }
