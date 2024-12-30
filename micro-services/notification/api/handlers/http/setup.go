@@ -20,7 +20,7 @@ func RunFiber(db *gorm.DB, cfg config.Config) error {
 
 	handler := &Handler{DB: db}
 	api := router.Group("/api/v1/notification")
-	api.Get("/:user_id", handler.GetNotificationsByUserID)
+	api.Get("/", newAuthMiddleware([]byte(cfg.Server.Secret)), handler.GetNotificationsByUserID)
 
 	fiberPort := cfg.Server.HttpPort
 	addr := fmt.Sprintf(":%d", fiberPort)

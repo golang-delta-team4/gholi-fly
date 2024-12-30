@@ -15,12 +15,9 @@ type Handler struct {
 }
 
 func (h *Handler) GetNotificationsByUserID(c *fiber.Ctx) error {
-	userIDParam := c.Params("user_id")
-	userUUID, err := uuid.Parse(userIDParam)
-	if err != nil {
-		log.Println("Invalid user_id:", userIDParam, "error:", err)
-		return c.Status(fiber.StatusBadRequest).
-			JSON(fiber.Map{"error": "Invalid user_id"})
+	userUUID, ok := c.Locals("UserUUID").(uuid.UUID)
+	if !ok {
+		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
 	}
 
 	var notifications []models.NotificationHistory
