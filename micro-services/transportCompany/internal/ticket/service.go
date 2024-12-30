@@ -63,7 +63,6 @@ func (s *service) BuyTicket(ctx context.Context, ticket domain.Ticket) (uuid.UUI
 	// bank
 	walletResponse, err := s.bankGrpc.GetWallets(&adaptersPb.GetWalletsRequest{
 		OwnerId: ticket.UserID.String(),
-		Type:    3,
 	})
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("%w %s", ErrBuyTicket, err)
@@ -80,7 +79,7 @@ func (s *service) BuyTicket(ctx context.Context, ticket domain.Ticket) (uuid.UUI
 		},
 	})
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("%w %w %s", ErrBuyTicket, err, response.Message)
+		return uuid.Nil, fmt.Errorf("%w %w", ErrBuyTicket, err)
 	}
 
 	invoiceId, err := s.invoiceService.CreateInvoice(ctx, invoiceDomain.Invoice{
