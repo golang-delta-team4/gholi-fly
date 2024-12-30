@@ -9,6 +9,8 @@ import (
 	pb "gholi-fly-agancy/api/pb"
 	"gholi-fly-agancy/internal/tour/domain"
 	"gholi-fly-agancy/internal/tour/port"
+	tourEventDomain "gholi-fly-agancy/internal/tour_event/domain"
+	tourEventSvc "gholi-fly-agancy/internal/tour_event/port"
 	"net/http"
 	"time"
 
@@ -30,15 +32,18 @@ type BookingCreateResponse struct {
 }
 
 type TourService struct {
-	staffSvc port.TourService
+	staffSvc     port.TourService
+	tourEventSvc tourEventSvc.TourEventService
 }
 
-func NewTourService(staffSvc port.TourService) *TourService {
+func NewTourService(staffSvc port.TourService, tourEventSvc tourEventSvc.TourEventService) *TourService {
 	return &TourService{
-		staffSvc: staffSvc,
+		staffSvc:     staffSvc,
+		tourEventSvc: tourEventSvc,
 	}
 }
 func (ts *TourService) CreateTour(ctx context.Context, agencyID string, hotelHost string, hotelPort uint, transportCompanyHost string, transportCompanyPort uint, req *pb.CreateTourRequest) (*pb.CreateTourResponse, error) {
+	tracId := uuid.MustParse(uuid.NewString())
 	// Parse agency ID
 	parsedAgencyID, err := uuid.Parse(agencyID)
 	if err != nil {
@@ -50,8 +55,9 @@ func (ts *TourService) CreateTour(ctx context.Context, agencyID string, hotelHos
 	if err != nil {
 		return nil, errors.New("invalid trip ID format")
 	}
-
+	var events = make([]tourEventDomain.TourEvent, 0)
 	// Step 1: Call transport company to buy tickets
+	compensationPayload := tourEventDomain.JSONB{"tripId": req.TripId}
 	transportURL := fmt.Sprintf("http://%s:%d/api/v1/transport-company/ticket/agency-buy", transportCompanyHost, transportCompanyPort)
 	transportRequest := map[string]interface{}{
 		"tripId":      tripID.String(),
@@ -66,8 +72,15 @@ func (ts *TourService) CreateTour(ctx context.Context, agencyID string, hotelHos
 	if err != nil {
 		return nil, fmt.Errorf("failed to buy transport ticket: %w", err)
 	}
-
+	events = append(events, tourEventDomain.TourEvent{
+		ReservationID:       tracId,
+		EventType:           tourEventDomain.EventTypeTripReservation,
+		Status:              tourEventDomain.StatusSuccess,
+		CompensationPayload: tourEventDomain.JSONB{"tripReservationId": transportResponse.TicketId},
+		Payload:             compensationPayload,
+	})
 	// Step 2: Call hotel service to book a hotel
+	compensationPayload = tourEventDomain.JSONB{"hotelId": req.HotelId}
 	hotelURL := fmt.Sprintf("http://%s:%d/api/v1/hotel/booking/%s", hotelHost, hotelPort, req.GetHotelId())
 	hotelRequest := BookingCreateRequest{
 		CheckIn:  req.GetCheckIn(),
@@ -79,7 +92,14 @@ func (ts *TourService) CreateTour(ctx context.Context, agencyID string, hotelHos
 	var hotelResponse BookingCreateResponse
 	err = makePostRequest(ctx, hotelURL, hotelRequest, &hotelResponse)
 	if err != nil {
-		return nil, fmt.Errorf("failed to book hotel: %w", err)
+		events = append(events, tourEventDomain.TourEvent{
+			ReservationID:       tracId,
+			EventType:           tourEventDomain.EventTypeHotelReservation,
+			Status:              tourEventDomain.StatusFailed,
+			CompensationPayload: compensationPayload,
+		})
+		err2 := ts.tourEventSvc.CreateEvent(ctx, events)
+		return nil, fmt.Errorf("failed to book hotel: %w, %w", err, err2)
 	}
 
 	startDate, err := time.Parse(time.RFC3339, req.GetStartDate())

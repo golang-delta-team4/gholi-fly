@@ -23,6 +23,7 @@ func Migrate(db *gorm.DB) error {
 		&types.Factor{},
 		&types.Tour{},
 		&types.Reservation{},
+		&types.TourEvent{},
 	); err != nil {
 		return fmt.Errorf("failed to migrate database: %w", err)
 	}
