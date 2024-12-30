@@ -53,6 +53,7 @@ services:
       - ./micro-services/user:/gholi-fly
     ports:
       - "8083:8080"
+      - "50053:50051"
     depends_on:
       gholi-db:
         condition: service_healthy
@@ -206,8 +207,59 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  gholi-nats:
+    image: nats:2.9-alpine
+    container_name: gholi-nats-server
+    command: [
+      "-js",          
+      "--store_dir",  
+      "/data"
+    ]
+    ports:
+      - "4222:4222"   
+    volumes:
+      - gholi-nats_data:/data
+
+  gholi-outbox-grpc:
+    image: outbox-nats
+    container_name: gholi-outbox-grpc
+    restart: on-failure
+    build:
+      context: ./micro-services/notification
+      dockerfile: build/Dockerfile
+    volumes:
+      - ./micro-services/notification/config.json:/app/config.json:ro 
+    ports:
+      - "8089:8080"
+      - "50051:50051"
+    command: ["./app", "--config", "/app/config.json"]
+
+  gholi-outbox-relay:
+    image: outbox-nats
+    container_name: gholi-outbox-relay
+    restart: on-failure
+    build:
+      context: ./micro-services/notification
+      dockerfile: build/Dockerfile
+    volumes:
+      - ./micro-services/notification/config.json:/app/config.json
+    command: [ "./relay", "--config", "/app/config.json"]
+
+  gholi-outbox-worker:
+    image: outbox-nats
+    container_name: gholi-outbox-worker
+    restart: on-failure
+    build:
+      context: ./micro-services/notification
+      dockerfile: build/Dockerfile
+    volumes:
+      - ./micro-services/notification/config.json:/app/config.json:ro 
+      - ./micro-services/notification/internal/email/template:/app/template
+    command: [ "./worker", "--config", "/app/config.json"]
     
 
 volumes:
   gholi-db-volume:
   gholi-redis-volume:
+  gholi-nats_data:
