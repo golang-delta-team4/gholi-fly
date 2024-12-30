@@ -78,7 +78,7 @@ func (r *tripRepo) ConfirmTrip(ctx context.Context, id uuid.UUID) error {
 		Updates(map[string]interface{}{
 			"is_confirmed": "true",
 		}).Error; err != nil {
-		return fmt.Errorf("failed to update trip: %w", err)
+		return fmt.Errorf("failed to confirm trip: %w", err)
 	}
 
 	return nil

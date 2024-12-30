@@ -13,5 +13,5 @@ type Repo interface {
 	GetAll(ctx context.Context, pageSize int, page int) ([]domain.TechnicalTeam, error)
 	SetMember(ctx context.Context, teamId uuid.UUID, technicalTeamMember domain.TechnicalTeamMember) error
 	SetToTrip(ctx context.Context, teamId uuid.UUID, tripId uuid.UUID) error
-	IsUserTechnicalTeamMemeber(ctx context.Context, teamId uuid.UUID, userId uuid.UUID) (bool, error)
+	IsUserTechnicalTeamMember(ctx context.Context, teamId uuid.UUID, userId uuid.UUID) (bool, error)
 }

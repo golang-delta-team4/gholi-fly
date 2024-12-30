@@ -186,9 +186,9 @@ func (s *service) ConfirmTrip(ctx context.Context, id uuid.UUID, userId uuid.UUI
 		return fmt.Errorf("error on confirm trip: %s", err.Error())
 	}
 	if trip.TechnicalTeamID == nil {
-		return fmt.Errorf("failed to confirm trip it dosent have technical team")
+		return fmt.Errorf("failed to confirm trip it dose not have technical team")
 	}
-	isTechnicalTeamMember, err := s.technicalTeamRepo.IsUserTechnicalTeamMemeber(ctx, *trip.TechnicalTeamID, userId)
+	isTechnicalTeamMember, err := s.technicalTeamRepo.IsUserTechnicalTeamMember(ctx, *trip.TechnicalTeamID, userId)
 	if err != nil {
 		return fmt.Errorf("error on confirm trip: %s", err.Error())
 	}
