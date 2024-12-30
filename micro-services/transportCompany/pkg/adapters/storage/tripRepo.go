@@ -70,3 +70,16 @@ func (r *tripRepo) GetTrips(ctx context.Context, pageSize int, page int) ([]doma
 func (r *tripRepo) DeleteTrip(ctx context.Context, id uuid.UUID) error {
 	return r.db.Table("trips").WithContext(ctx).Where("id = ?", id).Delete(&types.Trip{}).Error
 }
+
+func (r *tripRepo) ConfirmTrip(ctx context.Context, id uuid.UUID) error {
+	if err := r.db.WithContext(ctx).
+		Model(&types.Trip{}).
+		Where("id = ?", id).
+		Updates(map[string]interface{}{
+			"is_confirmed": "true",
+		}).Error; err != nil {
+		return fmt.Errorf("failed to update trip: %w", err)
+	}
+
+	return nil
+}

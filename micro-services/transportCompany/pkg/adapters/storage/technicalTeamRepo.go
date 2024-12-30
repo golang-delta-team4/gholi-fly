@@ -2,6 +2,8 @@ package storage
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/technicalTeam/domain"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/technicalTeam/port"
@@ -58,4 +60,19 @@ func (r *technicalTeamRepo) SetMember(ctx context.Context, teamId uuid.UUID, tec
 
 func (r *technicalTeamRepo) SetToTrip(ctx context.Context, teamId uuid.UUID, tripId uuid.UUID) error {
 	return r.db.Table("trips").WithContext(ctx).Where("id = ?", tripId).Update("technical_team_id", teamId).Error
+}
+
+func (r *technicalTeamRepo) IsUserTechnicalTeamMemeber(ctx context.Context, teamId uuid.UUID, userId uuid.UUID) (bool, error) {
+	var technicalTeam types.TechnicalTeam
+	result := r.db.Where("technical_team_id = ? AND user_id = ?", teamId, userId).Take(&technicalTeam)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return false, nil
+		} else {
+			return false, fmt.Errorf("error occurred: %w", result.Error)
+		}
+	} else {
+		return true, nil
+	}
 }

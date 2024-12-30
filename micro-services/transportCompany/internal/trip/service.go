@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"log"
 
+	technicalTeamPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/technicalTeam/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/domain"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/port"
+	tripRepo "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/port"
 	"github.com/google/uuid"
 )
 
@@ -18,12 +20,16 @@ var (
 )
 
 type service struct {
-	repo port.Repo
+	repo              port.Repo
+	technicalTeamRepo technicalTeamPort.Repo
+	tripRepo          tripRepo.Repo
 }
 
-func NewService(repo port.Repo) port.Service {
+func NewService(repo port.Repo, technicalTeamRepo technicalTeamPort.Repo, tripRepo tripRepo.Repo) port.Service {
 	return &service{
-		repo: repo,
+		repo:              repo,
+		technicalTeamRepo: technicalTeamRepo,
+		tripRepo:          tripRepo,
 	}
 }
 
@@ -172,4 +178,27 @@ func (s *service) GetTrips(ctx context.Context, pageSize int, pageNumber int) ([
 	}
 
 	return trips, nil
+}
+
+func (s *service) ConfirmTrip(ctx context.Context, id uuid.UUID, userId uuid.UUID) error {
+	trip, err := s.tripRepo.GetTripById(ctx, id)
+	if err != nil {
+		return fmt.Errorf("error on confirm trip: %s", err.Error())
+	}
+	if trip.TechnicalTeamID == nil {
+		return fmt.Errorf("failed to confirm trip it dosent have technical team")
+	}
+	isTechnicalTeamMember, err := s.technicalTeamRepo.IsUserTechnicalTeamMemeber(ctx, *trip.TechnicalTeamID, userId)
+	if err != nil {
+		return fmt.Errorf("error on confirm trip: %s", err.Error())
+	}
+	if !isTechnicalTeamMember {
+		return fmt.Errorf("failed to confirm trip you are not technical team member")
+	}
+	err = s.repo.ConfirmTrip(ctx, id)
+	if err != nil {
+		return fmt.Errorf("error on confirm trip: %s", err.Error())
+	}
+
+	return nil
 }

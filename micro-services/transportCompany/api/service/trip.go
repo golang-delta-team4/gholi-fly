@@ -346,3 +346,12 @@ func (s *TripService) DeleteTrip(ctx context.Context, tripId string) error {
 
 	return s.svc.DeleteTrip(ctx, tripUId)
 }
+
+func (s *TripService) ConfirmTrip(ctx context.Context, tripId string, userId uuid.UUID) error {
+	tripUId, err := uuid.Parse(tripId)
+	if err != nil {
+		return fmt.Errorf("%w %w", ErrTripCreationValidation, err)
+	}
+
+	return s.svc.ConfirmTrip(ctx, tripUId, userId)
+}

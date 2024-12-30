@@ -80,7 +80,10 @@ func (a *app) TripService(ctx context.Context) tripPort.Service {
 }
 
 func (a *app) tripServiceWithDB(db *gorm.DB) tripPort.Service {
-	return trip.NewService(storage.NewTripRepo(db, false, a.redisProvider))
+	return trip.NewService(
+		storage.NewTripRepo(db, false, a.redisProvider),
+		storage.NewTechnicalTeamRepo(db, false, a.redisProvider),
+		storage.NewTripRepo(db, false, a.redisProvider))
 }
 
 func (a *app) TicketService(ctx context.Context) ticketPort.Service {

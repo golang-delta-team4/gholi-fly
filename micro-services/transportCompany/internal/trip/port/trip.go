@@ -13,4 +13,5 @@ type Repo interface {
 	GetTrips(ctx context.Context, pageSize int, page int) ([]domain.Trip, error)
 	UpdateTrip(ctx context.Context, id uuid.UUID, updates map[string]interface{}) error
 	DeleteTrip(ctx context.Context, id uuid.UUID) error
+	ConfirmTrip(ctx context.Context, id uuid.UUID) error
 }
