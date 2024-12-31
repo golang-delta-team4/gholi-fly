@@ -23,8 +23,8 @@ func (r *VehicleRepo) Create(ctx context.Context, vehicle *domain.Vehicle) error
 	return r.db.WithContext(ctx).Create(vehicle).Error
 }
 
-func (r *VehicleRepo) GetByID(ctx context.Context, id uuid.UUID) (*domain.Vehicle, error) {
-	var vehicle domain.Vehicle
+func (r *VehicleRepo) GetByID(ctx context.Context, id uuid.UUID) (*types.Vehicle, error) {
+	var vehicle types.Vehicle
 	if err := r.db.WithContext(ctx).First(&vehicle, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (r *VehicleRepo) GetAll(ctx context.Context) ([]domain.Vehicle, error) {
 	return vehicles, nil
 }
 
-func (r *VehicleRepo) Update(ctx context.Context, vehicle *domain.Vehicle) error {
+func (r *VehicleRepo) Update(ctx context.Context, vehicle *types.Vehicle) error {
 	return r.db.WithContext(ctx).Save(vehicle).Error
 }
 
@@ -48,7 +48,6 @@ func (r *VehicleRepo) Delete(ctx context.Context, id uuid.UUID) error {
 }
 
 func (r *VehicleRepo) ProcessTripRequest(ctx context.Context) (*domain.TripRequest, error) {
-
 	// implementation
 	return nil, nil
 }
@@ -68,7 +67,7 @@ func (r *VehicleRepo) GetMatchedVehicle(ctx context.Context, vehicleMatchRequest
 		Joins("left join vehicle_reserves vr on vr.vehicle_id = vehicles.id").
 		Select("vehicles.id, vehicles.owner_id, vehicles.type, vehicles.capacity, vehicles.speed, vehicles.unique_code, vehicles.status, vehicles.year_of_manufacture, vehicles.created_at, vehicles.updated_at, vehicles.price_per_kilometer, ? * price_per_kilometer as computed_price", vehicleMatchRequest.TripDistance).
 		Where("0 = (?)", subQuery).
-		Where("vehicles.type = ? AND vehicles.capacity >= ? AND ? * vehicles.price_per_kilometer < ? AND vehicles.year_of_manufacture = ?",
+		Where("vehicles.status = 'active' and vehicles.type = ? AND vehicles.capacity >= ? AND ? * vehicles.price_per_kilometer < ? AND vehicles.year_of_manufacture = ?",
 			vehicleMatchRequest.TripType,
 			vehicleMatchRequest.NumberOfPassengers,
 			vehicleMatchRequest.TripDistance,
