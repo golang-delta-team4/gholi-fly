@@ -7,6 +7,8 @@ type Config struct {
 	Bank   BankGRPCConfig `json:"bank"`
 	User   UserGRPCConfig `json:"user"`
 	Role   RoleGRPCConfig `json:"role"`
+	Map   MapHTTPConfig `json:"map"`
+	Vehicle   VehicleHTTPConfig `json:"vehicle"`
 }
 
 type DBConfig struct {
@@ -39,6 +41,16 @@ type UserGRPCConfig struct {
 }
 
 type RoleGRPCConfig struct {
+	Host string `json:"host"`
+	Port uint   `json:"port"`
+}
+
+type MapHTTPConfig struct {
+	Host string `json:"host"`
+	Port uint   `json:"port"`
+}
+
+type VehicleHTTPConfig struct {
 	Host string `json:"host"`
 	Port uint   `json:"port"`
 }
