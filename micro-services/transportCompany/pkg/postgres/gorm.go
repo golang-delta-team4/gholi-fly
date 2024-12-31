@@ -24,6 +24,6 @@ func (o DBConnOptions) PostgresDSN() string {
 
 func NewPsqlGormConnection(opt DBConnOptions) (*gorm.DB, error) {
 	return gorm.Open(postgres.Open(opt.PostgresDSN()), &gorm.Config{
-		Logger: logger.Discard,
+		Logger: logger.Default,
 	})
 }

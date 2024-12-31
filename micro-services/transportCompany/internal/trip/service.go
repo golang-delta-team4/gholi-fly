@@ -5,11 +5,15 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
+	"time"
 
 	technicalTeamPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/technicalTeam/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/domain"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/port"
 	tripRepo "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/port"
+	httpPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/http/port"
+	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/http/presenter"
 	"github.com/google/uuid"
 )
 
@@ -23,13 +27,17 @@ type service struct {
 	repo              port.Repo
 	technicalTeamRepo technicalTeamPort.Repo
 	tripRepo          tripRepo.Repo
+	mapClient         httpPort.HttpPathClient
+	vehicleClient     httpPort.HttpVehicleClient
 }
 
-func NewService(repo port.Repo, technicalTeamRepo technicalTeamPort.Repo, tripRepo tripRepo.Repo) port.Service {
+func NewService(repo port.Repo, technicalTeamRepo technicalTeamPort.Repo, tripRepo tripRepo.Repo, mapClient httpPort.HttpPathClient, vehicleClient httpPort.HttpVehicleClient) port.Service {
 	return &service{
 		repo:              repo,
 		technicalTeamRepo: technicalTeamRepo,
 		tripRepo:          tripRepo,
+		mapClient:         mapClient,
+		vehicleClient:     vehicleClient,
 	}
 }
 
@@ -37,9 +45,36 @@ func (s *service) CreateTrip(ctx context.Context, trip domain.Trip) (uuid.UUID, 
 	if err := trip.Validate(); err != nil {
 		return uuid.Nil, fmt.Errorf("%w %w", ErrTripCreationValidation, err)
 	}
+	pathDetail, err := s.mapClient.GetPathDetail(trip.PathID)
+	if err != nil {
+		log.Println("error on getting path detail: ", err.Error())
+		return uuid.Nil, err
+	}
 	companyId, err := s.repo.CreateTrip(ctx, trip)
 	if err != nil {
 		log.Println("error on creating company: ", err.Error())
+		return uuid.Nil, err
+	}
+	vehicleReservationDetail, err := s.vehicleClient.GetMatchedVehicle(&presenter.MatchMakerRequest{
+		TripID:             companyId.String(),
+		ReserveStartDate:   trip.StartDate.Format(time.DateOnly),
+		ReserveEndDate:     trip.EndDate.Format(time.DateOnly),
+		TripDistance:       int(pathDetail.DistanceKM), //float64
+		NumberOfPassengers: int(trip.MinPassengers),
+		TripType:           presenter.TripType(trip.TripType),
+		MaxPrice:           int(math.Ceil(trip.AgencyPrice*float64(trip.MinPassengers)) * 0.3),
+		YearOfManufacture:  trip.VehicleYearOfManufacture,
+	})
+	if err != nil {
+		return uuid.Nil, err
+	}
+	trip.Id = companyId
+	trip.VehicleRequestID = &vehicleReservationDetail.ReservationID
+	updates := make(map[string]interface{})
+	updates["vehicle_request_id"] = vehicleReservationDetail.ReservationID
+	err = s.repo.UpdateTrip(ctx, companyId, updates)
+	if err != nil {
+		log.Println(err)
 		return uuid.Nil, err
 	}
 
