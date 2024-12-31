@@ -12,7 +12,7 @@ import (
 func BuyTicket(svcGetter ServiceGetter[*service.TicketService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		svc := svcGetter(c.UserContext())
-		userID, ok := c.Locals("user_id").(uuid.UUID)
+		userID, ok := c.Locals("UserUUID").(uuid.UUID)
 		if !ok {
 			return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
 		}
@@ -59,6 +59,24 @@ func CancelTicket(svcGetter ServiceGetter[*service.TicketService]) fiber.Handler
 
 		ticketId := c.Params("id")
 		response, err := svc.CancelTicket(c.UserContext(), ticketId)
+		if err != nil {
+			if errors.Is(err, service.ErrCompanyCreationValidation) {
+				return fiber.NewError(fiber.StatusBadRequest, err.Error())
+			}
+
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+
+		return c.JSON(response)
+	}
+}
+
+func CancelAgencyTicket(svcGetter ServiceGetter[*service.TicketService]) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
+
+		ticketId := c.Params("id")
+		response, err := svc.CancelAgencyTicket(c.UserContext(), ticketId)
 		if err != nil {
 			if errors.Is(err, service.ErrCompanyCreationValidation) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())

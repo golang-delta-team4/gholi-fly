@@ -6,7 +6,6 @@ option go_package = "github.com/golang-delta-team4/gholi-fly/transportCompany/ap
 message CreateCompanyRequest {
     string name = 1 [json_name = "name"];
     string description = 2 [json_name = "description"];
-    string ownerId = 3 [json_name = "ownerId"];
     string address =4 [json_name = "address"];
 	string phone =5 [json_name = "phone"];
 	string email =6 [json_name = "email"];
@@ -30,7 +29,6 @@ message GetCompanyResponse {
 message UpdateCompanyRequest {
     string name = 1 [json_name = "name"];
     string description = 2 [json_name = "description"];
-    string ownerId = 3 [json_name = "ownerId"];
     string address =4 [json_name = "address"];
 	string phone =5 [json_name = "phone"];
 	string email =6 [json_name = "email"];
@@ -107,14 +105,51 @@ message BuyAgencyTicketRequest {
     string tripId = 1 [json_name = "tripId"];
     string agencyId = 2 [json_name = "agencyId"];
     uint64 ticketCount = 3 [json_name = "ticketCount"];
+    string ownerOfAgencyId = 4 [json_name = "ownerOfAgencyId"];
 }
 
 message BuyTicketResponse {
     string ticketId = 1 [json_name = "ticketId"];
     string message = 2 [json_name = "message"];
-    uint64 totalPrice = 4 [json_name = "totalPrice"];
+    uint64 totalPrice = 3 [json_name = "totalPrice"];
 }
 
 message CancelTicketResponse {
     string message = 1 [json_name = "message"];
+}
+
+message CreateTechnicalTeamRequest {
+    string name = 1 [json_name = "name"];
+    string description = 2 [json_name = "description"];
+    string companyId = 3 [json_name = "companyId"];
+    string tripType = 4 [json_name = "tripType"];
+}
+
+message CreateTechnicalTeamResponse {
+    string id = 1 [json_name = "id"];
+    string message = 2 [json_name = "message"];
+}
+
+message SetTechnicalTeamToTripRequest {
+    string technicalTeamId = 1 [json_name = "technicalTeamId"];
+    string tripId = 2 [json_name = "tripId"];
+}
+
+message AddTechnicalTeamMemberRequest {
+    string userId = 1 [json_name = "userId"];
+    string position = 2 [json_name = "position"];
+    string technicalTeamId = 3 [json_name = "technicalTeamId"];
+}
+
+message GetTechnicalTeamResponse {
+    string id = 1 [json_name = "id"];
+    string name = 2 [json_name = "name"];
+    string description = 3 [json_name = "description"];
+    string companyId = 4 [json_name = "companyId"];
+    string tripType = 5 [json_name = "tripType"];
+    repeated string membersId = 6  [json_name = "membersId"];
+}
+
+message GetTechnicalTeamsResponse {
+    repeated GetTechnicalTeamResponse teams = 1 [json_name = "teams"];
 }

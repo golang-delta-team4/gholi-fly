@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"log"
 
+	rolePB "github.com/golang-delta-team4/gholi-fly-shared/pkg/protobuf/role"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company/domain"
-	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company/port"
+	port "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company/port"
+	grpcPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc/port"
 	"github.com/google/uuid"
 )
 
@@ -17,12 +19,14 @@ var (
 )
 
 type service struct {
-	repo port.Repo
+	repo       port.Repo
+	roleClient grpcPort.GRPCRoleClient
 }
 
-func NewService(repo port.Repo) port.Service {
+func NewService(repo port.Repo, roleClient grpcPort.GRPCRoleClient) port.Service {
 	return &service{
-		repo: repo,
+		repo:       repo,
+		roleClient: roleClient,
 	}
 }
 
@@ -35,7 +39,10 @@ func (s *service) CreateCompany(ctx context.Context, company domain.Company) (uu
 		log.Println("error on creating company: ", err.Error())
 		return uuid.Nil, err
 	}
-
+	_, err = s.roleClient.CreateRole(&rolePB.GrantResourceAccessRequest{OwnerUUID: company.OwnerId.String(), Permissions: createCompanyPermissions(companyId), RoleName: fmt.Sprintf("company-%s", companyId.String())})
+	if err != nil {
+		log.Println("error on creating role: ", err.Error())
+	}
 	return companyId, nil
 }
 
@@ -76,4 +83,29 @@ func (s *service) DeleteCompany(ctx context.Context, companyId uuid.UUID) error 
 		return err
 	}
 	return nil
+}
+
+func createCompanyPermissions(companyUUID uuid.UUID) []*rolePB.ResourcePermission {
+	return []*rolePB.ResourcePermission{
+		{
+			Route:  fmt.Sprintf("/company/%s/trip", companyUUID.String()),
+			Method: "POST",
+		},
+		{
+			Route:  fmt.Sprintf("/company/%s/trip/:id", companyUUID.String()),
+			Method: "PATCH",
+		},
+		{
+			Route:  fmt.Sprintf("/company/%s/trip/:id", companyUUID.String()),
+			Method: "DELETE",
+		},
+		{
+			Route:  fmt.Sprintf("/company/%s", companyUUID.String()),
+			Method: "PATCH",
+		},
+		{
+			Route:  fmt.Sprintf("/company/%s", companyUUID.String()),
+			Method: "DELETE",
+		},
+	}
 }

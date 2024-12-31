@@ -28,12 +28,14 @@ func (r *tripRepo) CreateTrip(ctx context.Context, tripDomain domain.Trip) (uuid
 }
 
 func (r *tripRepo) GetTripById(ctx context.Context, id uuid.UUID) (*domain.Trip, error) {
-	var trip domain.Trip
+	var trip types.Trip
 	err := r.db.Table("trips").WithContext(ctx).Where("id = ?", id).First(&trip).Error
 	if err != nil {
 		return nil, err
 	}
-	return &trip, nil
+
+	domainTrip := mapper.TripStorage2Domain(trip)
+	return domainTrip, nil
 }
 
 func (r *tripRepo) UpdateTrip(ctx context.Context, id uuid.UUID, updates map[string]interface{}) error {
@@ -52,14 +54,32 @@ func (r *tripRepo) UpdateTrip(ctx context.Context, id uuid.UUID, updates map[str
 }
 
 func (r *tripRepo) GetTrips(ctx context.Context, pageSize int, page int) ([]domain.Trip, error) {
-	var trips []domain.Trip
+	var trips []types.Trip
 	err := r.db.Table("trips").WithContext(ctx).Limit(pageSize).Offset(page - 1*pageSize).Find(&trips).Error
 	if err != nil {
 		return nil, err
 	}
-	return trips, nil
+	var tripsDomain []domain.Trip
+	for _, item := range trips {
+		domainItem := mapper.TripStorage2Domain(item)
+		tripsDomain = append(tripsDomain, *domainItem)
+	}
+	return tripsDomain, nil
 }
 
 func (r *tripRepo) DeleteTrip(ctx context.Context, id uuid.UUID) error {
 	return r.db.Table("trips").WithContext(ctx).Where("id = ?", id).Delete(&types.Trip{}).Error
+}
+
+func (r *tripRepo) ConfirmTrip(ctx context.Context, id uuid.UUID) error {
+	if err := r.db.WithContext(ctx).
+		Model(&types.Trip{}).
+		Where("id = ?", id).
+		Updates(map[string]interface{}{
+			"is_confirmed": "true",
+		}).Error; err != nil {
+		return fmt.Errorf("failed to confirm trip: %w", err)
+	}
+
+	return nil
 }
