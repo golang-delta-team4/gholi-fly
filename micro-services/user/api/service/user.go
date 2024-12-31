@@ -97,16 +97,20 @@ func (us *UserService) Refresh(ctx context.Context, userUUID uuid.UUID, refreshT
 
 }
 
-func (us *UserService) AuthorizeUser(ctx context.Context, req *pb.UserAuthorizationRequest) (bool, error) {
-	uuid, err := uuid.Parse(req.UserUUID)
-	if err != nil {
-		return false, errors.New("user uuid invalid")
-	}
-	return us.service.AuthorizeUser(ctx, &domain.UserAuthorize{UserUUID: uuid, Route: strings.ToLower(req.Route), Method: strings.ToLower(req.Method)})
+func (us *UserService) AuthorizeUser(ctx context.Context, req presenter.UserAuthorization) (bool, error) {
+	return us.service.AuthorizeUser(ctx, &domain.UserAuthorize{UserUUID: req.UserUUID, Route: strings.ToLower(req.Route), Method: strings.ToLower(req.Method)})
 }
 
-func (us *UserService) GetUserByUUID(ctx context.Context, req *pb.GetUserByUUIDRequest) (*domain.User, error) {
-	uuid, err := uuid.Parse(req.UserUUID)
+func (us *UserService) BlockUser(ctx context.Context, userUUID uuid.UUID) (error) {
+	return us.service.BlockUser(ctx, userUUID)
+}
+
+func (us *UserService) UnBlockUser(ctx context.Context, userUUID uuid.UUID) (error) {
+	return us.service.UnBlockUser(ctx, userUUID)
+}
+
+func (us *UserService) GetUserByUUID(ctx context.Context, userUUID string) (*domain.User, error) {
+	uuid, err := uuid.Parse(userUUID)
 	if err != nil {
 		return nil, errors.New("user uuid invalid")
 	}
@@ -125,4 +129,18 @@ func createToken(userUUID uuid.UUID, expMin uint, secret []byte) (string, time.T
 		return "", time.Time{}, err
 	}
 	return token, expirationTime, nil
+}
+
+func (us *UserService) GetAllUsers(ctx context.Context, query presenter.PaginationQuery) ([]domain.User, error) {
+	if query.Page == 0 {
+		query.Page = 1
+	} 
+	if query.Size == 0 {
+		query.Size = 10
+	}
+	return us.service.GetAllUsers(ctx, query)
+}
+
+func (us *UserService) GetBlockedUsers(ctx context.Context) ([]string, error) {
+	return us.service.GetBlockedUsers(ctx)
 }
