@@ -36,8 +36,8 @@ func StorageList2DomainList(users []types.User) []domain.User {
 		}
 		domainUsers = append(domainUsers, domain.User{
 			UUID:      user.UUID,
-			FirstName: user.LastName,
-			LastName:  user.FirstName,
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
 			Email:     user.Email,
 			CreatedAt: user.CreatedAt,
 			UpdatedAt: user.UpdatedAt,

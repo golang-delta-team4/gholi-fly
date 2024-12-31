@@ -101,6 +101,14 @@ func (us *UserService) AuthorizeUser(ctx context.Context, req presenter.UserAuth
 	return us.service.AuthorizeUser(ctx, &domain.UserAuthorize{UserUUID: req.UserUUID, Route: strings.ToLower(req.Route), Method: strings.ToLower(req.Method)})
 }
 
+func (us *UserService) BlockUser(ctx context.Context, userUUID uuid.UUID) (error) {
+	return us.service.BlockUser(ctx, userUUID)
+}
+
+func (us *UserService) UnBlockUser(ctx context.Context, userUUID uuid.UUID) (error) {
+	return us.service.UnBlockUser(ctx, userUUID)
+}
+
 func (us *UserService) GetUserByUUID(ctx context.Context, userUUID string) (*domain.User, error) {
 	uuid, err := uuid.Parse(userUUID)
 	if err != nil {

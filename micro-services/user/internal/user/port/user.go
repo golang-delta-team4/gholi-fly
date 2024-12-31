@@ -10,6 +10,8 @@ import (
 
 type Repo interface {
 	Create(ctx context.Context, user types.User) error
+	Block(ctx context.Context, userUUID uuid.UUID) error
+	UnBlock(ctx context.Context, userUUID uuid.UUID) error
 	GetByEmail(ctx context.Context, email string) (*types.User, error)
 	UpdateRefreshToken(ctx context.Context, refreshToken types.RefreshToken) error
 	AddRefreshToken(ctx context.Context, refreshToken *types.RefreshToken) error

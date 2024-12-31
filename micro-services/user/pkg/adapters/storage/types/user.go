@@ -14,6 +14,7 @@ type User struct {
 	LastName   string
 	Email      string `gorm:"unique"`
 	Password   string
+	IsBlocked bool `gorm:"default:false"`
 	IsVerified bool
 	UserRoles []UserRole
 }

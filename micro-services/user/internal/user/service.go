@@ -168,3 +168,18 @@ func (us *service) GetAllUsers(ctx context.Context, query presenter.PaginationQu
 	storageUsers := mapper.StorageList2DomainList(users)
 	return storageUsers, nil
 }
+
+func (us *service) BlockUser(ctx context.Context, userUUID uuid.UUID) (error) {
+	err := us.repo.Block(ctx, userUUID)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return ErrUserNotFound
+	}
+	return nil
+}
+func (us *service) UnBlockUser(ctx context.Context, userUUID uuid.UUID) (error) {
+	err := us.repo.UnBlock(ctx, userUUID)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return ErrUserNotFound
+	}
+	return nil
+}
