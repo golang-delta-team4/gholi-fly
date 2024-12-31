@@ -65,7 +65,7 @@ func (s *BookingService) CreateUserBooking(ctx context.Context, req *pb.BookingC
 			RoomID:        roomId,
 			UserID:        userUUID,
 			ReservationID: reservationId,
-			IsPayed:       false,
+			IsPaid:        false,
 			Status:        uint8(pb.BookingStatus_BOOKING_PENDING),
 		}, hotelUUID, false)
 
@@ -122,7 +122,7 @@ func (s *BookingService) CreateBooking(ctx context.Context, req *pb.BookingCreat
 			RoomID:        roomId,
 			UserID:        userUUID,
 			ReservationID: reservationId,
-			IsPayed:       false,
+			IsPaid:        false,
 			Status:        uint8(pb.BookingStatus_BOOKING_PENDING),
 		}, hotelUUID, true)
 
@@ -163,6 +163,7 @@ func (s *BookingService) GetAllBookingsByRoomID(ctx context.Context, roomID stri
 			CheckOut:      r.CheckOut.Format("2006-01-02"),
 			BookingStatus: pb.BookingStatus(r.Status),
 			UserId:        r.UserID.String(),
+			FactorId:      r.FactorID,
 		}
 		bookingList = append(bookingList, booking)
 	}
@@ -217,6 +218,7 @@ func (s *BookingService) GetBookingByID(ctx context.Context, bookingID string) (
 		CheckOut:      booking.CheckOut.Format("2006-01-02"),
 		BookingStatus: pb.BookingStatus(booking.Status),
 		UserId:        booking.UserID.String(),
+		FactorId:      booking.FactorID,
 	}, nil
 }
 
@@ -253,12 +255,12 @@ func (s *BookingService) DeleteBooking(ctx context.Context, bookingID string) er
 	return nil
 }
 
-func (s *BookingService) GetAllBookingsByUserID(ctx context.Context, userID string) (*pb.GetAllBookingResponse, error) {
+func (s *BookingService) GetAllBookingsByUserID(ctx context.Context, userUUID uuid.UUID) (*pb.GetAllBookingResponse, error) {
 
-	userUUID, err := uuid.Parse(userID)
-	if err != nil {
-		return nil, err
-	}
+	// userUUID, err := uuid.Parse(userID)
+	// if err != nil {
+	// 	return nil, err
+	// }
 	bookings, err := s.svc.GetAllBookingsByUserID(ctx, userUUID)
 	if err != nil {
 		return nil, err
@@ -268,6 +270,7 @@ func (s *BookingService) GetAllBookingsByUserID(ctx context.Context, userID stri
 	for _, r := range bookings {
 		booking := &pb.Booking{
 			Id:            r.UUID.String(),
+			FactorId:      r.FactorID,
 			HotelId:       r.HotelID.String(),
 			CheckIn:       r.CheckIn.Format("2006-01-02"),
 			CheckOut:      r.CheckOut.Format("2006-01-02"),
@@ -280,4 +283,56 @@ func (s *BookingService) GetAllBookingsByUserID(ctx context.Context, userID stri
 	return &pb.GetAllBookingResponse{
 		Bookings: bookingList,
 	}, nil
+}
+
+func (s *BookingService) ApproveUserBooking(ctx context.Context, factorID string, userUUID uuid.UUID) error {
+	factorUUID, err := uuid.Parse(factorID)
+	if err != nil {
+		return err
+	}
+	err = s.svc.ApproveUserBooking(ctx, factorUUID, userUUID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *BookingService) ApproveBooking(ctx context.Context, factorID string) error {
+	factorUUID, err := uuid.Parse(factorID)
+	if err != nil {
+		return err
+	}
+	err = s.svc.ApproveBooking(ctx, factorUUID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *BookingService) CancelUserBooking(ctx context.Context, factorID string, userUUID uuid.UUID) error {
+	factorUUID, err := uuid.Parse(factorID)
+	if err != nil {
+		return err
+	}
+	err = s.svc.CancelUserBooking(ctx, factorUUID, userUUID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *BookingService) CancelBooking(ctx context.Context, factorID string) error {
+	factorUUID, err := uuid.Parse(factorID)
+	if err != nil {
+		return err
+	}
+	err = s.svc.CancelBooking(ctx, factorUUID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

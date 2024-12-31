@@ -104,3 +104,27 @@ func (r *bookingRepo) AddBookingFactor(ctx context.Context, bookingID domain.Boo
 func (r *bookingRepo) Delete(ctx context.Context, bookingID domain.BookingUUID) error {
 	return r.db.Table("bookings").WithContext(ctx).Delete(&types.Booking{}, "uuid = ?", bookingID).Error
 }
+
+func (r *bookingRepo) ApproveUserBooking(ctx context.Context, factorID uuid.UUID, userUUID uuid.UUID) error {
+	return r.db.Table("bookings").WithContext(ctx).Where("factor_id = ? AND user_id = ?", factorID, userUUID).Updates(map[string]interface{}{
+		"status":    2,
+		"is_paid":   true,
+		"paid_date": gorm.Expr("NOW()"),
+	}).Error
+}
+
+func (r *bookingRepo) ApproveBooking(ctx context.Context, factorID uuid.UUID) error {
+	return r.db.Table("bookings").WithContext(ctx).Where("factor_id = ?", factorID).Updates(map[string]interface{}{
+		"status":    2,
+		"is_paid":   true,
+		"paid_date": gorm.Expr("NOW()"),
+	}).Error
+}
+
+func (r *bookingRepo) CancelUserBooking(ctx context.Context, factorID uuid.UUID, userUUID uuid.UUID) error {
+	return r.db.Table("bookings").WithContext(ctx).Where("factor_id = ? AND user_id = ?", factorID, userUUID).Update("status", 3).Error
+}
+
+func (r *bookingRepo) CancelBooking(ctx context.Context, factorID uuid.UUID) error {
+	return r.db.Table("bookings").WithContext(ctx).Where("factor_id = ?", factorID).Update("status", 3).Error
+}

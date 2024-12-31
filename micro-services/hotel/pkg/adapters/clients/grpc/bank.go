@@ -63,3 +63,25 @@ func (g *GRPCBankClient) CreateFactor(req *bankPB.CreateFactorRequest) (*bankPB.
 	}
 	return response, nil
 }
+
+func (g *GRPCBankClient) ApplyFactor(req *bankPB.ApplyFactorRequest) (*bankPB.ApplyFactorResponse, error) {
+	conn, err := grpc.Dial(fmt.Sprintf("%v:%v", g.host, g.port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, err
+	}
+
+	defer conn.Close()
+
+	// Create a new AuthService client
+	client := bankPB.NewFactorServiceClient(conn)
+
+	// Create a context
+	ctx := context.Background()
+
+	// Call the GetUserByToken method
+	response, err := client.ApplyFactor(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}

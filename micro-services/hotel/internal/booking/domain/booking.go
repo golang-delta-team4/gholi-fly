@@ -35,7 +35,7 @@ type Booking struct {
 	CheckIn       time.Time
 	CheckOut      time.Time
 	Status        BookingStatus
-	IsPayed       bool
+	IsPaid        bool
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 	DeletedAt     time.Time
