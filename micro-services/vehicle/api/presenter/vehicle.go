@@ -3,7 +3,6 @@ package presenter
 import (
 	"vehicle/internal/vehicle/domain"
 
-	"github.com/google/uuid"
 )
 
 type Vehicle struct {
@@ -14,15 +13,16 @@ type Vehicle struct {
 }
 
 type MatchMakerRequest struct {
-	TripID             uuid.UUID
-	ReserveStartDate   string
-	ReserveEndDate     string
-	TripDistance       int
-	NumberOfPassengers int
-	TripType           domain.VehicleType
-	MaxPrice           int
-	YearOfManufacture  int
+	TripID             string   `json:"trip_id"`
+	ReserveStartDate   string   `json:"reserve_start_date"`
+	ReserveEndDate     string   `json:"reserve_end_date"`
+	TripDistance       int      `json:"trip_distance"`
+	NumberOfPassengers int      `json:"number_of_passengers"`
+	TripType           domain.VehicleType `json:"trip_type"`
+	MaxPrice           int      `json:"max_price"`
+	YearOfManufacture  int      `json:"year_of_manufacture"`
 }
+
 
 type Status string
 

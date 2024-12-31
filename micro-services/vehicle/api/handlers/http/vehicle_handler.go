@@ -42,8 +42,9 @@ func (h *VehicleHandler) MatchVehicle(c *fiber.Ctx) error {
 	if reserveEndDate.Before(reserveStartDate) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "end date can't be sooner than start date"})
 	}
+	vehicleUUID, err := uuid.Parse(vehicleMatchRequest.TripID)
 	reservationID, vehicle, err := h.service.MatchVehicle(c.Context(), &domain.MatchMakerRequest{
-		TripID:             vehicleMatchRequest.TripID,
+		TripID:             vehicleUUID,
 		ReserveStartDate:   reserveStartDate,
 		ReserveEndDate:     reserveEndDate,
 		TripDistance:       vehicleMatchRequest.TripDistance,
@@ -128,5 +129,5 @@ func RegisterVehicleRoutes(app *fiber.App, service port.VehicleService, cfg conf
 	handler := NewVehicleHandler(service)
 	app.Post("/api/v1/vehicles", newAuthMiddleware([]byte(cfg.Server.Secret)), handler.CreateVehicle)
 	app.Patch("/api/v1/vehicles/:id", newAuthMiddleware([]byte(cfg.Server.Secret)), handler.UpdateVehicle)
-	app.Get("/api/v1/vehicles/match", handler.MatchVehicle)
+	app.Post("/api/v1/vehicles/match", handler.MatchVehicle)
 }
