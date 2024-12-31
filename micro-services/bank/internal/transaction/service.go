@@ -171,8 +171,9 @@ func (s *service) UpdateTransactionStatus(ctx context.Context, transactionID dom
 	return nil
 }
 
-func (s *service) GetTransactionSum(ctx context.Context, filters domain.TransactionFilters) (int64, error) {
-	total, err := s.transactionRepo.GetSum(ctx, filters)
+func (s *service) GetTransactionSum(ctx context.Context, filters *domain.TransactionFilters) (int64, error) {
+	fmt.Printf("%+v", filters)
+	total, err := s.transactionRepo.GetSum(ctx, *filters)
 	if err != nil {
 		log.Println("error fetching transaction sum:", err.Error())
 		return 0, err

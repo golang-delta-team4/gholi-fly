@@ -1,0 +1,124 @@
+{
+	"info": {
+		"_postman_id": "1a84cc8a-e4fe-497f-bb6a-594275de7524",
+		"name": "vehicle",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31577173"
+	},
+	"item": [
+		{
+			"name": "match-maker",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"TripID\": \"09eca11f-a4d9-4b40-87c9-2c8f64d56e65\",\n  \"ReserveStartDate\": \"2026-04-07\",\n  \"ReserveEndDate\": \"2025-11-25\",\n  \"TripDistance\": 100,\n  \"NumberOfPassengers\": 4,\n  \"TripType\": \"air\",\n  \"MaxPrice\": 200000000,\n  \"YearOfManufacture\": 2018\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/api/v1/vehicles/match",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"vehicles",
+						"match"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create vehicle",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU2MzI5OTgsIlVzZXJVVUlEIjoiYzk0YTk4ZTktMGQ3Ni00YzAxLWEwMzItNTYyNzY2ZTU1YTU1In0.xc7HNXewXTytPv6UiVcfSeyusDWw9HRW0-kKiPdflfC5IW4HQFeDQKG5-UlYw83tnGCb6VcSOfC_KxgtvVsnJQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"type\": \"bus\",\n  \"capacity\": 50,\n  \"speed\": 80.5,\n  \"unique_code\": \"BUS123454\",\n  \"status\": \"active\",\n  \"year_of_manufacture\": 2018,\n  \"price_per_kilometer\": 15,\n  \"created_at\": \"2024-12-30T10:00:00Z\",\n  \"updated_at\": \"2024-12-30T10:00:00Z\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/api/v1/vehicles",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"vehicles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"capacity\": 50,\n  \"speed\": 80.5,\n  \"status\": \"inactive\",\n  \"price_per_kilometer\": 15\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/api/v1/vehicles/4c84e088-0296-465a-b5b8-b68b8682491b",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"vehicles",
+						"4c84e088-0296-465a-b5b8-b68b8682491b"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

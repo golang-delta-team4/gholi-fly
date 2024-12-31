@@ -12,4 +12,5 @@ type PathService interface {
 	CreatePath(ctx context.Context, path *domain.Path) error
 	UpdatePath(ctx context.Context, path *domain.Path) error
 	DeletePath(ctx context.Context, id uuid.UUID) error
+	FilterPaths(ctx context.Context, filters map[string]interface{}) ([]domain.Path, error)
 }

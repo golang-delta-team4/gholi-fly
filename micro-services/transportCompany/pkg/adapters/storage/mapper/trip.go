@@ -39,3 +39,38 @@ func TripDomain2Storage(tripDomain domain.Trip) *types.Trip {
 		VehicleName:      tripDomain.VehicleName,
 	}
 }
+
+func TripStorage2Domain(tripStorage types.Trip) *domain.Trip {
+	return &domain.Trip{
+		Id:               tripStorage.Id,
+		CompanyID:        tripStorage.CompanyID,
+		UserReleaseDate:  tripStorage.UserReleaseDate,
+		TourReleaseDate:  tripStorage.TourReleaseDate,
+		TripType:         tripStorage.TripType,
+		UserPrice:        tripStorage.UserPrice,
+		AgencyPrice:      tripStorage.AgencyPrice,
+		PathID:           tripStorage.PathID,
+		MinPassengers:    tripStorage.MinPassengers,
+		FromCountry:      tripStorage.FromCountry,
+		ToCountry:        tripStorage.ToCountry,
+		FromTerminalName: tripStorage.FromTerminalName,
+		Origin:           tripStorage.Origin,
+		SoldTickets:      tripStorage.SoldTickets,
+		ToTerminalName:   tripStorage.ToTerminalName,
+		Destination:      tripStorage.Destination,
+		PathName:         tripStorage.PathName,
+		PathDistanceKM:   tripStorage.PathDistanceKM,
+		IsCanceled:       tripStorage.IsCanceled,
+		IsConfirmed:      tripStorage.IsConfirmed,
+		Status:           tripStorage.Status,
+		StartDate:        tripStorage.StartDate,
+		EndDate:          tripStorage.EndDate,
+		Profit:           tripStorage.Profit,
+		MaxTickets:       tripStorage.MaxTickets,
+		TechnicalTeamID:  tripStorage.TechnicalTeamID,
+		VehicleRequestID: tripStorage.VehicleRequestID,
+		VehicleID:        tripStorage.VehicleID,
+		IsFinished:       tripStorage.IsFinished,
+		VehicleName:      tripStorage.VehicleName,
+	}
+}

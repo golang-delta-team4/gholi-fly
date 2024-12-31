@@ -14,6 +14,7 @@ type Ticket struct {
 	UserID    *uuid.UUID `gorm:"type:uuid;default:NULL"`
 	AgencyID  *uuid.UUID `gorm:"type:uuid;default:NULL"`
 	Price     float64
+	Count     uint
 	Status    string `gorm:"default:'pending'"`
 	InvoiceId uuid.UUID
 	Invoice   Invoice `gorm:"foreignKey:InvoiceId; constraint:OnDelete:CASCADE;"`

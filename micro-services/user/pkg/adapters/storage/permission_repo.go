@@ -16,8 +16,13 @@ func NewPermissionRepo(db *gorm.DB) permissionPort.Repo {
 	return &permissionRepo{db: db}
 }
 
-func (pr *permissionRepo) Create(ctx context.Context, permission types.Permission) error {
+func (pr *permissionRepo) Create(ctx context.Context, permission []types.Permission) error {
 	return pr.db.Create(&permission).Error
+}
+
+func (pr *permissionRepo) Get(ctx context.Context, permission types.Permission) error {
+	err := pr.db.Model(&types.Permission{}).Where("route = ? and method = ?", permission.Route, permission.Method).First(&permission).Error
+	return err
 }
 
 func (pr *permissionRepo) CheckPermissionExistence(ctx context.Context, route string, method string) (bool, error) {
@@ -35,6 +40,15 @@ func (pr *permissionRepo) CheckPermissionExistence(ctx context.Context, route st
 func (pr *permissionRepo) GetPermissionsByUUID(ctx context.Context, permissionsUUID []types.Permission) ([]types.Permission, error) {
 	var permissions []types.Permission
 	err := pr.db.Model(&types.Permission{}).Find(&permissions,permissionsUUID).Error
+	if err != nil {
+		return nil, err
+	}
+	return permissions, nil
+}
+
+func (pr *permissionRepo) GetAllPermissions(ctx context.Context) ([]types.Permission, error) {
+	var permissions []types.Permission
+	err := pr.db.Model(&types.Permission{}).Find(&permissions).Error
 	if err != nil {
 		return nil, err
 	}

@@ -7,6 +7,7 @@ import (
 	"vehicle/internal/vehicle/domain"
 	"vehicle/internal/vehicle/port"
 	"vehicle/pkg/adapters/storage"
+	"vehicle/pkg/adapters/storage/types"
 	"vehicle/pkg/postgres"
 
 	"gorm.io/gorm"
@@ -16,6 +17,8 @@ type app struct {
 	db             *gorm.DB
 	cfg            config.Config
 	vehicleService port.VehicleService
+	
+	
 }
 
 func (a *app) DB() *gorm.DB {
@@ -48,7 +51,7 @@ func (a *app) setDB() error {
 	}
 
 	// Run migrations
-	err = postgres.AutoMigrate(db, &domain.Vehicle{})
+	err = postgres.AutoMigrate(db, &types.Vehicle{}, &domain.TripRequest{}, &types.VehicleReserve{})
 	if err != nil {
 		return err
 	}
@@ -58,8 +61,8 @@ func (a *app) setDB() error {
 }
 
 func (a *app) setServices() error {
-	vehicleRepo := storage.NewVehicleRepo(a.db)
-	a.vehicleService = vehicle.NewVehicleService(vehicleRepo) // Initialize the service
+    vehicleRepo := storage.NewVehicleRepo(a.db)
+    a.vehicleService = vehicle.NewVehicleService(vehicleRepo, a.cfg.TripService.URL) 
 	return nil
 }
 

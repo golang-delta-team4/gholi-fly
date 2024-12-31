@@ -13,4 +13,5 @@ type Service interface {
 	GetTrips(ctx context.Context, pageSize int, page int) ([]domain.Trip, error)
 	UpdateTrip(ctx context.Context, trip domain.Trip, oldTrip domain.Trip) error
 	DeleteTrip(ctx context.Context, id uuid.UUID) error
+	ConfirmTrip(ctx context.Context, id uuid.UUID, userId uuid.UUID) error
 }

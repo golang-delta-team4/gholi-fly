@@ -26,3 +26,9 @@ func ticketServiceGetter(appContainer app.App, cfg config.ServerConfig) ServiceG
 		return service.NewTicketService(appContainer.TicketService(ctx))
 	}
 }
+
+func technicalTeamServiceGetter(appContainer app.App, cfg config.ServerConfig) ServiceGetter[*service.TechnicalTeamService] {
+	return func(ctx context.Context) *service.TechnicalTeamService {
+		return service.NewTechnicalTeamService(appContainer.TechnicalTeamService(ctx))
+	}
+}

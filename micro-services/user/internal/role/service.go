@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"user-service/api/presenter"
+	permissionDomain "user-service/internal/permission/domain"
 	permissionPort "user-service/internal/permission/port"
 	"user-service/internal/role/domain"
 	rolePort "user-service/internal/role/port"
@@ -83,5 +85,60 @@ func (s *service) AssignRole(ctx context.Context, userUUID uuid.UUID, roles []do
 		}
 	}
 	return nil
-	
+
+}
+
+func (s *service) GrantResourceAccess(ctx context.Context, ownerUUID uuid.UUID, permissions []permissionDomain.Permission, roleName string) error {
+	permissionsWithUUID, err := s.permissionService.CreatePermissions(ctx, permissions)
+	if err != nil {
+		return err
+	}
+	roleUUID, err := s.CreateRole(ctx, &domain.Role{Name: roleName, Permissions: permissionsWithUUID})
+	if err != nil {
+		return err
+	}
+	err = s.AssignRole(ctx, ownerUUID, []domain.Role{{UUID: roleUUID}})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *service) CreateSuperAdminRole(ctx context.Context) (uuid.UUID, error) {
+	permissions, err := s.permissionService.GetAllPermissions(ctx)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	role, err := s.repo.GetByName(ctx, "SuperAdmin")
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		roleUUID := uuid.New()
+		_, err = s.repo.Create(ctx, &types.Role{Name: "SuperAdmin", UUID: roleUUID, Permissions: permissions})
+		if err != nil {
+			return uuid.Nil, err
+		}
+		return roleUUID, nil
+	}
+	if err != nil {
+		return uuid.Nil, err
+	}
+	return role.UUID, nil
+}
+
+func (us *service) GetAllRoles(ctx context.Context, query presenter.PaginationQuery) ([]domain.Role, error) {
+	roles, err := us.repo.GetAllRoles(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	storageRoles := mapper.RoleStorageList2DomainList(roles)
+	return storageRoles, nil
+}
+
+func (us *service) DeleteRole(ctx context.Context, roleUUID uuid.UUID) error {
+	role, err := us.repo.GetRole(ctx, roleUUID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return &ErrRoleNotFound{roleUUID}
+		}
+	}
+	return us.repo.Delete(ctx, *role)
 }
