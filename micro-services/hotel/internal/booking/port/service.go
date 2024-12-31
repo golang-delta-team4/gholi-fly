@@ -10,7 +10,8 @@ import (
 )
 
 type Service interface {
-	CreateBookingByHotelID(ctx context.Context, booking bookingDomain.Booking, hotelID hotelDomain.HotelUUID) (bookingDomain.BookingUUID, roomDomain.RoomPrice, error)
+	CreateBookingByHotelID(ctx context.Context, booking bookingDomain.Booking, hotelID hotelDomain.HotelUUID, isAgency bool) (bookingDomain.BookingUUID, roomDomain.RoomPrice, error)
+	CreateBookingFactor(ctx context.Context, userId uuid.UUID, hotelID hotelDomain.HotelUUID, totalPrice uint, bookingId bookingDomain.BookingUUID) (string, error)
 	GetAllBookingsByRoomID(ctx context.Context, roomID roomDomain.RoomUUID) ([]bookingDomain.Booking, error)
 	GetAllBookingsByUserID(ctx context.Context, userID uuid.UUID) ([]bookingDomain.Booking, error)
 	GetBookingByID(ctx context.Context, bookingID bookingDomain.BookingUUID) (*bookingDomain.Booking, error)

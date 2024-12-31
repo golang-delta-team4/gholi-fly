@@ -11,6 +11,8 @@ import (
 type (
 	BookingID   = uint
 	BookingUUID = uuid.UUID
+
+	UserUUID = uuid.UUID
 )
 
 type BookingStatus = uint8
@@ -27,9 +29,9 @@ type Booking struct {
 	UUID          BookingUUID
 	HotelID       hotelDomain.HotelUUID
 	RoomID        uuid.UUID
-	UserID        *uuid.UUID
-	AgencyID      *uuid.UUID
+	UserID        UserUUID
 	ReservationID uuid.UUID
+	FactorID      string
 	CheckIn       time.Time
 	CheckOut      time.Time
 	Status        BookingStatus

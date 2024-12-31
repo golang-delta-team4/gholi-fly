@@ -23,10 +23,9 @@ func NewBookingRepo(db *gorm.DB) bookingPort.Repo {
 	return &bookingRepo{db: db}
 }
 
-func (r *bookingRepo) CreateByHotelID(ctx context.Context, bookingDomain domain.Booking, hotelID hotelDomain.HotelUUID) (domain.BookingUUID, roomDomain.RoomPrice, error) {
+func (r *bookingRepo) CreateByHotelID(ctx context.Context, bookingDomain domain.Booking, hotelID hotelDomain.HotelUUID, isAgency bool) (domain.BookingUUID, roomDomain.RoomPrice, error) {
 	booking := mapper.BookingDomain2Storage(bookingDomain)
 	booking.HotelID = hotelID
-	reservationId := booking.ReservationID
 
 	var room types.Room
 	err := r.db.Table("rooms").WithContext(ctx).Where("uuid = ?", booking.RoomID).First(&room).Error
@@ -35,18 +34,20 @@ func (r *bookingRepo) CreateByHotelID(ctx context.Context, bookingDomain domain.
 	}
 
 	var existingBooking types.Booking
-	err = r.db.Table("bookings").WithContext(ctx).Where("room_id = ? AND reservation_id != ?", booking.RoomID, reservationId).First(&existingBooking).Error
-	if err == nil {
+	err = r.db.Table("bookings").WithContext(ctx).
+		Where("room_id = ? AND check_in < ? AND check_out > ?", booking.RoomID, booking.CheckOut, booking.CheckIn).
+		First(&existingBooking).Error
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return domain.BookingUUID{}, 0, errors.New("booking already exists in these days")
-	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return domain.BookingUUID{}, 0, err
 	}
 
 	err = r.db.Table("bookings").WithContext(ctx).Create(booking).Error
 	if err != nil {
 		return domain.BookingUUID{}, 0, err
 	}
-
+	if isAgency {
+		return domain.BookingUUID(booking.UUID), room.AgencyPrice, nil
+	}
 	return domain.BookingUUID(booking.UUID), room.BasePrice, nil
 }
 
@@ -86,6 +87,10 @@ func (r *bookingRepo) GetByUserID(ctx context.Context, userID uuid.UUID) ([]doma
 func (r *bookingRepo) Update(ctx context.Context, bookingDomain domain.Booking) error {
 	booking := mapper.BookingDomain2Storage(bookingDomain)
 	return r.db.Table("bookings").WithContext(ctx).Save(booking).Error
+}
+
+func (r *bookingRepo) AddBookingFactor(ctx context.Context, bookingID domain.BookingUUID, factorID string) error {
+	return r.db.Table("bookings").WithContext(ctx).Where("reservation_id = ?", bookingID).Update("factor_id", factorID).Error
 }
 
 func (r *bookingRepo) Delete(ctx context.Context, bookingID domain.BookingUUID) error {
