@@ -34,6 +34,12 @@ func (h *VehicleHandler) MatchVehicle(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err})
 	}
+	if reserveStartDate.Before(time.Now()) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "start date can't be sooner than now"})
+	}
+	if reserveEndDate.Before(reserveStartDate) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "end date can't be sooner than start date"})
+	}
 	reservationID, vehicle, err := h.service.MatchVehicle(c.Context(), &domain.MatchMakerRequest{
 		TripID:             vehicleMatchRequest.TripID,
 		ReserveStartDate:   reserveStartDate,

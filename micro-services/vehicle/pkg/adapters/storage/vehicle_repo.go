@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"time"
 
 	"vehicle/internal/vehicle/domain"
 	"vehicle/pkg/adapters/storage/types"
@@ -57,7 +58,8 @@ func (r *VehicleRepo) GetMatchedVehicle(ctx context.Context, vehicleMatchRequest
 	subQuery := r.db.Model(&types.VehicleReserve{}).
 		Table("vehicle_reserves as vr2").
 		Select("count(*)").
-		Where("vr2.vehicle_id = vehicles.id and (? >= vr2.start_date and ? < vr2.end_date) or (? < vr2.end_date and ? > vr2.start_date)",
+		Where("vr2.start_date > ? and vr2.vehicle_id = vehicles.id and (? >= vr2.start_date and ? < vr2.end_date) or (? < vr2.end_date and ? > vr2.start_date)",
+			time.Now(),
 			vehicleMatchRequest.ReserveStartDate,
 			vehicleMatchRequest.ReserveStartDate,
 			vehicleMatchRequest.ReserveEndDate,
