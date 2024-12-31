@@ -12,6 +12,7 @@ import (
 	roomPort "gholi-fly-hotel/internal/room/port"
 	"gholi-fly-hotel/internal/staff"
 	staffPort "gholi-fly-hotel/internal/staff/port"
+	"gholi-fly-hotel/pkg/adapters/clients/grpc"
 	"gholi-fly-hotel/pkg/adapters/storage"
 	"gholi-fly-hotel/pkg/postgres"
 
@@ -94,7 +95,7 @@ func (a *app) BookingService(ctx context.Context) bookingPort.Service {
 }
 
 func (a *app) bookingServiceWithDB(db *gorm.DB) bookingPort.Service {
-	return booking.NewService(storage.NewBookingRepo(db))
+	return booking.NewService(storage.NewBookingRepo(db), storage.NewHotelRepo(db), grpc.NewGRPCBankClient(a.cfg.Bank.Host, a.cfg.Bank.Port))
 }
 
 func (a *app) Config() config.Config {

@@ -10,8 +10,8 @@ type Room struct {
 	UUID        uuid.UUID `gorm:"type:uuid;unique;not null;primaryKey"`
 	HotelID     uuid.UUID `gorm:"type:uuid;references:UUID;not null"`
 	Hotel       Hotel     `gorm:"foreignKey:HotelID;references:UUID;constraint:OnDelete:CASCADE"`
-	RoomNumber  uint
-	Floor       uint
+	RoomNumber  uint      `gorm:"uniqueIndex:idx_room_floor"`
+	Floor       uint      `gorm:"uniqueIndex:idx_room_floor"`
 	Size        uint
 	BasePrice   uint
 	AgencyPrice uint
