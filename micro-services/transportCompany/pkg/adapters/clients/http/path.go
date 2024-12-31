@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -19,6 +20,8 @@ type httpPathClient struct {
 func NewHttpPathClient(port int) port.HttpPathClient {
 	return &httpPathClient{ port: port}
 }
+
+var ErrPathNotFound = errors.New("path not found")
 
 func (h *httpPathClient) GetPathDetail(pathID uuid.UUID) (*presenter.GetPathByIDResponse, error) {
 	url := fmt.Sprintf("http://:%d/api/v1/paths/filter?id=%s", h.port, pathID)
@@ -46,7 +49,9 @@ func (h *httpPathClient) GetPathDetail(pathID uuid.UUID) (*presenter.GetPathByID
 	if err := json.Unmarshal(body, &pathDetail); err != nil {
 		return nil, fmt.Errorf("error unmarshalling JSON: %v", err)
 	}
-
+	if len(pathDetail) == 0 {
+		return nil, ErrPathNotFound
+	}
 	return &pathDetail[0], nil
 
 }
