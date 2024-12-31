@@ -1,6 +1,7 @@
 package presenter
 
 import (
+	"vehicle/internal/vehicle/domain"
 
 	"github.com/google/uuid"
 )
@@ -18,27 +19,10 @@ type MatchMakerRequest struct {
 	ReserveEndDate     string
 	TripDistance       int
 	NumberOfPassengers int
-	TripType           TripType
+	TripType           domain.VehicleType
 	MaxPrice           int
 	YearOfManufacture  int
 }
-
-type TripType string
-
-var (
-	GroundTrip TripType = "ground"
-	AirTrip    TripType = "air"
-	SeaTrip    TripType = "sea"
-)
-
-type VehicleType string
-
-var (
-	Bus   VehicleType = "bus"
-	Train VehicleType = "train"
-	Ship  VehicleType = "ship"
-	Plane VehicleType = "plane"
-)
 
 type Status string
 
