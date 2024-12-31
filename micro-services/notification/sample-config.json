@@ -1,0 +1,23 @@
+{
+    "db": {
+        "host": "gholi-db",
+        "port": 5432,
+        "database": "outbox_db",
+        "user": "gholi-user",
+        "password": "password123"
+    },
+    "server": {
+        "port": 50051
+    },
+    "smtp":{
+        "sender": "",
+        "host": "",
+        "port": "",
+        "username": "",
+        "password": ""
+    },
+    "nats":{
+        "host": "",
+        "port": 4222
+    }
+}

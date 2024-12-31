@@ -12,11 +12,14 @@ type VehicleRequest struct {
 	TripID                uuid.UUID `gorm:"type:uuid;not null;"`
 	VehicleType           string    `gorm:"not null"`
 	MinCapacity           int
+	ProductionYearMin     int
 	Status                string    `gorm:"default:'pending'"`
 	MatchedVehicleID      uuid.UUID `gorm:"type:uuid;not null;"`
+	VehicleReservationFee float64
 	VehicleProductionYear int
 	VehicleName           string
-	Cost                  float64
+	MatchVehicleSpeed     float64
+	MinCost               float64
 	CreatedAt             time.Time
 	UpdatedAt             time.Time
 	DeletedAt             gorm.DeletedAt `gorm:"index"`

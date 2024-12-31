@@ -70,9 +70,6 @@ func (r *companyRepo) UpdateCompany(ctx context.Context, company domain.Company)
 	if company.Address != "" {
 		updates["address"] = company.Address
 	}
-	if company.OwnerId != uuid.Nil {
-		updates["owner_id"] = company.OwnerId
-	}
 	if company.Phone != "" {
 		updates["phone"] = company.Phone
 	}

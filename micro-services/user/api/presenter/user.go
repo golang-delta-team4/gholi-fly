@@ -3,6 +3,8 @@ package presenter
 import (
 	"errors"
 	"regexp"
+
+	"github.com/google/uuid"
 )
 
 type UserSignUpRequest struct {
@@ -20,6 +22,27 @@ type UserSignInRequest struct {
 type UserSignInResponse struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
+}
+
+type GetUserResponse struct {
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Email     string `json:"email"`
+}
+
+type PaginationQuery struct {
+    Page int `query:"page" default:"1" validate:"gt=0"`
+    Size int `query:"size" default:"10" validate:"gt=0"`
+}
+
+type UserAuthorization struct {
+	UserUUID uuid.UUID
+	Route    string
+	Method   string
+}
+
+type BlockUserRequest struct {
+	UserUUID string `json:"userUUID"`
 }
 
 func EmailValidation(email string) error {

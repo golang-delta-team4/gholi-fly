@@ -3,6 +3,9 @@ module gholi-fly-bank
 go 1.23.2
 
 require (
+	github.com/gofiber/contrib/jwt v1.0.10
+	github.com/gofiber/fiber/v2 v2.52.5
+	github.com/golang-delta-team4/gholi-fly-shared v0.0.0-20241226205559-d7fcf97df960
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/uuid v1.6.0
 	google.golang.org/grpc v1.69.2
@@ -12,9 +15,8 @@ require (
 )
 
 require (
+	github.com/MicahParks/keyfunc/v2 v2.1.0 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
-	github.com/gofiber/fiber/v2 v2.52.5 // indirect
-	github.com/golang-delta-team4/gholi-fly-shared v0.0.0-20241226205559-d7fcf97df960 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgx/v5 v5.5.5 // indirect

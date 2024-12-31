@@ -2,6 +2,7 @@ package domain
 
 import (
 	"time"
+	"user-service/internal/role/domain"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -15,6 +16,7 @@ type User struct {
 	Password  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	Roles     []domain.Role
 }
 
 type UserAuthorize struct {

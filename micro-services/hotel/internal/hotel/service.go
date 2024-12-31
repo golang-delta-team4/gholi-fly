@@ -30,6 +30,9 @@ func NewService(repo port.Repo) port.Service {
 
 // CreateHotel creates a new hotel
 func (s *service) CreateHotel(ctx context.Context, hotel domain.Hotel) (domain.HotelUUID, error) {
+	if err := hotel.Validate(); err != nil {
+		return uuid.Nil, ErrHotelCreationValidation
+	}
 	hotelID, err := s.repo.Create(ctx, hotel)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {

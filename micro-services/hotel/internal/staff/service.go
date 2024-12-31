@@ -7,6 +7,8 @@ import (
 	staffDomain "gholi-fly-hotel/internal/staff/domain"
 	"gholi-fly-hotel/internal/staff/port"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 var (
@@ -29,6 +31,9 @@ func NewService(repo port.Repo) port.Service {
 
 // CreateStaff creates a new staff
 func (s *service) CreateStaffByHotelID(ctx context.Context, staff staffDomain.Staff, hotelID hotelDomain.HotelUUID) (staffDomain.StaffUUID, error) {
+	if err := staff.Validate(); err != nil {
+		return uuid.Nil, ErrStaffCreationValidation
+	}
 	staffID, err := s.repo.CreateByHotelID(ctx, staff, hotelID)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {

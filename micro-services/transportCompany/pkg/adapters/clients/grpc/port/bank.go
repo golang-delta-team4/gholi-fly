@@ -6,4 +6,6 @@ import (
 
 type GRPCBankClient interface {
 	CreateFactor(rq *pb.CreateFactorRequest) (*pb.CreateFactorResponse, error)
+	GetWallets(req *pb.GetWalletsRequest) (*pb.GetWalletsResponse, error)
+	ApplyFactor(req *pb.ApplyFactorRequest) (*pb.ApplyFactorResponse, error)
 }

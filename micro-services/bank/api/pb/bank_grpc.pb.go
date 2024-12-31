@@ -166,6 +166,7 @@ const (
 	FactorService_CreateFactor_FullMethodName = "/bank.FactorService/CreateFactor"
 	FactorService_ApplyFactor_FullMethodName  = "/bank.FactorService/ApplyFactor"
 	FactorService_GetFactors_FullMethodName   = "/bank.FactorService/GetFactors"
+	FactorService_CancelFactor_FullMethodName = "/bank.FactorService/CancelFactor"
 )
 
 // FactorServiceClient is the client API for FactorService service.
@@ -177,6 +178,7 @@ type FactorServiceClient interface {
 	CreateFactor(ctx context.Context, in *CreateFactorRequest, opts ...grpc.CallOption) (*CreateFactorResponse, error)
 	ApplyFactor(ctx context.Context, in *ApplyFactorRequest, opts ...grpc.CallOption) (*ApplyFactorResponse, error)
 	GetFactors(ctx context.Context, in *GetFactorsRequest, opts ...grpc.CallOption) (*GetFactorsResponse, error)
+	CancelFactor(ctx context.Context, in *CancelFactorRequest, opts ...grpc.CallOption) (*CancelFactorResponse, error)
 }
 
 type factorServiceClient struct {
@@ -217,6 +219,16 @@ func (c *factorServiceClient) GetFactors(ctx context.Context, in *GetFactorsRequ
 	return out, nil
 }
 
+func (c *factorServiceClient) CancelFactor(ctx context.Context, in *CancelFactorRequest, opts ...grpc.CallOption) (*CancelFactorResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CancelFactorResponse)
+	err := c.cc.Invoke(ctx, FactorService_CancelFactor_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // FactorServiceServer is the server API for FactorService service.
 // All implementations must embed UnimplementedFactorServiceServer
 // for forward compatibility.
@@ -226,6 +238,7 @@ type FactorServiceServer interface {
 	CreateFactor(context.Context, *CreateFactorRequest) (*CreateFactorResponse, error)
 	ApplyFactor(context.Context, *ApplyFactorRequest) (*ApplyFactorResponse, error)
 	GetFactors(context.Context, *GetFactorsRequest) (*GetFactorsResponse, error)
+	CancelFactor(context.Context, *CancelFactorRequest) (*CancelFactorResponse, error)
 	mustEmbedUnimplementedFactorServiceServer()
 }
 
@@ -244,6 +257,9 @@ func (UnimplementedFactorServiceServer) ApplyFactor(context.Context, *ApplyFacto
 }
 func (UnimplementedFactorServiceServer) GetFactors(context.Context, *GetFactorsRequest) (*GetFactorsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFactors not implemented")
+}
+func (UnimplementedFactorServiceServer) CancelFactor(context.Context, *CancelFactorRequest) (*CancelFactorResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CancelFactor not implemented")
 }
 func (UnimplementedFactorServiceServer) mustEmbedUnimplementedFactorServiceServer() {}
 func (UnimplementedFactorServiceServer) testEmbeddedByValue()                       {}
@@ -320,6 +336,24 @@ func _FactorService_GetFactors_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FactorService_CancelFactor_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelFactorRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FactorServiceServer).CancelFactor(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FactorService_CancelFactor_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FactorServiceServer).CancelFactor(ctx, req.(*CancelFactorRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // FactorService_ServiceDesc is the grpc.ServiceDesc for FactorService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -338,6 +372,10 @@ var FactorService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFactors",
 			Handler:    _FactorService_GetFactors_Handler,
+		},
+		{
+			MethodName: "CancelFactor",
+			Handler:    _FactorService_CancelFactor_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
