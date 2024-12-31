@@ -60,7 +60,7 @@ func (r *ticketRepo) CancelAgencyTicket(ctx context.Context, ticketId uuid.UUID,
 
 func (r *ticketRepo) GetTicket(ctx context.Context, ticketId uuid.UUID) (*domain.Ticket, error) {
 	var ticket types.Ticket
-	err := r.db.Table("tickets").WithContext(ctx).Where("id = ?", ticketId).First(&ticket).Error
+	err := r.db.Table("tickets").WithContext(ctx).Preload("Invoice").Where("id = ?", ticketId).First(&ticket).Error
 	if err != nil {
 		return nil, err
 	}

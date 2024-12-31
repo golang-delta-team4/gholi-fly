@@ -28,5 +28,6 @@ func TicketStorage2Domain(ticketStorage types.Ticket) *domain.Ticket {
 		Status:    ticketStorage.Status,
 		InvoiceId: ticketStorage.InvoiceId,
 		Count:     ticketStorage.Count,
+		FactorId:  ticketStorage.Invoice.Info,
 	}
 }

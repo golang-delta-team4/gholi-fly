@@ -133,7 +133,7 @@ func (s *service) BuyAgencyTicket(ctx context.Context, ticket domain.Ticket) (uu
 	response, err := s.bankGrpc.CreateFactor(&adaptersPb.CreateFactorRequest{
 		Factor: &adaptersPb.Factor{
 			SourceService: "transportCompany",
-			TotalAmount:   uint64(trip.AgencyPrice),
+			TotalAmount:   uint64(totalPrice),
 			CustomerId:    ticket.OwnerOfAgencyId.String(),
 			BookingId:     ticket.OwnerOfAgencyId.String(),
 			ExternalId:    ticket.OwnerOfAgencyId.String(),
@@ -144,12 +144,13 @@ func (s *service) BuyAgencyTicket(ctx context.Context, ticket domain.Ticket) (uu
 		},
 	})
 	if err != nil {
-		return uuid.Nil, 0, fmt.Errorf("%w %w %s", ErrBuyTicket, err, response.Message)
+		return uuid.Nil, 0, fmt.Errorf("%w %w", ErrBuyTicket, err)
 	}
 
 	invoiceId, err := s.invoiceService.CreateInvoice(ctx, invoiceDomain.Invoice{
 		IssuedDate: time.Now(),
 		Status:     invoiceDomain.Paid,
+		Info:       response.Factor.Id,
 		TotalPrice: totalPrice,
 	})
 	if err != nil {
@@ -163,6 +164,7 @@ func (s *service) BuyAgencyTicket(ctx context.Context, ticket domain.Ticket) (uu
 	s.bankGrpc.ApplyFactor(&adaptersPb.ApplyFactorRequest{
 		FactorId: response.Factor.Id,
 	})
+
 	return ticketId, totalPrice, nil
 }
 
@@ -179,7 +181,12 @@ func (s *service) CancelTicket(ctx context.Context, ticketId uuid.UUID) error {
 		return fmt.Errorf("%w %s", ErrCancelTicket, "trip is started")
 	}
 
-	// TODO: Cancel factor
+	_, err = s.bankGrpc.CancelFactor(&adaptersPb.CancelFactorRequest{
+		FactorId: ticket.FactorId,
+	})
+	if err != nil {
+		return fmt.Errorf("%w %s", ErrCancelTicket, err)
+	}
 	err = s.repo.CancelTicket(ctx, ticketId, ticket.TripID)
 	if err != nil {
 		return fmt.Errorf("%w %s", ErrCancelTicket, err)
@@ -200,7 +207,12 @@ func (s *service) CancelAgencyTicket(ctx context.Context, ticketId uuid.UUID) er
 		return fmt.Errorf("%w %s", ErrCancelTicket, "trip is started")
 	}
 
-	// TODO: Cancel factor
+	_, err = s.bankGrpc.CancelFactor(&adaptersPb.CancelFactorRequest{
+		FactorId: ticket.FactorId,
+	})
+	if err != nil {
+		return fmt.Errorf("%w %s", ErrCancelTicket, err)
+	}
 	err = s.repo.CancelAgencyTicket(ctx, ticketId, ticket.TripID, ticket.Count)
 	if err != nil {
 		return fmt.Errorf("%w %s", ErrCancelTicket, err)
