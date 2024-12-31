@@ -32,8 +32,15 @@ message GetUserResponse {
     string lastName = 4 [json_name="lastName"];
 }
 
+message GetBlockedUsersResponse {
+    repeated string uuids = 1 [json_name="uuids"];
+}
+
+message Empty {}
+
 service UserService {
     rpc UserAuthorization(UserAuthorizationRequest) returns (UserAuthorizationResponse);
     rpc GetUserByUUID(GetUserByUUIDRequest) returns (GetUserResponse);
     rpc GetUserByEmail(GetUserByEmailRequest) returns (GetUserResponse);
+    rpc GetBlockedUsers(Empty) returns (GetBlockedUsersResponse);
 }
