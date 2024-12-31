@@ -67,11 +67,14 @@ func (s *service) BuyTicket(ctx context.Context, ticket domain.Ticket) (uuid.UUI
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("%w %s", ErrBuyTicket, err)
 	}
-	totalPrice := float64(ticket.Count) * trip.AgencyPrice
+	totalPrice := 1 * trip.UserPrice
 	response, err := s.bankGrpc.CreateFactor(&adaptersPb.CreateFactorRequest{
 		Factor: &adaptersPb.Factor{
 			SourceService: "transportCompany",
-			TotalAmount:   uint64(trip.AgencyPrice),
+			TotalAmount:   uint64(trip.UserPrice),
+			CustomerId:    ticket.UserID.String(),
+			BookingId:     ticket.UserID.String(),
+			ExternalId:    ticket.UserID.String(),
 			Distributions: []*adaptersPb.Distribution{&adaptersPb.Distribution{
 				WalletId: walletResponse.Wallets[0].Id,
 				Amount:   uint64(totalPrice),
@@ -131,6 +134,9 @@ func (s *service) BuyAgencyTicket(ctx context.Context, ticket domain.Ticket) (uu
 		Factor: &adaptersPb.Factor{
 			SourceService: "transportCompany",
 			TotalAmount:   uint64(trip.AgencyPrice),
+			CustomerId:    ticket.OwnerOfAgencyId.String(),
+			BookingId:     ticket.OwnerOfAgencyId.String(),
+			ExternalId:    ticket.OwnerOfAgencyId.String(),
 			Distributions: []*adaptersPb.Distribution{&adaptersPb.Distribution{
 				WalletId: walletResponse.Wallets[0].Id,
 				Amount:   uint64(totalPrice),
