@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 
 	"vehicle/api/handlers/http"
@@ -25,5 +26,5 @@ func main() {
 
 	// Set up Fiber router
 	app := http.SetupRouter(appContainer)
-	log.Fatal(app.Listen(":8080"))
+	log.Fatal(app.Listen(fmt.Sprintf(":%d", cfg.Server.HttpPort)))
 }
