@@ -44,7 +44,7 @@ message CreateTripRequest {
 	string pathId =7 [json_name = "pathId"];
     uint64 minPassengers =8 [json_name = "minPassengers"];
     string technicalTeamId =9 [json_name = "technicalTeamId"];
-    string vehicleRequestId =10 [json_name = "vehicleRequestId"];
+    uint64 vehicleYearOfManufacture =10 [json_name = "vehicleYearOfManufacture"];
     uint64 soldTickets =11 [json_name = "soldTickets"];
     uint64 maxTickets =12 [json_name = "maxTickets"];
     string startDate =13 [json_name = "startDate"];

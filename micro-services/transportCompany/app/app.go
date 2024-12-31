@@ -7,6 +7,7 @@ import (
 
 	// "log"
 	clientPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc/port"
+	clientHttp "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/http"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/storage/types"
 
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/config"
@@ -83,7 +84,9 @@ func (a *app) tripServiceWithDB(db *gorm.DB) tripPort.Service {
 	return trip.NewService(
 		storage.NewTripRepo(db, false, a.redisProvider),
 		storage.NewTechnicalTeamRepo(db, false, a.redisProvider),
-		storage.NewTripRepo(db, false, a.redisProvider))
+		storage.NewTripRepo(db, false, a.redisProvider),
+		clientHttp.NewHttpPathClient(int(a.cfg.Map.Port)),
+		clientHttp.NewHttpVehicleClient(int(a.cfg.Vehicle.Port)))
 }
 
 func (a *app) TicketService(ctx context.Context) ticketPort.Service {
