@@ -183,3 +183,15 @@ func (us *service) UnBlockUser(ctx context.Context, userUUID uuid.UUID) (error) 
 	}
 	return nil
 }
+
+func (us *service) GetBlockedUsers(ctx context.Context) ([]string, error) {
+	uuids, err := us.repo.GetBlocked(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var stringUUIDs []string
+	for _, uuid := range uuids {
+		stringUUIDs = append(stringUUIDs, uuid.String())
+	}
+	return stringUUIDs, nil
+}

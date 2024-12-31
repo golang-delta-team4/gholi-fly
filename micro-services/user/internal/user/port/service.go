@@ -22,4 +22,5 @@ type Service interface {
 	GetUserByEmail(ctx context.Context, email string) (*domain.User, error)
 	AuthorizeUser(ctx context.Context, userAuthorization *domain.UserAuthorize) (bool, error)
 	GetAllUsers(ctx context.Context, query presenter.PaginationQuery) ([]domain.User, error)
+	GetBlockedUsers(ctx context.Context) ([]string, error)
 }

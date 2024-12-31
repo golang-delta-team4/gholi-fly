@@ -140,3 +140,7 @@ func (us *UserService) GetAllUsers(ctx context.Context, query presenter.Paginati
 	}
 	return us.service.GetAllUsers(ctx, query)
 }
+
+func (us *UserService) GetBlockedUsers(ctx context.Context) ([]string, error) {
+	return us.service.GetBlockedUsers(ctx)
+}
