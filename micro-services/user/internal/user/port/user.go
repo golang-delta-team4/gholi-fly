@@ -21,4 +21,5 @@ type Repo interface {
 	GetUserByEmail(ctx context.Context, email string) (*types.User, error)
 	AuthorizeUser(ctx context.Context, userAuthorization *types.UserAuthorization) (bool, error)
 	GetAllUsers(ctx context.Context, query presenter.PaginationQuery) ([]types.User, error)
+	GetBlocked(ctx context.Context) ([]uuid.UUID, error)
 }

@@ -49,3 +49,11 @@ func (h *grpcUserHandler) GetUserByUUID(ctx context.Context, req *pb.GetUserByUU
 	}
 	return &pb.GetUserResponse{Email: user.Email, FirstName: user.FirstName, LastName: user.LastName, Uuid: user.UUID.String()}, nil
 }
+
+func (h *grpcUserHandler) GetBlockedUsers(ctx context.Context, req *pb.Empty) (*pb.GetBlockedUsersResponse, error) {
+	uuids, err := h.userService.GetBlockedUsers(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal server error: %v", err)
+	}
+	return &pb.GetBlockedUsersResponse{Uuids: uuids}, nil
+}

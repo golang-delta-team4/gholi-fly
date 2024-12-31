@@ -103,3 +103,9 @@ func (ur *userRepo) UnBlock(ctx context.Context, userUUID uuid.UUID) error {
 	return ur.db.Model(&types.User{}).Where("uuid = ?", userUUID).Update("is_blocked", false).Error
 
 }
+
+func (ur *userRepo) GetBlocked(ctx context.Context) ([]uuid.UUID, error) {
+	var uuids []uuid.UUID
+	err := ur.db.Model(&types.User{}).Select("uuid").Where("is_blocked = true").Find(&uuids).Error
+	return uuids, err
+}
