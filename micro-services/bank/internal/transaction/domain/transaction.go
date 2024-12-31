@@ -27,6 +27,7 @@ const (
 	TransactionStatusCompleted
 	TransactionStatusFailed
 	TransactionStatusRefunded
+	TransactionStatusCanceled
 )
 
 // Transaction represents a money movement in the system.
