@@ -46,6 +46,50 @@ func SignUp(svcGetter shared.ServiceGetter[*service.UserService]) fiber.Handler 
 	}
 }
 
+func BlockUser(svcGetter shared.ServiceGetter[*service.UserService]) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
+		var req presenter.BlockUserRequest
+		if err := c.BodyParser(&req); err != nil {
+			return fiber.ErrBadRequest
+		}
+		userUUID, err := uuid.Parse(req.UserUUID)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+		err = svc.BlockUser(c.UserContext(), userUUID)
+		if err != nil {
+			if errors.Is(err, user.ErrUserNotFound) {
+				return fiber.NewError(fiber.StatusBadRequest, err.Error())
+			}
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		return c.JSON("updated successfully")
+	}
+}
+
+func UnBlockUser(svcGetter shared.ServiceGetter[*service.UserService]) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
+		var req presenter.BlockUserRequest
+		if err := c.BodyParser(&req); err != nil {
+			return fiber.ErrBadRequest
+		}
+		userUUID, err := uuid.Parse(req.UserUUID)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+		err = svc.UnBlockUser(c.UserContext(), userUUID)
+		if err != nil {
+			if errors.Is(err, user.ErrUserNotFound) {
+				return fiber.NewError(fiber.StatusBadRequest, err.Error())
+			}
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		return c.JSON("updated successfully")
+	}
+}
+
 func SignIn(svcGetter shared.ServiceGetter[*service.UserService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		svc := svcGetter(c.UserContext())

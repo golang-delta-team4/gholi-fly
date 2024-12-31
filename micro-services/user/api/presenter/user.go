@@ -41,6 +41,10 @@ type UserAuthorization struct {
 	Method   string
 }
 
+type BlockUserRequest struct {
+	UserUUID string `json:"userUUID"`
+}
+
 func EmailValidation(email string) error {
 	emailRegex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 	emailMatched, err := regexp.MatchString(emailRegex, email)

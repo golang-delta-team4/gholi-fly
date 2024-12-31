@@ -65,7 +65,7 @@ func (ur *userRepo) AuthorizeUser(ctx context.Context, userAuthorization *types.
 		Joins("left join roles r on r.id = ur.role_id").
 		Joins("left join role_permissions rp on rp.role_id = r.id").
 		Joins("left join permissions p on rp.permission_id = p.id").
-		Where("users.uuid = ? and ((p.route = ? and p.method = ?) or r.name = 'SuperAdmin')", userAuthorization.UserUUID, userAuthorization.Route, userAuthorization.Method).
+		Where("users.is_blocked = false and users.uuid = ? and ((p.route = ? and p.method = ?) or r.name = 'SuperAdmin')", userAuthorization.UserUUID, userAuthorization.Route, userAuthorization.Method).
 		Select("count(users.id)").Find(&total).Error
 
 	if err != nil {
@@ -94,4 +94,12 @@ func (ur *userRepo) GetAllUsers(ctx context.Context, query presenter.PaginationQ
 			return nil, err
 		}
 		return users, nil
+}
+
+func (ur *userRepo) Block(ctx context.Context, userUUID uuid.UUID) error {
+	return ur.db.Model(&types.User{}).Where("uuid = ?", userUUID).Update("is_blocked", true).Error
+}
+func (ur *userRepo) UnBlock(ctx context.Context, userUUID uuid.UUID) error {
+	return ur.db.Model(&types.User{}).Where("uuid = ?", userUUID).Update("is_blocked", false).Error
+
 }

@@ -22,6 +22,8 @@ func Run(appContainer app.App, cfg config.Config) error {
 	})
 	userGroup := api.Group("users")
 	userGroup.Get("", newAuthMiddleware([]byte(cfg.Server.Secret)),newAuthorizationMiddlewareDirect(userServiceGetter(context.Background())),setTransaction(appContainer.DB()), GetAllUsers(userServiceGetter))
+	userGroup.Post("/block", newAuthMiddleware([]byte(cfg.Server.Secret)),newAuthorizationMiddlewareDirect(userServiceGetter(context.Background())),setTransaction(appContainer.DB()), BlockUser(userServiceGetter))
+	userGroup.Post("/unblock", newAuthMiddleware([]byte(cfg.Server.Secret)),newAuthorizationMiddlewareDirect(userServiceGetter(context.Background())),setTransaction(appContainer.DB()), UnBlockUser(userServiceGetter))
 	userGroup.Post("/sign-up", setTransaction(appContainer.DB()), SignUp(userServiceGetter))
 	userGroup.Get("/me", newAuthMiddleware([]byte(cfg.Server.Secret)), GetMe(userServiceGetter))
 	userGroup.Post("/sign-in", SignIn(userServiceGetter))
