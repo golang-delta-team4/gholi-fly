@@ -1,16 +1,16 @@
 package http
 
 import (
-	"vehicle/internal/vehicle/port"
+	"vehicle/app"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func SetupRouter(vehicleService port.VehicleService) *fiber.App {
+func SetupRouter(appContainer app.App) *fiber.App {
 	app := fiber.New()
 
 	// Register routes
-	RegisterVehicleRoutes(app, vehicleService)
+	RegisterVehicleRoutes(app, appContainer.VehicleService(), appContainer.Config())
 
 	return app
 }

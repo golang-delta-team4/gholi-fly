@@ -6,11 +6,13 @@ import (
 	"log"
 	"time"
 	"vehicle/api/presenter"
+	"vehicle/config"
 	vehicleService "vehicle/internal/vehicle"
 	"vehicle/internal/vehicle/domain"
 	"vehicle/internal/vehicle/port"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 type VehicleHandler struct {
@@ -70,6 +72,8 @@ func (h *VehicleHandler) CreateVehicle(c *fiber.Ctx) error {
 			"error": "Invalid request payload",
 		})
 	}
+	userUUID := c.Locals("UserUUID")
+	vehicle.OwnerID = userUUID.(uuid.UUID)
 
 	log.Printf("Vehicle parsed: %+v", vehicle)
 
@@ -84,8 +88,8 @@ func (h *VehicleHandler) CreateVehicle(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(vehicle)
 }
 
-func RegisterVehicleRoutes(app *fiber.App, service port.VehicleService) {
+func RegisterVehicleRoutes(app *fiber.App, service port.VehicleService, cfg config.Config) {
 	handler := NewVehicleHandler(service)
-	app.Post("/api/v1/vehicles", handler.CreateVehicle)
+	app.Post("/api/v1/vehicles", newAuthMiddleware([]byte(cfg.Server.Secret)),handler.CreateVehicle)
 	app.Get("/api/v1/vehicles/match", handler.MatchVehicle)
 }

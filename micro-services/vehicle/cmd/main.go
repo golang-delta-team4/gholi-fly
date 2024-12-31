@@ -24,6 +24,6 @@ func main() {
 	}
 
 	// Set up Fiber router
-	app := http.SetupRouter(appContainer.VehicleService())
+	app := http.SetupRouter(appContainer)
 	log.Fatal(app.Listen(":8080"))
 }
