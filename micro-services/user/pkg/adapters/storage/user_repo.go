@@ -60,12 +60,12 @@ func (ur *userRepo) GetUserByUUID(ctx context.Context, userUUID uuid.UUID) (*typ
 
 func (ur *userRepo) AuthorizeUser(ctx context.Context, userAuthorization *types.UserAuthorization) (bool, error) {
 	var total int
-	err := ur.db.Model(&types.User{}).
+	err := ur.db.Model(&types.User{}).Debug().
 		Joins("left join user_roles ur on users.id = ur.user_id").
 		Joins("left join roles r on r.id = ur.role_id").
 		Joins("left join role_permissions rp on rp.role_id = r.id").
 		Joins("left join permissions p on rp.permission_id = p.id").
-		Where("users.is_blocked = false and users.uuid = ? and ((p.route = ? and p.method = ?) or r.name = 'SuperAdmin')", userAuthorization.UserUUID, userAuthorization.Route, userAuthorization.Method).
+		Where("users.is_blocked = false and users.uuid = ? and ((? like replace(p.route, ':id', '%') and p.method = ?) or r.name = 'SuperAdmin')", userAuthorization.UserUUID, userAuthorization.Route, userAuthorization.Method).
 		Select("count(users.id)").Find(&total).Error
 
 	if err != nil {

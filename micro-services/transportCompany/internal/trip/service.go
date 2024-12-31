@@ -46,6 +46,10 @@ func (s *service) CreateTrip(ctx context.Context, trip domain.Trip) (uuid.UUID, 
 		return uuid.Nil, fmt.Errorf("%w %w", ErrTripCreationValidation, err)
 	}
 	pathDetail, err := s.mapClient.GetPathDetail(trip.PathID)
+	if err != nil {
+		log.Println("error on getting path detail: ", err.Error())
+		return uuid.Nil, err
+	}
 	companyId, err := s.repo.CreateTrip(ctx, trip)
 	if err != nil {
 		log.Println("error on creating company: ", err.Error())
