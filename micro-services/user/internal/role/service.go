@@ -104,16 +104,24 @@ func (s *service) GrantResourceAccess(ctx context.Context, ownerUUID uuid.UUID, 
 	return nil
 }
 
-func (s *service) CreateSuperAdminRole(ctx context.Context) (error) {
+func (s *service) CreateSuperAdminRole(ctx context.Context) (uuid.UUID, error) {
 	permissions, err := s.permissionService.GetAllPermissions(ctx)
 	if err != nil {
-		return err
+		return uuid.Nil, err
 	}
-	_, err = s.repo.Create(ctx, &types.Role{Name: "SuperAdmin", Permissions: permissions})
+	role, err := s.repo.GetByName(ctx, "SuperAdmin")
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		roleUUID := uuid.New()
+		_, err = s.repo.Create(ctx, &types.Role{Name: "SuperAdmin", UUID: roleUUID, Permissions: permissions})
+		if err != nil {
+			return uuid.Nil, err
+		}
+		return roleUUID, nil
+	}
 	if err != nil {
-		return err
+		return uuid.Nil, err
 	}
-	return nil
+	return role.UUID, nil
 }
 
 func (us *service) GetAllRoles(ctx context.Context, query presenter.PaginationQuery) ([]domain.Role, error) {

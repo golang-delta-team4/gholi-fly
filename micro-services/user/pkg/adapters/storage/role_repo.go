@@ -41,16 +41,25 @@ func (rr *roleRepo) GetRole(ctx context.Context, roleUUID uuid.UUID) (*types.Rol
 	return &role, nil
 }
 
-func (ur *roleRepo) GetAllRoles(ctx context.Context, query presenter.PaginationQuery) ([]types.Role, error) {
+func (rr *roleRepo) GetAllRoles(ctx context.Context, query presenter.PaginationQuery) ([]types.Role, error) {
 	var roles []types.Role
-	err := ur.db.Model(&types.Role{}).Preload("Permissions").Limit(query.Size).Offset((query.Page-1)*query.Page).Where("deleted_at is null").Find(&roles).Error
+	err := rr.db.Model(&types.Role{}).Preload("Permissions").Limit(query.Size).Offset((query.Page-1)*query.Page).Where("deleted_at is null").Find(&roles).Error
 	if err != nil {
 		return nil, err
 	}
 	return roles, nil
 }
 
-func (ur *roleRepo) Delete(ctx context.Context, role types.Role) (error) {
-	return ur.db.Model(&types.Role{}).Delete(&role).Error
+func (rr *roleRepo) Delete(ctx context.Context, role types.Role) (error) {
+	return rr.db.Model(&types.Role{}).Delete(&role).Error
 	
+}
+
+func (rr *roleRepo) GetByName(ctx context.Context, roleName string) (*types.Role, error) {
+	var role *types.Role
+	err := rr.db.Model(&types.Role{}).Where("name = ?", roleName).First(&role).Error
+	if err != nil {
+		return nil, err
+	}
+	return role, nil
 }

@@ -3,13 +3,16 @@ package app
 import (
 	"context"
 	"log"
+	"os"
 	"user-service/config"
 	"user-service/internal/permission"
 	"user-service/internal/permission/domain"
 	permissionPort "user-service/internal/permission/port"
 	"user-service/internal/role"
+	roleDomain "user-service/internal/role/domain"
 	rolePort "user-service/internal/role/port"
 	"user-service/internal/user"
+	userDomain "user-service/internal/user/domain"
 	userPort "user-service/internal/user/port"
 	"user-service/pkg/adapters/clients/grpc"
 	grpcPort "user-service/pkg/adapters/clients/grpc/port"
@@ -17,7 +20,7 @@ import (
 	"user-service/pkg/adapters/storage/types"
 	appCtx "user-service/pkg/context"
 	"user-service/pkg/postgres"
-
+	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 )
 
@@ -83,13 +86,30 @@ func NewApp(cfg config.Config) (App, error) {
 	a.userService = user.NewService(storage.NewUserRepo(a.db), grpc.NewGRPCBankClient(cfg.BankGRPCConfig.Host, int(cfg.BankGRPCConfig.Port)))
 	a.permissionService = permission.NewService(storage.NewPermissionRepo(a.db))
 	a.roleService = role.NewService(storage.NewRoleRepo(a.db), a.permissionService, a.userService)
-	err := a.roleService.CreateSuperAdminRole(context.Background())
+	roleUUID, err := a.roleService.CreateSuperAdminRole(context.Background())
 	if err != nil {
 		log.Printf("error creating super admin: %v\n", err)
 	}
 	_, err = a.permissionService.CreatePermissions(context.Background(), seedPermissions())
 	if err != nil {
 		log.Printf("error seeding permissions: %v\n", err)
+	}
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+	userID, err := a.userService.SignUp(context.Background(), &userDomain.User{
+		FirstName: os.Getenv("DEFAULT_USER_FIRST_NAME"),
+		LastName:  os.Getenv("DEFAULT_USER_LAST_NAME"),
+		Email:     os.Getenv("DEFAULT_USER_EMAIL"),
+		Password:  os.Getenv("DEFAULT_USER_PASSWORD")})
+
+	if err != nil {
+		log.Printf("error creating user: %v\n", err)
+	}
+	err = a.roleService.AssignRole(context.Background(), userID, []roleDomain.Role{{UUID: roleUUID}})
+	if err != nil {
+		log.Printf("error assigning roles: %v\n", err)
 	}
 	return a, nil
 }
@@ -177,6 +197,6 @@ func seedPermissions() []domain.Permission {
 			Method: "DELETE",
 		},
 	}
-	
+
 	return permissions
 }
