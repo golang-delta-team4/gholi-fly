@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option go_package = "gholi-fly/pb";
+
+enum AccessStatus {
+    ACCESS_FAILED = 0;
+    ACCESS_GRANTED = 1;
+}
+
+message ResourcePermission {
+    string route = 1 [json_name="route"];
+    string method = 2 [json_name="method"];
+}
+
+message GrantResourceAccessResponse {
+    AccessStatus status = 1 [json_name="status"];
+}
+
+message GrantResourceAccessRequest {
+    string ownerUUID = 1 [json_name="ownerUUID"];
+    repeated ResourcePermission permissions = 2 [json_name="permissions"];
+    string roleName = 3 [json_name="roleName"];
+}
+
+service RoleService {
+    rpc GrantResourceAccess(GrantResourceAccessRequest) returns (GrantResourceAccessResponse);
+}
