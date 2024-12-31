@@ -26,15 +26,16 @@ type MatchMakerRequest struct {
 	ReserveEndDate     time.Time
 	TripDistance       int
 	NumberOfPassengers int
-	TripType           TripType
+	TripType           VehicleType
 	MaxPrice           int
 	YearOfManufacture  int
 }
 
-type TripType string
+type VehicleType string
 
 var (
-	GroundTrip TripType = "ground"
-	AirTrip    TripType = "air"
-	SeaTrip    TripType = "sea"
+	Bus   VehicleType = "bus"
+	Train VehicleType = "train"
+	Ship  VehicleType = "ship"
+	Airplane VehicleType = "airplane"
 )

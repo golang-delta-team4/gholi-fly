@@ -48,7 +48,7 @@ func (h *VehicleHandler) MatchVehicle(c *fiber.Ctx) error {
 		ReserveEndDate:     reserveEndDate,
 		TripDistance:       vehicleMatchRequest.TripDistance,
 		NumberOfPassengers: vehicleMatchRequest.NumberOfPassengers,
-		TripType:           domain.TripType(vehicleMatchRequest.TripType),
+		TripType:           domain.VehicleType(vehicleMatchRequest.TripType),
 		MaxPrice:           vehicleMatchRequest.MaxPrice,
 		YearOfManufacture:  vehicleMatchRequest.YearOfManufacture,
 	})
