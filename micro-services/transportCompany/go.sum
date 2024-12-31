@@ -25,6 +25,8 @@ github.com/gofiber/fiber/v2 v2.52.5 h1:tWoP1MJQjGEe4GB5TUGOi7P2E0ZMMRx5ZTG4rT+yG
 github.com/gofiber/fiber/v2 v2.52.5/go.mod h1:KEOE+cXMhXG0zHc9d8+E38hoX+ZN7bhOtgeF2oT6jrQ=
 github.com/golang-delta-team4/gholi-fly-shared v0.0.0-20241226205559-d7fcf97df960 h1:q7I2Zl8Sl+yv4tJYHkpAyKVMxgGe5yydXM5vcLpq8l0=
 github.com/golang-delta-team4/gholi-fly-shared v0.0.0-20241226205559-d7fcf97df960/go.mod h1:wj8/lyrCWvVyNC9RdCuy9yfi65YWi1wQ/83NDxY2ngE=
+github.com/golang-delta-team4/gholi-fly-shared v0.0.0-20241227143526-32701b179a55 h1:Jy/0+kJSLBdh1I22YjtbK4vTF8rjToKy9B8o8MLwRlA=
+github.com/golang-delta-team4/gholi-fly-shared v0.0.0-20241227143526-32701b179a55/go.mod h1:wj8/lyrCWvVyNC9RdCuy9yfi65YWi1wQ/83NDxY2ngE=
 github.com/golang-jwt/jwt/v5 v5.2.1 h1:OuVbFODueb089Lh128TAcimifWaLhJwVflnrgM17wHk=
 github.com/golang-jwt/jwt/v5 v5.2.1/go.mod h1:pqrtFR0X4osieyHYxtmOUWsAWrfe1Q5UVIyoH402zdk=
 github.com/golang/protobuf v1.5.4 h1:i7eJL8qZTpSEXOPTxNKhASYpMn+8e5Q6AdndVa1dWek=

@@ -41,42 +41,65 @@ type Trip struct {
 	CreatedAt        time.Time
 }
 
+
 func (t *Trip) Validate() error {
 	if t.CompanyID == uuid.Nil {
-		return errors.New("CompanyID can't be nil")
+		return errors.New("company id can't be nil")
 	}
 	if t.TripType == "" {
-		return errors.New("TripType can't be empty")
+		return errors.New("trip type can't be empty")
+	}
+	if !isValidVehicleType(t.TripType) {
+		return errors.New("trip type must be one of 'bus', 'train', 'ship', or 'airplane'")
 	}
 	if t.UserReleaseDate.IsZero() {
-		return errors.New("UserReleaseDate can't be zero")
+		return errors.New("user release date can't be zero")
 	}
 	if t.TourReleaseDate.IsZero() {
-		return errors.New("TourReleaseDate can't be zero")
+		return errors.New("tourReleaseDate can't be zero")
 	}
 	if t.UserReleaseDate.Before(t.TourReleaseDate) {
-		return errors.New("Tour release date can't be before user release date")
+		return errors.New("tour release date can't be before user release date")
 	}
 	if t.UserPrice < 0 {
-		return errors.New("UserPrice can't be negative")
+		return errors.New("user price can't be negative")
 	}
 	if t.AgencyPrice < 0 {
-		return errors.New("AgencyPrice can't be negative")
+		return errors.New("agency price can't be negative")
 	}
 	if t.PathID == uuid.Nil {
-		return errors.New("PathID can't be nil")
+		return errors.New("path id can't be nil")
 	}
 	if t.MinPassengers == 0 {
-		return errors.New("MinPassengers can't be zero")
+		return errors.New("min passengers can't be zero")
 	}
-	if t.SoldTickets > t.MaxTickets {
-		return errors.New("SoldTickets can't be greater than MaxTickets")
+	if t.SoldTickets >= t.MaxTickets {
+		return errors.New("sold tickets can't be greater than max tickets")
 	}
-	if t.Profit < 0 {
-		return errors.New("Profit can't be negative")
+	if t.Profit <= 0 {
+		return errors.New("profit can't be negative")
 	}
 	if t.StartDate.Before(time.Now()) {
-		return errors.New("StartDate can't be before now")
+		return errors.New("start date can't be before now")
 	}
 	return nil
+}
+
+
+type VehicleType string
+
+var (
+	Bus   VehicleType = "bus"
+	Train VehicleType = "train"
+	Ship  VehicleType = "ship"
+	Airplane VehicleType = "airplane"
+)
+
+func isValidVehicleType(tripType string) bool {
+	switch VehicleType(tripType) {
+	case Bus, Train, Ship, Airplane:
+		return true
+	default:
+		return false
+	}
 }

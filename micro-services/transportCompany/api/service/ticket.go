@@ -55,9 +55,16 @@ func (s *TicketService) BuyAgencyTicket(ctx context.Context, req *pb.BuyAgencyTi
 		return nil, fmt.Errorf("%w %w", ErrBuyTicket, err)
 	}
 
+	ownerOfAgencyId, err := uuid.Parse(req.OwnerOfAgencyId)
+	if err != nil {
+		return nil, fmt.Errorf("%w %w", ErrBuyTicket, err)
+	}
+
 	ticketId, totalPrice, err := s.svc.BuyAgencyTicket(ctx, domain.Ticket{
-		AgencyID: &agencyID,
-		TripID:   tripId,
+		AgencyID:        &agencyID,
+		TripID:          tripId,
+		Count:           uint(req.TicketCount),
+		OwnerOfAgencyId: ownerOfAgencyId,
 	})
 	if err != nil {
 		return nil, err
@@ -76,6 +83,20 @@ func (s *TicketService) CancelTicket(ctx context.Context, ticketId string) (*pb.
 	}
 
 	err = s.svc.CancelTicket(ctx, ticketUId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.CancelTicketResponse{}, nil
+}
+
+func (s *TicketService) CancelAgencyTicket(ctx context.Context, ticketId string) (*pb.CancelTicketResponse, error) {
+	ticketUId, err := uuid.Parse(ticketId)
+	if err != nil {
+		return nil, fmt.Errorf("error on parse ticket id: %w", err)
+	}
+
+	err = s.svc.CancelAgencyTicket(ctx, ticketUId)
 	if err != nil {
 		return nil, err
 	}

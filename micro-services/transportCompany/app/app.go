@@ -5,18 +5,27 @@ import (
 	"fmt"
 	"log"
 
+	// "log"
+	clientPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc/port"
+	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/storage/types"
+
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/config"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company"
 	companyPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/invoice"
 	invoicePort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/invoice/port"
+	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/technicalTeam"
+	technicalTeamPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/technicalTeam/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/ticket"
 	ticketPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/ticket/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip"
 	tripPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/storage"
-	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/storage/types"
+
+	// "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/storage/types"
+
+	// "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/storage/types"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/cache"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/postgres"
 
@@ -33,7 +42,9 @@ type app struct {
 	companyService companyPort.Service
 	tripService    tripPort.Service
 	ticketService  ticketPort.Service
+	technicalTeam  technicalTeamPort.Service
 	redisProvider  cache.Provider
+	userGRPCClient clientPort.GRPCUserClient
 }
 
 func (a *app) DB() *gorm.DB {
@@ -53,7 +64,7 @@ func (a *app) CompanyService(ctx context.Context) companyPort.Service {
 }
 
 func (a *app) companyServiceWithDB(db *gorm.DB) companyPort.Service {
-	return company.NewService(storage.NewCompanyRepo(db, false, a.redisProvider))
+	return company.NewService(storage.NewCompanyRepo(db, false, a.redisProvider), grpc.NewGRPCRoleClient(a.cfg.Role.Host, int(a.cfg.Role.Port)))
 }
 
 func (a *app) TripService(ctx context.Context) tripPort.Service {
@@ -69,7 +80,10 @@ func (a *app) TripService(ctx context.Context) tripPort.Service {
 }
 
 func (a *app) tripServiceWithDB(db *gorm.DB) tripPort.Service {
-	return trip.NewService(storage.NewTripRepo(db, false, a.redisProvider))
+	return trip.NewService(
+		storage.NewTripRepo(db, false, a.redisProvider),
+		storage.NewTechnicalTeamRepo(db, false, a.redisProvider),
+		storage.NewTripRepo(db, false, a.redisProvider))
 }
 
 func (a *app) TicketService(ctx context.Context) ticketPort.Service {
@@ -89,8 +103,28 @@ func (a *app) ticketServiceWithDB(db *gorm.DB) ticketPort.Service {
 		a.tripServiceWithDB(db), a.invoiceServiceWithDB(db), grpc.NewGRPCBankClient(a.cfg.Bank.Host, int(a.cfg.Bank.Port)))
 }
 
+func (a *app) TechnicalTeamService(ctx context.Context) technicalTeamPort.Service {
+	db := appCtx.GetDB(ctx)
+	if db == nil {
+		if a.technicalTeam == nil {
+			a.technicalTeam = a.technicalTeamServiceWithDB(a.db)
+		}
+		return a.technicalTeam
+	}
+
+	return a.technicalTeamServiceWithDB(db)
+}
+
+func (a *app) technicalTeamServiceWithDB(db *gorm.DB) technicalTeamPort.Service {
+	return technicalTeam.NewService(storage.NewTechnicalTeamRepo(db, false, a.redisProvider))
+}
+
 func (a *app) invoiceServiceWithDB(db *gorm.DB) invoicePort.Service {
 	return invoice.NewService(storage.NewInvoiceRepo(db, false, a.redisProvider))
+}
+
+func (a *app) UserGRPCService() clientPort.GRPCUserClient {
+	return a.userGRPCClient
 }
 
 func (a *app) Config() config.Config {
@@ -107,10 +141,11 @@ func (a *app) setDB() error {
 		Schema: a.cfg.DB.Schema,
 	})
 
-	migrateErr := db.AutoMigrate(&types.Company{}, &types.Ticket{}, &types.Invoice{}, &types.TechnicalTeam{}, &types.TechnicalTeamMemeber{}, &types.Trip{}, &types.VehicleRequest{})
+	migrateErr := db.AutoMigrate(&types.Company{}, &types.Ticket{}, &types.Invoice{}, &types.TechnicalTeam{}, &types.TechnicalTeamMember{}, &types.Trip{}, &types.VehicleRequest{})
 	if migrateErr != nil {
 		log.Fatalf("Failed to migrate : %v", migrateErr)
 	}
+
 	if err != nil {
 		return err
 	}
@@ -133,8 +168,7 @@ func NewApp(cfg config.Config) (App, error) {
 	}
 
 	a.setRedis()
-
-	//return a, a.registerOutboxHandlers()
+	a.userGRPCClient = grpc.NewGRPCUserClient(a.cfg.User.Host, int(a.cfg.User.Port))
 
 	return a, nil
 }
@@ -146,16 +180,3 @@ func NewMustApp(cfg config.Config) App {
 	}
 	return app
 }
-
-// func (a *app) registerOutboxHandlers() error {
-// 	scheduler, err := gocron.NewScheduler()
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	common.RegisterOutboxRunner(a.notifServiceWithDB(a.db), scheduler)
-
-// 	scheduler.Start()
-
-// 	return nil
-// }
