@@ -39,8 +39,10 @@ func (s *service) CreateCompany(ctx context.Context, company domain.Company) (uu
 		log.Println("error on creating company: ", err.Error())
 		return uuid.Nil, err
 	}
-	s.roleClient.CreateRole(&rolePB.GrantResourceAccessRequest{OwnerUUID: company.OwnerId.String(), Permissions: createCompanyPermissions(companyId), RoleName: fmt.Sprintf("company-%s", companyId.String())})
-
+	_, err = s.roleClient.CreateRole(&rolePB.GrantResourceAccessRequest{OwnerUUID: company.OwnerId.String(), Permissions: createCompanyPermissions(companyId), RoleName: fmt.Sprintf("company-%s", companyId.String())})
+	if err != nil {
+		log.Println("error on creating role: ", err.Error())
+	}
 	return companyId, nil
 }
 

@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/api/pb"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/api/service"
+	"github.com/google/uuid"
 )
 
 func CreateCompany(svcGetter ServiceGetter[*service.CompanyService]) fiber.Handler {
@@ -15,7 +16,8 @@ func CreateCompany(svcGetter ServiceGetter[*service.CompanyService]) fiber.Handl
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
-		response, err := svc.Create(c.UserContext(), &req)
+		ownerUUID := c.Locals("UserUUID").(uuid.UUID)
+		response, err := svc.Create(c.UserContext(), &req, ownerUUID)
 
 		if err != nil {
 			if errors.Is(err, service.ErrCompanyCreationValidation) {

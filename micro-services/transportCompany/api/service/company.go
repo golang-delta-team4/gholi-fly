@@ -25,16 +25,12 @@ var (
 	ErrCompanyCreationValidation = company.ErrCompanyCreationValidation
 )
 
-func (s *CompanyService) Create(ctx context.Context, req *pb.CreateCompanyRequest) (*pb.CreateCompanyResponse, error) {
-	ownerId, err := uuid.Parse(req.OwnerId)
-	if err != nil {
-		return nil, fmt.Errorf("%w %w", ErrCompanyCreationValidation, err)
-	}
+func (s *CompanyService) Create(ctx context.Context, req *pb.CreateCompanyRequest, ownerUUID uuid.UUID) (*pb.CreateCompanyResponse, error) {
 
 	companyId, err := s.svc.CreateCompany(ctx, domain.Company{
 		Name:        req.Name,
 		Description: req.Description,
-		OwnerId:     ownerId,
+		OwnerId:     ownerUUID,
 		Address:     req.Address,
 		Phone:       req.Phone,
 		Email:       req.Email,
@@ -105,19 +101,10 @@ func (s *CompanyService) UpdateCompany(
 		return fmt.Errorf("%w %w", ErrCompanyCreationValidation, err)
 	}
 
-	var ownerId uuid.UUID
-	if req.OwnerId != "" {
-		ownerId, err = uuid.Parse(req.OwnerId)
-		if err != nil {
-			return fmt.Errorf("%w %w", ErrCompanyCreationValidation, err)
-		}
-	}
-
 	return s.svc.UpdateCompany(ctx, domain.Company{
 		Id:          companyUId,
 		Name:        req.Name,
 		Description: req.Description,
-		OwnerId:     ownerId,
 		Address:     req.Address,
 		Phone:       req.Phone,
 		Email:       req.Email,
