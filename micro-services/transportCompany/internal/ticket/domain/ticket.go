@@ -16,6 +16,7 @@ type Ticket struct {
 	Status          string
 	InvoiceId       uuid.UUID
 	OwnerOfAgencyId uuid.UUID
+	FactorId        string
 }
 
 func (t *Ticket) Validate() error {
