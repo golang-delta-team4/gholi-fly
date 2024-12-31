@@ -55,12 +55,11 @@ func (r *bookingRepo) GetByID(ctx context.Context, bookingID domain.BookingUUID)
 	var booking types.Booking
 
 	err := r.db.Table("bookings").WithContext(ctx).Where("uuid = ?", bookingID).First(&booking).Error
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
 		return nil, err
-	}
-
-	if booking.ID == 0 {
-		return nil, nil
 	}
 
 	return mapper.BookingStorage2Domain(booking), nil
@@ -78,6 +77,15 @@ func (r *bookingRepo) GetByRoomID(ctx context.Context, roomID roomDomain.RoomUUI
 func (r *bookingRepo) GetByUserID(ctx context.Context, userID uuid.UUID) ([]domain.Booking, error) {
 	var bookings []types.Booking
 	err := r.db.Table("bookings").WithContext(ctx).Where("user_id = ?", userID).Find(&bookings).Error
+	if err != nil {
+		return nil, err
+	}
+	return mapper.BatchBookingStorage2Domain(bookings), nil
+}
+
+func (r *bookingRepo) GetAllBookingsByHotelID(ctx context.Context, hotelID hotelDomain.HotelUUID) ([]domain.Booking, error) {
+	var bookings []types.Booking
+	err := r.db.Table("bookings").WithContext(ctx).Where("hotel_id = ?", hotelID).Find(&bookings).Error
 	if err != nil {
 		return nil, err
 	}

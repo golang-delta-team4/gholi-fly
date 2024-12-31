@@ -37,12 +37,12 @@ func CreateUserBookingByHotelID(svcGetter ServiceGetter[*service.BookingService]
 
 func CreateBookingByHotelID(svcGetter ServiceGetter[*service.BookingService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		hotelID := c.Params("hotel_id")
 		svc := svcGetter(c.UserContext())
 		var req pb.BookingCreateRequest
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.ErrBadRequest
 		}
+		hotelID := req.HotelId
 		userId := req.UserId
 		userUUID, err := uuid.Parse(userId)
 		if err != nil {
@@ -79,30 +79,85 @@ func GetAllBookingsByRoomID(svcGetter ServiceGetter[*service.BookingService]) fi
 	}
 }
 
-// func GetAllBookingsByUserID(svcGetter ServiceGetter[*service.BookingService]) fiber.Handler {
-// 	return func(c *fiber.Ctx) error {
-// 		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
+func GetAllBookingsByHotelID(svcGetter ServiceGetter[*service.BookingService]) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
+		hotelID := c.Params("hotel_id")
 
-// 	}
-// }
+		resp, err := svc.GetAllBookingsByHotelID(c.UserContext(), hotelID)
+		if err != nil {
+			if errors.Is(err, service.ErrBookingNotFound) {
+				return fiber.NewError(fiber.StatusBadRequest, err.Error())
+			}
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
 
-// func GetBookingByID(svcGetter ServiceGetter[*service.BookingService]) fiber.Handler {
-// 	return func(c *fiber.Ctx) error {
-// 		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
+		return c.JSON(resp)
+	}
+}
 
-// 	}
-// }
+func GetAllBookingsByUserID(svcGetter ServiceGetter[*service.BookingService]) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
+		userID := c.Params("user_id")
+
+		resp, err := svc.GetAllBookingsByUserID(c.UserContext(), userID)
+		if err != nil {
+			if errors.Is(err, service.ErrBookingNotFound) {
+				return fiber.NewError(fiber.StatusBadRequest, err.Error())
+			}
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+
+		return c.JSON(resp)
+	}
+}
+
+func GetBookingByID(svcGetter ServiceGetter[*service.BookingService]) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
+		bookingID := c.Params("booking_id")
+
+		resp, err := svc.GetBookingByID(c.UserContext(), bookingID)
+		if err != nil {
+			if errors.Is(err, service.ErrBookingNotFound) {
+				return fiber.NewError(fiber.StatusBadRequest, err.Error())
+			}
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+
+		return c.JSON(resp)
+	}
+}
 
 // func UpdateBookingByID(svcGetter ServiceGetter[*service.BookingService]) fiber.Handler {
 // 	return func(c *fiber.Ctx) error {
-// 		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
+// 		svc := svcGetter(c.UserContext())
+// 		bookingID := c.Params("booking_id")
+// 		var req pb.UpdateBookingStatusRequest
+// 		if err := c.BodyParser(&req); err != nil {
+// 			return fiber.ErrBadRequest
+// 		}
 
+// 		resp, err := svc.UpdateBookingStatus(c.UserContext(), bookingID, req.Status)
+// 		if err != nil {
+// 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+// 		}
+
+// 		return c.JSON(resp)
 // 	}
 // }
 
-// func DeleteBookingByID(svcGetter ServiceGetter[*service.BookingService]) fiber.Handler {
-// 	return func(c *fiber.Ctx) error {
-// 		return fiber.NewError(fiber.StatusInternalServerError, "err.Error()")
+func DeleteBookingByID(svcGetter ServiceGetter[*service.BookingService]) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		svc := svcGetter(c.UserContext())
+		bookingID := c.Params("booking_id")
 
-// 	}
-// }
+		err := svc.DeleteBooking(c.UserContext(), bookingID)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+
+		return c.SendStatus(fiber.StatusNoContent)
+	}
+}
