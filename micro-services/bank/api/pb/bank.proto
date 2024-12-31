@@ -49,7 +49,13 @@ message GetWalletsResponse {
     repeated Wallet wallets = 2;
     string message = 3;
 }
+message UpdateWalletBalanceRequest {
+    uint64 deposite_amount = 1;  // The new balance value
+}
 
+message UpdateWalletBalanceResponse {
+    ResponseStatus status = 1; // SUCCESS or FAILURE
+}
 // Factor Service Definitions
 enum FactorType {
     FACTOR_TYPE_UNKNOWN = 0;
@@ -97,7 +103,15 @@ message ApplyFactorResponse {
     ResponseStatus status = 1;
     string message = 2;
 }
+// Cancel Factor Definitions
+message CancelFactorRequest {
+    string factor_id = 1; // UUID of the factor to be canceled
+}
 
+message CancelFactorResponse {
+    ResponseStatus status = 1; // SUCCESS or FAILURE
+    string message = 2;        // Additional information about the cancellation
+}
 // Request to get factors by ID or filters with pagination
 message GetFactorsRequest {
     string factor_id = 1;              // Optional specific factor ID
@@ -126,4 +140,5 @@ service FactorService {
     rpc CreateFactor(CreateFactorRequest) returns (CreateFactorResponse);
     rpc ApplyFactor(ApplyFactorRequest) returns (ApplyFactorResponse);
     rpc GetFactors(GetFactorsRequest) returns (GetFactorsResponse);
+    rpc CancelFactor(CancelFactorRequest) returns (CancelFactorResponse);
 }
