@@ -21,6 +21,8 @@ var (
 	ErrBookingCreationDuplicate  = errors.New("booking already exists in these days")
 	ErrBookingNotFound           = errors.New("booking not found")
 	ErrInvalidSourceService      = errors.New("invalid source service")
+	ErrBookingApprovalFailed     = errors.New("error on approving booking")
+	ErrBookingCancellationFailed = errors.New("error on cancelling booking")
 )
 
 type service struct {
@@ -89,6 +91,38 @@ func (s *service) CreateBookingFactor(ctx context.Context, userId uuid.UUID, hot
 	}
 	s.repo.AddBookingFactor(ctx, bookingId, response.Factor.Id)
 	return response.Factor.Id, nil
+}
+
+func (s *service) ApproveUserBooking(ctx context.Context, factorID uuid.UUID, userUUID uuid.UUID) error {
+	err := s.repo.ApproveUserBooking(ctx, factorID, userUUID)
+	if err != nil {
+		return ErrBookingApprovalFailed
+	}
+	return nil
+}
+
+func (s *service) ApproveBooking(ctx context.Context, factorID uuid.UUID) error {
+	err := s.repo.ApproveBooking(ctx, factorID)
+	if err != nil {
+		return ErrBookingApprovalFailed
+	}
+	return nil
+}
+
+func (s *service) CancelUserBooking(ctx context.Context, factorID uuid.UUID, userUUID uuid.UUID) error {
+	err := s.repo.CancelUserBooking(ctx, factorID, userUUID)
+	if err != nil {
+		return ErrBookingCancellationFailed
+	}
+	return nil
+}
+
+func (s *service) CancelBooking(ctx context.Context, factorID uuid.UUID) error {
+	err := s.repo.CancelBooking(ctx, factorID)
+	if err != nil {
+		return ErrBookingCancellationFailed
+	}
+	return nil
 }
 
 // GetAllBookingsByRoomID returns all bookings by room ID

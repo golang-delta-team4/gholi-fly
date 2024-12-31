@@ -61,8 +61,12 @@ func registerBookingAPI(appContainer app.App, router fiber.Router, cfg config.Se
 	bookingRouter.Post("user/:hotel_id", setTransaction(appContainer.DB()), newAuthMiddleware([]byte(cfg.Secret)), CreateUserBookingByHotelID(bookingSvcGetter))
 	bookingRouter.Post("/", setTransaction(appContainer.DB()), CreateBookingByHotelID(bookingSvcGetter))
 	bookingRouter.Get("/room/:room_id", setTransaction(appContainer.DB()), newAuthMiddleware([]byte(cfg.Secret)), GetAllBookingsByRoomID(bookingSvcGetter))
-	bookingRouter.Get("/user/:user_id", setTransaction(appContainer.DB()), newAuthMiddleware([]byte(cfg.Secret)), GetAllBookingsByUserID(bookingSvcGetter))
+	bookingRouter.Get("/user/", setTransaction(appContainer.DB()), newAuthMiddleware([]byte(cfg.Secret)), GetAllBookingsByUserID(bookingSvcGetter))
 	bookingRouter.Get("/:id", setTransaction(appContainer.DB()), newAuthMiddleware([]byte(cfg.Secret)), GetBookingByID(bookingSvcGetter))
+	bookingRouter.Patch("/cancel/user/:factor_id", setTransaction(appContainer.DB()), newAuthMiddleware([]byte(cfg.Secret)), CancelUserBookingByID(bookingSvcGetter))
+	bookingRouter.Patch("/cancel/:factor_id", setTransaction(appContainer.DB()), CancelBookingByID(bookingSvcGetter))
+	bookingRouter.Patch("/approve/user/:factor_id", setTransaction(appContainer.DB()), newAuthMiddleware([]byte(cfg.Secret)), ApproveUserBookingByID(bookingSvcGetter))
+	bookingRouter.Patch("/approve/:factor_id", setTransaction(appContainer.DB()), ApproveBookingByID(bookingSvcGetter))
 	// bookingRouter.Put("/:id", setTransaction(appContainer.DB()), newAuthMiddleware([]byte(cfg.Secret)), UpdateBookingByID(bookingSvcGetter))
 	bookingRouter.Delete("/:id", setTransaction(appContainer.DB()), newAuthMiddleware([]byte(cfg.Secret)), DeleteBookingByID(bookingSvcGetter))
 }

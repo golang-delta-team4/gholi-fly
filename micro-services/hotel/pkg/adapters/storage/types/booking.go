@@ -17,8 +17,8 @@ type Booking struct {
 	UserID        uuid.UUID
 	FactorID      string
 	ReservationID uuid.UUID
-	IsPayed       bool
-	PayedDate     *time.Time
+	IsPaid        bool
+	PaidDate      *time.Time
 	CheckIn       time.Time
 	CheckOut      time.Time
 	Status        uint8
