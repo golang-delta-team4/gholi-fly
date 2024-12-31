@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"context"
-	"gholi-fly-bank/api/pb"
+	pb "gholi-fly-bank/api/pb"
 	"gholi-fly-bank/app"
 	creditPort "gholi-fly-bank/internal/credit/port"
 	factorDomain "gholi-fly-bank/internal/factor/domain"
@@ -107,11 +107,37 @@ func (h *GRPCBankHandler) GetWallets(ctx context.Context, req *pb.GetWalletsRequ
 	// Convert domain wallets to protobuf Wallet messages
 	var walletResponses []*pb.Wallet
 	for _, w := range wallets {
+		// Calculate the pending credit transactions
+		creditFilters := transactionDomain.TransactionFilters{
+			WalletID: w.ID,
+			Type:     transactionDomain.TransactionTypeCredit,
+			Status:   transactionDomain.TransactionStatusPending,
+		}
+		creditSum, err := h.transactionService.GetTransactionSum(ctx, &creditFilters)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to calculate pending credit transactions: %v", err)
+		}
+
+		// Calculate the pending debit transactions
+		debitFilters := transactionDomain.TransactionFilters{
+			WalletID: w.ID,
+			Type:     transactionDomain.TransactionTypeDebit,
+			Status:   transactionDomain.TransactionStatusPending,
+		}
+		debitSum, err := h.transactionService.GetTransactionSum(ctx, &debitFilters)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to calculate pending debit transactions: %v", err)
+		}
+
+		// Calculate the actual balance
+		actualBalance := int64(w.Balance) + creditSum - debitSum
+
+		// Convert wallet to protobuf response
 		walletResponses = append(walletResponses, &pb.Wallet{
 			Id:        w.ID.String(),
-			OwnerId:   w.OwnerID.String(), // Convert uuid.UUID to string
+			OwnerId:   w.OwnerID.String(),
 			Type:      pb.WalletType(w.Type),
-			Balance:   uint64(w.Balance),
+			Balance:   uint64(actualBalance),                           // Updated balance calculation
 			CreatedAt: w.CreatedAt.Format("2006-01-02T15:04:05Z07:00"), // Convert time to RFC3339
 			UpdatedAt: w.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
 		})
@@ -122,6 +148,7 @@ func (h *GRPCBankHandler) GetWallets(ctx context.Context, req *pb.GetWalletsRequ
 		Wallets: walletResponses,
 	}, nil
 }
+
 func (h *GRPCBankHandler) CreateFactor(ctx context.Context, req *pb.CreateFactorRequest) (*pb.CreateFactorResponse, error) {
 	// Validate required fields
 	if req.Factor == nil {
@@ -136,12 +163,19 @@ func (h *GRPCBankHandler) CreateFactor(ctx context.Context, req *pb.CreateFactor
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid customer_id format: %v", err)
 	}
-
+	externalId, err := uuid.Parse(req.Factor.ExternalId)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid external_id format: %v", err)
+	}
+	bookingId, err := uuid.Parse(req.Factor.BookingId)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid booking_id format: %v", err)
+	}
 	// Map request to domain
 	factor := factorDomain.Factor{
 		SourceService:  req.Factor.SourceService,
-		ExternalID:     uuid.MustParse(req.Factor.ExternalId),
-		BookingID:      uuid.MustParse(req.Factor.BookingId),
+		ExternalID:     externalId,
+		BookingID:      bookingId,
 		Amount:         uint(req.Factor.TotalAmount),
 		Status:         factorDomain.FactorStatusPending,
 		Details:        req.Factor.Details,
@@ -163,7 +197,7 @@ func (h *GRPCBankHandler) CreateFactor(ctx context.Context, req *pb.CreateFactor
 	customerWallet := customerWallets[0]
 
 	// Calculate effective balance
-	effectiveBalance, err := h.transactionService.GetTransactionSum(ctx, transactionDomain.TransactionFilters{
+	effectiveBalance, err := h.transactionService.GetTransactionSum(ctx, &transactionDomain.TransactionFilters{
 		WalletID: customerWallet.ID,
 		Status:   transactionDomain.TransactionStatusPending,
 	})
@@ -188,7 +222,10 @@ func (h *GRPCBankHandler) CreateFactor(ctx context.Context, req *pb.CreateFactor
 
 	// Process distributions
 	for _, dist := range req.Factor.Distributions {
-		walletID := uuid.MustParse(dist.WalletId)
+		walletID, err := uuid.Parse(dist.WalletId)
+		if err != nil {
+			return &pb.CreateFactorResponse{}, err
+		}
 
 		transaction := transactionDomain.Transaction{
 			WalletID: walletID,
@@ -306,7 +343,7 @@ func (h *GRPCBankHandler) ApplyFactor(ctx context.Context, req *pb.ApplyFactorRe
 	customerWallet := customerWallets[0]
 
 	// Calculate effective balance
-	effectiveBalance, err := h.transactionService.GetTransactionSum(ctx, transactionDomain.TransactionFilters{
+	effectiveBalance, err := h.transactionService.GetTransactionSum(ctx, &transactionDomain.TransactionFilters{
 		WalletID: customerWallet.ID,
 		Status:   transactionDomain.TransactionStatusPending,
 	})
@@ -357,6 +394,78 @@ func (h *GRPCBankHandler) ApplyFactor(ctx context.Context, req *pb.ApplyFactorRe
 	return &pb.ApplyFactorResponse{
 		Status:  pb.ResponseStatus_SUCCESS,
 		Message: "Factor applied successfully",
+	}, nil
+}
+func (h *GRPCBankHandler) CancelFactor(ctx context.Context, req *pb.CancelFactorRequest) (*pb.CancelFactorResponse, error) {
+	// Validate the factor ID
+	if req.FactorId == "" {
+		return &pb.CancelFactorResponse{
+			Status:  pb.ResponseStatus_FAILED,
+			Message: "factor ID is required",
+		}, nil
+	}
+
+	// Parse the Factor ID
+	factorID, err := uuid.Parse(req.FactorId)
+	if err != nil {
+		return &pb.CancelFactorResponse{
+			Status:  pb.ResponseStatus_FAILED,
+			Message: "invalid factor ID format",
+		}, nil
+	}
+
+	// Fetch the factor
+	factor, err := h.factorService.GetFactorByID(ctx, factorID)
+	if err != nil {
+		return &pb.CancelFactorResponse{
+			Status:  pb.ResponseStatus_FAILED,
+			Message: "failed to retrieve factor: " + err.Error(),
+		}, nil
+	}
+
+	// Check if the factor is already paid
+	if factor.IsPaid {
+		return &pb.CancelFactorResponse{
+			Status:  pb.ResponseStatus_FAILED,
+			Message: "cannot cancel a paid factor",
+		}, nil
+	}
+
+	// Update the status of all associated pending transactions
+	transactions, err := h.transactionService.GetTransactions(ctx, transactionDomain.TransactionFilters{
+		FactorID: factor.ID,
+		Status:   transactionDomain.TransactionStatusPending,
+	})
+	if err != nil {
+		return &pb.CancelFactorResponse{
+			Status:  pb.ResponseStatus_FAILED,
+			Message: "failed to retrieve associated transactions: " + err.Error(),
+		}, nil
+	}
+
+	for _, transaction := range transactions {
+		err := h.transactionService.UpdateTransactionStatus(ctx, transaction.ID, transactionDomain.TransactionStatusCanceled)
+		if err != nil {
+			return &pb.CancelFactorResponse{
+				Status:  pb.ResponseStatus_FAILED,
+				Message: "failed to update transaction status: " + err.Error(),
+			}, nil
+		}
+	}
+
+	// Update the factor's status to FactorStatusRejected
+	err = h.factorService.UpdateFactorStatus(ctx, factor.ID, factorDomain.FactorStatusRejected)
+	if err != nil {
+		return &pb.CancelFactorResponse{
+			Status:  pb.ResponseStatus_FAILED,
+			Message: "failed to update factor status: " + err.Error(),
+		}, nil
+	}
+
+	// Return success response
+	return &pb.CancelFactorResponse{
+		Status:  pb.ResponseStatus_SUCCESS,
+		Message: "Factor canceled successfully",
 	}, nil
 }
 

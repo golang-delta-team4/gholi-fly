@@ -8,39 +8,39 @@ import (
 )
 
 type Trip struct {
-	Id               uuid.UUID
-	CompanyID        uuid.UUID
-	TripType         string
-	UserReleaseDate  time.Time
-	TourReleaseDate  time.Time
-	UserPrice        float64
-	AgencyPrice      float64
-	PathID           uuid.UUID
-	FromCountry      string
-	ToCountry        string
-	Origin           string
-	FromTerminalName string
-	ToTerminalName   string
-	Destination      string
-	PathName         string
-	PathDistanceKM   float64
-	Status           string
-	MinPassengers    uint
-	TechnicalTeamID  *uuid.UUID
-	VehicleRequestID *uuid.UUID
-	SoldTickets      uint
-	MaxTickets       uint
-	VehicleID        *uuid.UUID
-	VehicleName      string
-	IsCanceled       bool
-	IsFinished       bool
-	IsConfirmed      bool
-	StartDate        *time.Time
-	EndDate          *time.Time
-	Profit           float64
-	CreatedAt        time.Time
+	Id                       uuid.UUID
+	CompanyID                uuid.UUID
+	TripType                 string
+	UserReleaseDate          time.Time
+	TourReleaseDate          time.Time
+	UserPrice                float64
+	AgencyPrice              float64
+	PathID                   uuid.UUID
+	FromCountry              string
+	ToCountry                string
+	Origin                   string
+	FromTerminalName         string
+	ToTerminalName           string
+	Destination              string
+	PathName                 string
+	PathDistanceKM           float64
+	Status                   string
+	MinPassengers            uint
+	TechnicalTeamID          *uuid.UUID
+	VehicleRequestID         *uuid.UUID
+	VehicleYearOfManufacture int
+	SoldTickets              uint
+	MaxTickets               uint
+	VehicleID                *uuid.UUID
+	VehicleName              string
+	IsCanceled               bool
+	IsFinished               bool
+	IsConfirmed              bool
+	StartDate                *time.Time
+	EndDate                  *time.Time
+	Profit                   float64
+	CreatedAt                time.Time
 }
-
 
 func (t *Trip) Validate() error {
 	if t.CompanyID == uuid.Nil {
@@ -76,7 +76,7 @@ func (t *Trip) Validate() error {
 	if t.SoldTickets >= t.MaxTickets {
 		return errors.New("sold tickets can't be greater than max tickets")
 	}
-	if t.Profit <= 0 {
+	if t.Profit < 0 {
 		return errors.New("profit can't be negative")
 	}
 	if t.StartDate.Before(time.Now()) {
@@ -85,13 +85,12 @@ func (t *Trip) Validate() error {
 	return nil
 }
 
-
 type VehicleType string
 
 var (
-	Bus   VehicleType = "bus"
-	Train VehicleType = "train"
-	Ship  VehicleType = "ship"
+	Bus      VehicleType = "bus"
+	Train    VehicleType = "train"
+	Ship     VehicleType = "ship"
 	Airplane VehicleType = "airplane"
 )
 

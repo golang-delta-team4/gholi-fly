@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"gholi-fly-bank/api/handlers/grpc"
+	"gholi-fly-bank/api/handlers/http"
 	"gholi-fly-bank/app"
 	"gholi-fly-bank/config"
 	"log"
@@ -37,6 +38,14 @@ func main() {
 		log.Printf("Starting gRPC server on port %d", c.Server.GrpcPort)
 		if err := grpc.Run(appContainer, c); err != nil {
 			log.Fatalf("gRPC server error: %v", err)
+		}
+	}()
+	// Start http server
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := http.Run(appContainer, c.Server); err != nil {
+			log.Fatalf("http server error: %v", err)
 		}
 	}()
 

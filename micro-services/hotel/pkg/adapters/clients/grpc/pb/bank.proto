@@ -1,0 +1,129 @@
+syntax = "proto3";
+
+package bank;
+
+option go_package = "gholi-fly-bank/api/pb";
+
+// Common Enums
+enum ResponseStatus {
+    FAILED = 0;
+    SUCCESS = 1;
+}
+
+// Wallet Service Definitions
+enum WalletType {
+    UNKNOWN = 0;
+    PERSON = 1;
+    COMPANY = 2;
+    APP = 3;
+}
+
+message Wallet {
+    string id = 1;
+    string owner_id = 2;
+    WalletType type = 3;
+    uint64 balance = 4;
+    string created_at = 5;
+    string updated_at = 6;
+}
+
+message CreateWalletRequest {
+    string owner_id = 1;
+    WalletType type = 2;
+}
+
+message CreateWalletResponse {
+    ResponseStatus status = 1;
+    Wallet wallet = 2;
+    string message = 3;
+            
+}
+
+message GetWalletsRequest {
+    string owner_id = 1;
+    WalletType type = 2;
+}
+
+message GetWalletsResponse {
+    ResponseStatus status = 1;
+    repeated Wallet wallets = 2;
+    string message = 3;
+}
+
+// Factor Service Definitions
+enum FactorType {
+    FACTOR_TYPE_UNKNOWN = 0;
+    FACTOR_TYPE_SIMPLE = 1;
+    FACTOR_TYPE_AGGREGATED = 2;
+}
+
+message Distribution {
+    string wallet_id = 1; // UUID of the wallet
+    uint64 amount = 2;    // Amount to be transferred
+}
+
+message Factor {
+    string id = 1;                    // UUID of the factor
+    string source_service = 2;        // Service generating the factor
+    string external_id = 3;           // Unique ID in the source service
+    string booking_id = 4;            // Associated booking ID
+    uint64 total_amount = 5;          // Total amount for the factor
+    repeated Distribution distributions = 6; // Amount distribution information
+    string details = 7;               // JSON-encoded details
+    bool instant_payment = 8;         // Should the payment be made instantly?
+    bool is_paid = 9;                 // Has the factor been paid?
+    string customer_id = 10;          // UUID of the customer associated with the factor
+    string created_at = 11;           // Timestamp when the factor was created
+    string updated_at = 12;           // Timestamp when the factor was last updated
+}
+
+
+message CreateFactorRequest {
+    FactorType factor_type = 1;
+    Factor factor = 2;
+}
+
+message CreateFactorResponse {
+    ResponseStatus status = 1;
+    string message = 2;
+    Factor factor = 4 [json_name = "factor"];
+}
+
+message ApplyFactorRequest {
+    string factor_id = 1;
+}
+
+message ApplyFactorResponse {
+    ResponseStatus status = 1;
+    string message = 2;
+}
+
+// Request to get factors by ID or filters with pagination
+message GetFactorsRequest {
+    string factor_id = 1;              // Optional specific factor ID
+    string booking_id = 2;             // Optional filter by booking ID
+    bool is_paid = 3;                  // Optional filter by payment status
+    uint32 page = 4;                   // Page number for pagination
+    uint32 page_size = 5;              // Number of factors per page
+  }
+  
+  // Response for getting factors with pagination
+  message GetFactorsResponse {
+    ResponseStatus status = 1;         // SUCCESS or FAILURE
+    repeated Factor factors = 2;       // List of matching factors
+    uint32 total_count = 3;            // Total number of factors
+    string message = 4;                // Optional response message
+  }
+
+// Wallet Service
+service WalletService {
+    rpc CreateWallet(CreateWalletRequest) returns (CreateWalletResponse);
+    rpc GetWallets(GetWalletsRequest) returns (GetWalletsResponse);
+}
+
+// Factor Service
+service FactorService {
+    rpc CreateFactor(CreateFactorRequest) returns (CreateFactorResponse);
+    rpc ApplyFactor(ApplyFactorRequest) returns (ApplyFactorResponse);
+    rpc GetFactors(GetFactorsRequest) returns (GetFactorsResponse);
+}

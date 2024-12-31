@@ -4,18 +4,22 @@ import (
 	"context"
 	"errors"
 	"time"
+	"user-service/api/presenter"
 	"user-service/internal/user/domain"
 	userPort "user-service/internal/user/port"
 	bankClientPort "user-service/pkg/adapters/clients/grpc/port"
 	"user-service/pkg/adapters/storage/mapper"
 	"user-service/pkg/adapters/storage/types"
+
 	bankPB "github.com/golang-delta-team4/gholi-fly-shared/pkg/protobuf/bank"
+	"github.com/jackc/pgx/v5/pgconn"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 var (
+	ErrEmailNotUnique 		   = errors.New("the email address is already registered.")
 	ErrUserNotFound            = errors.New("user not found")
 	ErrEmailOrPasswordMismatch = errors.New("email or password mismatch")
 )
@@ -42,11 +46,16 @@ func (us *service) SignUp(ctx context.Context, user *domain.User) (uuid.UUID, er
 	}
 	err = us.repo.Create(ctx, *storageUser)
 	if err != nil {
+		if pgErr, ok := err.(*pgconn.PgError); ok { //gorm does not have any sentinel error for this error type
+			if pgErr.Code == "23505" {
+				return uuid.Nil, ErrEmailNotUnique
+			}
+		}
 		return uuid.Nil, err
 	}
 	resp, err := us.bankClient.CreateUserWallet(storageUser.UUID.String())
 	if err != nil {
-		return uuid.Nil, err
+		return uuid.Nil, errors.New("failed to create user wallet")
 	}
 	if resp.Status == bankPB.ResponseStatus_FAILED {
 		return uuid.Nil, err
@@ -149,4 +158,40 @@ func (us *service) GetUserByEmail(ctx context.Context, email string) (*domain.Us
 		return nil, err
 	}
 	return mapper.Storage2Domain(*user), nil
+}
+
+func (us *service) GetAllUsers(ctx context.Context, query presenter.PaginationQuery) ([]domain.User, error) {
+	users, err := us.repo.GetAllUsers(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	storageUsers := mapper.StorageList2DomainList(users)
+	return storageUsers, nil
+}
+
+func (us *service) BlockUser(ctx context.Context, userUUID uuid.UUID) (error) {
+	err := us.repo.Block(ctx, userUUID)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return ErrUserNotFound
+	}
+	return nil
+}
+func (us *service) UnBlockUser(ctx context.Context, userUUID uuid.UUID) (error) {
+	err := us.repo.UnBlock(ctx, userUUID)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return ErrUserNotFound
+	}
+	return nil
+}
+
+func (us *service) GetBlockedUsers(ctx context.Context) ([]string, error) {
+	uuids, err := us.repo.GetBlocked(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var stringUUIDs []string
+	for _, uuid := range uuids {
+		stringUUIDs = append(stringUUIDs, uuid.String())
+	}
+	return stringUUIDs, nil
 }

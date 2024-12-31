@@ -7,6 +7,7 @@ import (
 	"gholi-fly-hotel/api/service"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 func CreateHotel(svcGetter ServiceGetter[*service.HotelService]) fiber.Handler {
@@ -16,8 +17,11 @@ func CreateHotel(svcGetter ServiceGetter[*service.HotelService]) fiber.Handler {
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.ErrBadRequest
 		}
-
-		resp, err := svc.CreateHotel(c.UserContext(), &req)
+		userID, ok := c.Locals("UserUUID").(uuid.UUID)
+		if !ok {
+			return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
+		}
+		resp, err := svc.CreateHotel(c.UserContext(), &req, userID)
 		if err != nil {
 			if errors.Is(err, service.ErrHotelCreationValidation) || errors.Is(err, service.ErrHotelCreationDuplicate) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())

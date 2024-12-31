@@ -28,15 +28,11 @@ var (
 	ErrHotelNotFound           = hotel.ErrHotelNotFound
 )
 
-func (s *HotelService) CreateHotel(ctx context.Context, req *pb.HotelCreateRequest) (*pb.HotelCreateResponse, error) {
-	ownerUUID, err := uuid.Parse(req.OwnerId)
-	if err != nil {
-		return nil, err
-	}
+func (s *HotelService) CreateHotel(ctx context.Context, req *pb.HotelCreateRequest, ownerId domain.OwnerUUID) (*pb.HotelCreateResponse, error) {
 	hotelId, err := s.svc.CreateHotel(ctx, domain.Hotel{
 		Name:    req.Name,
 		City:    req.City,
-		OwnerID: ownerUUID,
+		OwnerID: ownerId,
 	})
 
 	if err != nil {

@@ -14,11 +14,11 @@ type Booking struct {
 	Hotel         Hotel     `gorm:"foreignKey:HotelID;references:UUID;constraint:OnDelete:CASCADE"`
 	RoomID        uuid.UUID `gorm:"type:uuid;not null;references:UUID"`
 	Room          Room      `gorm:"foreignKey:RoomID;references:UUID;constraint:OnDelete:CASCADE"`
-	UserID        *uuid.UUID
-	AgencyID      *uuid.UUID
+	UserID        uuid.UUID
+	FactorID      string
 	ReservationID uuid.UUID
-	IsPayed       bool
-	PayedDate     *time.Time
+	IsPaid        bool
+	PaidDate      *time.Time
 	CheckIn       time.Time
 	CheckOut      time.Time
 	Status        uint8
