@@ -8,6 +8,8 @@ import (
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/api/pb"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/api/service"
 	clientPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc/port"
+	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/http"
+	mapHttpPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/http"
 	"github.com/google/uuid"
 )
 
@@ -28,7 +30,12 @@ func CreateTrip(svcGetter ServiceGetter[*service.TripService], userGRPCService c
 			if errors.Is(err, service.ErrCompanyCreationValidation) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())
 			}
-
+			if errors.Is(err, mapHttpPort.ErrVehicleNotFound) {
+				return fiber.NewError(fiber.StatusNotFound, err.Error())
+			}
+			if errors.Is(err, http.ErrPathNotFound) {
+				return fiber.NewError(fiber.StatusNotFound, err.Error())
+			}
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 
@@ -46,7 +53,6 @@ func GetTripById(svcGetter ServiceGetter[*service.TripService]) fiber.Handler {
 			if errors.Is(err, service.ErrCompanyCreationValidation) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())
 			}
-
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 

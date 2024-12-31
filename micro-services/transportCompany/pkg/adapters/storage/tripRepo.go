@@ -43,7 +43,7 @@ func (r *tripRepo) UpdateTrip(ctx context.Context, id uuid.UUID, updates map[str
 		return nil
 	}
 
-	if err := r.db.WithContext(ctx).
+	if err := r.db.WithContext(ctx).Debug().
 		Model(&types.Trip{}).
 		Where("id = ?", id).
 		Updates(updates).Error; err != nil {
