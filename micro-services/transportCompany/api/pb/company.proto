@@ -6,7 +6,6 @@ option go_package = "github.com/golang-delta-team4/gholi-fly/transportCompany/ap
 message CreateCompanyRequest {
     string name = 1 [json_name = "name"];
     string description = 2 [json_name = "description"];
-    string ownerId = 3 [json_name = "ownerId"];
     string address =4 [json_name = "address"];
 	string phone =5 [json_name = "phone"];
 	string email =6 [json_name = "email"];
@@ -30,7 +29,6 @@ message GetCompanyResponse {
 message UpdateCompanyRequest {
     string name = 1 [json_name = "name"];
     string description = 2 [json_name = "description"];
-    string ownerId = 3 [json_name = "ownerId"];
     string address =4 [json_name = "address"];
 	string phone =5 [json_name = "phone"];
 	string email =6 [json_name = "email"];
