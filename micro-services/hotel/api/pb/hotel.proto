@@ -7,7 +7,6 @@ option go_package = "gholi-fly-hotel/api/pb";
 message HotelCreateRequest {
     string name = 1 [json_name = "name"];
     string city = 2 [json_name = "city"];
-    string ownerId = 3 [json_name = "ownerId"];
 }
 
 message HotelCreateResponse {

@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"errors"
 	hotelDomain "gholi-fly-hotel/internal/hotel/domain"
 	"time"
 
@@ -33,4 +34,18 @@ type Staff struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt time.Time
+}
+
+func (s *Staff) Validate() error {
+	if s.HotelID == uuid.Nil {
+		return errors.New("hotel id can't be nil")
+	}
+	if s.StaffType <= 0 {
+		return errors.New("undefined staff type")
+	}
+	if s.Name == "" {
+		return errors.New("name cant be empty")
+	}
+
+	return nil
 }
