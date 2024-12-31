@@ -7,6 +7,7 @@ import (
 	"vehicle/internal/vehicle/domain"
 	"vehicle/internal/vehicle/port"
 	"vehicle/pkg/adapters/storage"
+	"vehicle/pkg/adapters/storage/types"
 	"vehicle/pkg/postgres"
 
 	"gorm.io/gorm"
@@ -50,7 +51,7 @@ func (a *app) setDB() error {
 	}
 
 	// Run migrations
-	err = postgres.AutoMigrate(db, &domain.Vehicle{}, &domain.TripRequest{})
+	err = postgres.AutoMigrate(db, &types.Vehicle{}, &domain.TripRequest{}, &types.VehicleReserve{})
 	if err != nil {
 		return err
 	}

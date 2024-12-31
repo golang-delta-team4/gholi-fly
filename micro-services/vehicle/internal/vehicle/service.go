@@ -3,15 +3,18 @@ package vehicle
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
-	"sort"
 	"time"
 	"vehicle/internal/vehicle/domain"
 	"vehicle/internal/vehicle/port"
+	"vehicle/pkg/adapters/storage/mapper"
+	"vehicle/pkg/adapters/storage/types"
 	"vehicle/pkg/adapters/transport"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type service struct {
@@ -25,6 +28,10 @@ func NewVehicleService(repo port.VehicleRepository, tripServiceURL string) port.
 		tripServiceURL: tripServiceURL,
 	}
 }
+
+var (
+	ErrVehicleNotFound = errors.New("vehicle not found")
+)
 
 // Example of using the tripServiceURL in one of the methods
 func (s *service) FetchTripRequest(ctx context.Context) (*domain.TripRequest, error) {
@@ -87,32 +94,22 @@ func (s *service) DeleteVehicle(ctx context.Context, id uuid.UUID) error {
 	return s.repo.Delete(ctx, id)
 }
 
-func (s *service) MatchVehicle(ctx context.Context, tripRequest *domain.TripRequest) (*domain.Vehicle, error) {
-	vehicles, err := s.repo.GetAll(ctx)
+func (s *service) MatchVehicle(ctx context.Context, vehicleMatchRequest *domain.MatchMakerRequest) (uuid.UUID, *domain.Vehicle, error) {
+	vehicle, err := s.repo.GetMatchedVehicle(ctx, vehicleMatchRequest)
 	if err != nil {
-		return nil, err
-	}
-
-	filteredVehicles := []domain.Vehicle{}
-	for _, vehicle := range vehicles {
-		if vehicle.Type == tripRequest.TripType && vehicle.Capacity >= tripRequest.MinPassengers {
-			filteredVehicles = append(filteredVehicles, vehicle)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return uuid.Nil, nil, ErrVehicleNotFound
 		}
+		return uuid.Nil, nil, err
 	}
-
-	if len(filteredVehicles) == 0 {
-		return nil, fmt.Errorf("no matching vehicles found")
+	vehicleDomain := mapper.VehicleToDomain(&vehicle)
+	reservationID, err := s.repo.CreateReservation(ctx, types.VehicleReserve{
+		TripID:    vehicleMatchRequest.TripID,
+		StartDate: vehicleMatchRequest.ReserveStartDate,
+		EndDate:   vehicleMatchRequest.ReserveEndDate,
+		VehicleID: vehicle.ID})
+	if err != nil {
+		return uuid.Nil, nil, err
 	}
-
-	sort.Slice(filteredVehicles, func(i, j int) bool {
-		if filteredVehicles[i].Capacity != filteredVehicles[j].Capacity {
-			return filteredVehicles[i].Capacity > filteredVehicles[j].Capacity
-		}
-		if filteredVehicles[i].YearOfManufacture != filteredVehicles[j].YearOfManufacture {
-			return filteredVehicles[i].YearOfManufacture > filteredVehicles[j].YearOfManufacture
-		}
-		return filteredVehicles[i].CreatedAt.Before(filteredVehicles[j].CreatedAt)
-	})
-
-	return &filteredVehicles[0], nil
+	return reservationID, vehicleDomain, nil
 }

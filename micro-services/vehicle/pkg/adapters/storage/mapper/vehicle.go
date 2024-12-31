@@ -15,6 +15,7 @@ func VehicleToDomain(v *types.Vehicle) *domain.Vehicle {
 		UniqueCode:        v.UniqueCode,
 		Status:            v.Status,
 		YearOfManufacture: v.YearOfManufacture,
+		PricePerKilometer: v.PricePerKilometer,
 		CreatedAt:         v.CreatedAt,
 		UpdatedAt:         v.UpdatedAt,
 	}
@@ -30,6 +31,7 @@ func DomainToVehicle(d *domain.Vehicle) *types.Vehicle {
 		UniqueCode:        d.UniqueCode,
 		Status:            d.Status,
 		YearOfManufacture: d.YearOfManufacture,
+		PricePerKilometer: d.PricePerKilometer,
 		CreatedAt:         d.CreatedAt,
 		UpdatedAt:         d.UpdatedAt,
 	}

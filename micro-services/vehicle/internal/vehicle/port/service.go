@@ -15,5 +15,5 @@ type VehicleService interface {
 	UpdateVehicle(ctx context.Context, vehicle *domain.Vehicle) error
 	DeleteVehicle(ctx context.Context, id uuid.UUID) error
 	ProcessTripRequest(ctx context.Context) (*domain.TripRequest, error) 
-	MatchVehicle(ctx context.Context, tripRequest *domain.TripRequest) (*domain.Vehicle, error)
+	MatchVehicle(ctx context.Context, vehicleMatchRequest *domain.MatchMakerRequest) (uuid.UUID, *domain.Vehicle, error)
 }

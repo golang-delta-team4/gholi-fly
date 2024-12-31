@@ -1,7 +1,12 @@
 package http
 
 import (
+	"errors"
+	"fmt"
 	"log"
+	"time"
+	"vehicle/api/presenter"
+	vehicleService "vehicle/internal/vehicle"
 	"vehicle/internal/vehicle/domain"
 	"vehicle/internal/vehicle/port"
 
@@ -17,19 +22,37 @@ func NewVehicleHandler(service port.VehicleService) *VehicleHandler {
 }
 
 func (h *VehicleHandler) MatchVehicle(c *fiber.Ctx) error {
-    var tripRequest domain.TripRequest
-    if err := c.BodyParser(&tripRequest); err != nil {
-        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request payload"})
-    }
+	var vehicleMatchRequest presenter.MatchMakerRequest
+	if err := c.BodyParser(&vehicleMatchRequest); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": fmt.Sprintf("Invalid request payload %v", err)})
+	}
+	reserveStartDate, err := time.Parse(time.DateOnly, vehicleMatchRequest.ReserveStartDate)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err})
+	}
+	reserveEndDate, err := time.Parse(time.DateOnly, vehicleMatchRequest.ReserveEndDate)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err})
+	}
+	reservationID, vehicle, err := h.service.MatchVehicle(c.Context(), &domain.MatchMakerRequest{
+		TripID:             vehicleMatchRequest.TripID,
+		ReserveStartDate:   reserveStartDate,
+		ReserveEndDate:     reserveEndDate,
+		TripDistance:       vehicleMatchRequest.TripDistance,
+		NumberOfPassengers: vehicleMatchRequest.NumberOfPassengers,
+		TripType:           domain.TripType(vehicleMatchRequest.TripType),
+		MaxPrice:           vehicleMatchRequest.MaxPrice,
+		YearOfManufacture:  vehicleMatchRequest.YearOfManufacture,
+	})
+	if err != nil {
+		if errors.Is(err, vehicleService.ErrVehicleNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})
+		}
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})
+	}
 
-    vehicle, err := h.service.MatchVehicle(c.Context(), &tripRequest)
-    if err != nil {
-        return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})
-    }
-
-    return c.Status(fiber.StatusOK).JSON(vehicle)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"reservation_id": reservationID, "vehicle_detail": vehicle})
 }
-
 
 func (h *VehicleHandler) CreateVehicle(c *fiber.Ctx) error {
 	log.Println("Incoming request to create vehicle")
@@ -55,9 +78,8 @@ func (h *VehicleHandler) CreateVehicle(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(vehicle)
 }
 
-
 func RegisterVehicleRoutes(app *fiber.App, service port.VehicleService) {
 	handler := NewVehicleHandler(service)
-    app.Post("/api/v1/vehicles", handler.CreateVehicle)
-    app.Post("/api/v1/vehicles/match", handler.MatchVehicle)
+	app.Post("/api/v1/vehicles", handler.CreateVehicle)
+	app.Get("/api/v1/vehicles/match", handler.MatchVehicle)
 }
