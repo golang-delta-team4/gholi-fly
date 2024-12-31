@@ -16,7 +16,6 @@ message BookingCreateRequest {
     string hotelId = 3 [json_name = "hotelId"];
     repeated string roomIds = 4 [json_name = "roomIds"];  // Add room IDs field
     string userId = 5 [json_name = "userId"];             // Optional user ID
-    string agencyId = 6 [json_name = "agencyId"];        // Optional agency ID
 }
 
 message BookingCreateResponse {

@@ -14,7 +14,9 @@ type Service interface {
 	CreateBookingFactor(ctx context.Context, userId uuid.UUID, hotelID hotelDomain.HotelUUID, totalPrice uint, bookingId bookingDomain.BookingUUID) (string, error)
 	GetAllBookingsByRoomID(ctx context.Context, roomID roomDomain.RoomUUID) ([]bookingDomain.Booking, error)
 	GetAllBookingsByUserID(ctx context.Context, userID uuid.UUID) ([]bookingDomain.Booking, error)
+	GetAllBookingsByHotelID(ctx context.Context, hotelID hotelDomain.HotelUUID) ([]bookingDomain.Booking, error)
 	GetBookingByID(ctx context.Context, bookingID bookingDomain.BookingUUID) (*bookingDomain.Booking, error)
 	UpdateBooking(ctx context.Context, booking bookingDomain.Booking) error
+	UpdateBookingStatus(ctx context.Context, bookingID bookingDomain.BookingUUID, status uint8) (*bookingDomain.Booking, error)
 	DeleteBooking(ctx context.Context, bookingID bookingDomain.BookingUUID) error
 }

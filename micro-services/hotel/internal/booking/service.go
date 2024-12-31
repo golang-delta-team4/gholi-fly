@@ -101,6 +101,11 @@ func (s *service) GetAllBookingsByUserID(ctx context.Context, userID uuid.UUID) 
 	return s.repo.GetByUserID(ctx, userID)
 }
 
+// GetAllBookingsByHotelID returns all bookings by hotel ID
+func (s *service) GetAllBookingsByHotelID(ctx context.Context, hotelID hotelDomain.HotelUUID) ([]bookingDomain.Booking, error) {
+	return s.repo.GetAllBookingsByHotelID(ctx, hotelID)
+}
+
 // GetBookingByID returns a booking by its ID
 func (s *service) GetBookingByID(ctx context.Context, bookingID bookingDomain.BookingUUID) (*bookingDomain.Booking, error) {
 	booking, err := s.repo.GetByID(ctx, bookingID)
@@ -113,6 +118,20 @@ func (s *service) GetBookingByID(ctx context.Context, bookingID bookingDomain.Bo
 // UpdateBooking updates a booking
 func (s *service) UpdateBooking(ctx context.Context, booking bookingDomain.Booking) error {
 	return s.repo.Update(ctx, booking)
+}
+
+// UpdateBookingStatus updates the status of a booking
+func (s *service) UpdateBookingStatus(ctx context.Context, bookingID bookingDomain.BookingUUID, status uint8) (*bookingDomain.Booking, error) {
+	booking, err := s.repo.GetByID(ctx, bookingID)
+	if err != nil {
+		return nil, ErrBookingNotFound
+	}
+	booking.Status = status
+	err = s.repo.Update(ctx, *booking)
+	if err != nil {
+		return nil, err
+	}
+	return booking, nil
 }
 
 // DeleteBooking deletes a booking
