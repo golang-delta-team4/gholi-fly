@@ -15,6 +15,26 @@ type Vehicle struct {
 	UniqueCode        string    `gorm:"type:varchar(100);unique;not null" json:"unique_code"`
 	Status            string    `gorm:"type:varchar(20);not null" json:"status"` // active, inactive
 	YearOfManufacture int       `gorm:"type:int;not null" json:"year_of_manufacture"`
+	PricePerKilometer float64
 	CreatedAt         time.Time `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt         time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 }
+
+type MatchMakerRequest struct {
+	TripID             uuid.UUID
+	ReserveStartDate   time.Time
+	ReserveEndDate     time.Time
+	TripDistance       int
+	NumberOfPassengers int
+	TripType           TripType
+	MaxPrice           int
+	YearOfManufacture  int
+}
+
+type TripType string
+
+var (
+	GroundTrip TripType = "ground"
+	AirTrip    TripType = "air"
+	SeaTrip    TripType = "sea"
+)
