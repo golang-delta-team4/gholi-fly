@@ -88,8 +88,45 @@ func (h *VehicleHandler) CreateVehicle(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(vehicle)
 }
 
+func (h *VehicleHandler) UpdateVehicle(c *fiber.Ctx) error {
+	log.Println("Incoming request to create vehicle")
+	vehicleId := c.Params("id")
+	vehicleUUID, err := uuid.Parse(vehicleId)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid vehicle id",
+		})
+	}
+	var vehicle presenter.Vehicle
+	if err := c.BodyParser(&vehicle); err != nil {
+		log.Printf("Error parsing body: %v", err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request payload",
+		})
+	}
+
+	log.Printf("Vehicle parsed: %+v", vehicle)
+	domainVehicle := domain.Vehicle{
+		ID:                vehicleUUID,
+		Capacity:          vehicle.Capacity,
+		Speed:             vehicle.Speed,
+		Status:            string(vehicle.Status),
+		PricePerKilometer: vehicle.PricePerKilometer,
+	}
+	if err := h.service.UpdateVehicle(c.Context(), &domainVehicle); err != nil {
+		log.Printf("Error creating vehicle: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	log.Printf("Vehicle created: %+v", vehicle)
+	return c.Status(fiber.StatusCreated).JSON("vehicle updated successfully")
+}
+
 func RegisterVehicleRoutes(app *fiber.App, service port.VehicleService, cfg config.Config) {
 	handler := NewVehicleHandler(service)
-	app.Post("/api/v1/vehicles", newAuthMiddleware([]byte(cfg.Server.Secret)),handler.CreateVehicle)
+	app.Post("/api/v1/vehicles", newAuthMiddleware([]byte(cfg.Server.Secret)), handler.CreateVehicle)
+	app.Patch("/api/v1/vehicles/:id", newAuthMiddleware([]byte(cfg.Server.Secret)), handler.UpdateVehicle)
 	app.Get("/api/v1/vehicles/match", handler.MatchVehicle)
 }

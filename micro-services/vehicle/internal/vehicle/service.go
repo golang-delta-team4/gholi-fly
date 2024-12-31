@@ -79,7 +79,11 @@ func (s *service) CreateVehicle(ctx context.Context, vehicle *domain.Vehicle) er
 }
 
 func (s *service) GetVehicleByID(ctx context.Context, id uuid.UUID) (*domain.Vehicle, error) {
-	return s.repo.GetByID(ctx, id)
+	vehicle, err := s.repo.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return mapper.VehicleToDomain(vehicle), nil
 }
 
 func (s *service) GetAllVehicles(ctx context.Context) ([]domain.Vehicle, error) {
@@ -87,7 +91,26 @@ func (s *service) GetAllVehicles(ctx context.Context) ([]domain.Vehicle, error) 
 }
 
 func (s *service) UpdateVehicle(ctx context.Context, vehicle *domain.Vehicle) error {
-	return s.repo.Update(ctx, vehicle)
+	currentVehicle, err := s.repo.GetByID(ctx, vehicle.ID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrVehicleNotFound
+		}
+		return err
+	}
+	if vehicle.Capacity != 0 {
+		currentVehicle.Capacity = vehicle.Capacity
+	}
+	if vehicle.PricePerKilometer != 0 {
+		currentVehicle.PricePerKilometer = vehicle.PricePerKilometer
+	}
+	if vehicle.Speed != 0 {
+		currentVehicle.Speed = vehicle.Speed
+	}
+	if vehicle.Status != "" {
+		currentVehicle.Status = vehicle.Status
+	}
+	return s.repo.Update(ctx, currentVehicle)
 }
 
 func (s *service) DeleteVehicle(ctx context.Context, id uuid.UUID) error {
