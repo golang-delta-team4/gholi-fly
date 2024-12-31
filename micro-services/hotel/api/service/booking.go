@@ -30,7 +30,7 @@ var (
 	ErrBookingNotFound           = booking.ErrBookingNotFound
 )
 
-func (s *BookingService) CreateBooking(ctx context.Context, req *pb.BookingCreateRequest, hotelId string) (*pb.BookingCreateResponse, error) {
+func (s *BookingService) CreateUserBooking(ctx context.Context, req *pb.BookingCreateRequest, hotelId string, userUUID domain.UserUUID) (*pb.BookingCreateResponse, error) {
 	hotelUUID, err := uuid.Parse(hotelId)
 	if err != nil {
 		return nil, err
@@ -54,18 +54,7 @@ func (s *BookingService) CreateBooking(ctx context.Context, req *pb.BookingCreat
 	if err != nil {
 		return nil, err
 	}
-	if checkIn.After(checkOut) {
-		return nil, ErrBookingCreationValidation
-	}
 
-	userUUID, err := uuid.Parse("43ab4a09-b060-4e74-860b-8ab6f1fd1a03")
-	if err != nil {
-		return nil, ErrBookingCreationValidation
-	}
-	agencyUUID, err := uuid.Parse("43ab4a09-b060-4e74-860b-9ab6f1fd1a03")
-	if err != nil {
-		return nil, ErrBookingCreationValidation
-	}
 	reservationId := uuid.New()
 	totalPrice := 0
 	for _, roomId := range roomUUIDs {
@@ -74,18 +63,79 @@ func (s *BookingService) CreateBooking(ctx context.Context, req *pb.BookingCreat
 			CheckOut:      checkOut,
 			HotelID:       hotelUUID,
 			RoomID:        roomId,
-			UserID:        &userUUID,
-			AgencyID:      &agencyUUID,
+			UserID:        userUUID,
 			ReservationID: reservationId,
 			IsPayed:       false,
 			Status:        uint8(pb.BookingStatus_BOOKING_PENDING),
-		}, hotelUUID)
+		}, hotelUUID, false)
 
 		if err != nil {
 			return nil, err
 		}
 		totalPrice += int(price)
 
+	}
+
+	_, err = s.svc.CreateBookingFactor(ctx, userUUID, hotelUUID, uint(totalPrice), reservationId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.BookingCreateResponse{
+		ReservationId: reservationId.String(),
+		TotalPrice:    int64(totalPrice),
+	}, nil
+}
+
+func (s *BookingService) CreateBooking(ctx context.Context, req *pb.BookingCreateRequest, hotelId string, userUUID domain.UserUUID) (*pb.BookingCreateResponse, error) {
+	hotelUUID, err := uuid.Parse(hotelId)
+	if err != nil {
+		return nil, err
+	}
+
+	// Parse all room IDs
+	roomUUIDs := make([]uuid.UUID, 0, len(req.RoomIds))
+	for _, roomID := range req.RoomIds {
+		roomUUID, err := uuid.Parse(roomID)
+		if err != nil {
+			return nil, ErrBookingCreationValidation
+		}
+		roomUUIDs = append(roomUUIDs, roomUUID)
+	}
+
+	checkIn, err := time.Parse("2006-01-02", req.CheckIn)
+	if err != nil {
+		return nil, err
+	}
+	checkOut, err := time.Parse("2006-01-02", req.CheckOut)
+	if err != nil {
+		return nil, err
+	}
+
+	reservationId := uuid.New()
+	totalPrice := 0
+	for _, roomId := range roomUUIDs {
+		_, price, err := s.svc.CreateBookingByHotelID(ctx, domain.Booking{
+			CheckIn:       checkIn,
+			CheckOut:      checkOut,
+			HotelID:       hotelUUID,
+			RoomID:        roomId,
+			UserID:        userUUID,
+			ReservationID: reservationId,
+			IsPayed:       false,
+			Status:        uint8(pb.BookingStatus_BOOKING_PENDING),
+		}, hotelUUID, true)
+
+		if err != nil {
+			return nil, err
+		}
+		totalPrice += int(price)
+
+	}
+
+	_, err = s.svc.CreateBookingFactor(ctx, userUUID, hotelUUID, uint(totalPrice), reservationId)
+	if err != nil {
+		return nil, err
 	}
 
 	return &pb.BookingCreateResponse{
@@ -112,12 +162,7 @@ func (s *BookingService) GetAllBookingsByRoomID(ctx context.Context, roomID stri
 			CheckIn:       r.CheckIn.Format("2006-01-02"),
 			CheckOut:      r.CheckOut.Format("2006-01-02"),
 			BookingStatus: pb.BookingStatus(r.Status),
-		}
-		if r.UserID != nil {
-			booking.UserId = r.UserID.String()
-		}
-		if r.AgencyID != nil {
-			booking.AgencyId = r.AgencyID.String()
+			UserId:        r.UserID.String(),
 		}
 		bookingList = append(bookingList, booking)
 	}

@@ -6,7 +6,10 @@ import (
 	bookingDomain "gholi-fly-hotel/internal/booking/domain"
 	"gholi-fly-hotel/internal/booking/port"
 	hotelDomain "gholi-fly-hotel/internal/hotel/domain"
+	hotelPort "gholi-fly-hotel/internal/hotel/port"
 	roomDomain "gholi-fly-hotel/internal/room/domain"
+	bankPb "gholi-fly-hotel/pkg/adapters/clients/grpc/pb"
+	bankClientPort "gholi-fly-hotel/pkg/adapters/clients/grpc/port"
 	"strings"
 
 	"github.com/google/uuid"
@@ -21,28 +24,71 @@ var (
 )
 
 type service struct {
-	repo port.Repo
+	repo       port.Repo
+	hotelRepo  hotelPort.Repo
+	bankClient bankClientPort.GRPCBankClient
 }
 
-func NewService(repo port.Repo) port.Service {
+func NewService(repo port.Repo, hotelRepo hotelPort.Repo, bankClient bankClientPort.GRPCBankClient) port.Service {
 	return &service{
-		repo: repo,
+		repo:       repo,
+		hotelRepo:  hotelRepo,
+		bankClient: bankClient,
 	}
 }
 
 // CreateBookingByRoomID creates a new booking by room ID
-func (s *service) CreateBookingByHotelID(ctx context.Context, booking bookingDomain.Booking, hotelID hotelDomain.HotelUUID) (bookingDomain.BookingUUID, roomDomain.RoomPrice, error) {
+func (s *service) CreateBookingByHotelID(ctx context.Context, booking bookingDomain.Booking, hotelID hotelDomain.HotelUUID, isAgency bool) (bookingDomain.BookingUUID, roomDomain.RoomPrice, error) {
 	if err := booking.Validate(); err != nil {
 		return uuid.Nil, 0, ErrBookingCreationValidation
 	}
-	bookingID, price, err := s.repo.CreateByHotelID(ctx, booking, hotelID)
+	bookingID, price, err := s.repo.CreateByHotelID(ctx, booking, hotelID, isAgency)
 	if err != nil {
 		if strings.Contains(err.Error(), ErrBookingCreationDuplicate.Error()) {
 			return bookingDomain.BookingUUID{}, 0, ErrBookingCreationDuplicate
 		}
 		return bookingDomain.BookingUUID{}, 0, ErrBookingCreation
 	}
+
 	return bookingID, price, nil
+}
+
+func (s *service) CreateBookingFactor(ctx context.Context, userId uuid.UUID, hotelID hotelDomain.HotelUUID, totalPrice uint, bookingId bookingDomain.BookingUUID) (string, error) {
+
+	hotel, err := s.hotelRepo.GetByID(ctx, hotelID)
+	if err != nil {
+		return "", err
+	}
+	ownerId := hotel.OwnerID
+
+	walletResponse, err := s.bankClient.GetUserWallets(&bankPb.GetWalletsRequest{
+		OwnerId: ownerId.String(),
+	})
+	if walletResponse == nil || err != nil {
+		return "", err
+	}
+
+	response, err := s.bankClient.CreateFactor(&bankPb.CreateFactorRequest{
+		Factor: &bankPb.Factor{
+			SourceService: "Hotel_Service",
+			TotalAmount:   uint64(totalPrice),
+			CustomerId:    userId.String(),
+			BookingId:     bookingId.String(),
+			ExternalId:    bookingId.String(),
+
+			Distributions: []*bankPb.Distribution{
+				{
+					WalletId: walletResponse.Wallets[0].Id,
+					Amount:   uint64(totalPrice),
+				},
+			},
+		},
+	})
+	if err != nil {
+		return "", err
+	}
+	s.repo.AddBookingFactor(ctx, bookingId, response.Factor.Id)
+	return response.Factor.Id, nil
 }
 
 // GetAllBookingsByRoomID returns all bookings by room ID
