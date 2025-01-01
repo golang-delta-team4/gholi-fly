@@ -27,6 +27,9 @@ func (s *service) GetAllPaths(ctx context.Context) ([]domain.Path, error) {
 }
 
 func (s *service) CreatePath(ctx context.Context, path *domain.Path) (*domain.Path, error) {
+	if path.ID == uuid.Nil {
+		path.ID = uuid.New()
+	}
 	return s.repo.Create(ctx, path)
 }
 
