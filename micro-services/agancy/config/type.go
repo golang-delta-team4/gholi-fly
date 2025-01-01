@@ -7,6 +7,7 @@ type Config struct {
 	HotelService     HotelService     `json:"hotelService"`
 	TransportService TransportService `json:"transportService"`
 	Logger           LoggerConfig     `json:"logger"`
+	Bank             BankGRPCConfig   `json:"bank"`
 }
 
 type DBConfig struct {
@@ -48,4 +49,8 @@ type LoggerConfig struct {
 	MaxAge      int    `json:"maxAge"`
 	Compress    bool   `json:"compress"`
 	Level       string `json:"level"`
+}
+type BankGRPCConfig struct {
+	Host string `json:"host"`
+	Port int    `json:"port"`
 }
