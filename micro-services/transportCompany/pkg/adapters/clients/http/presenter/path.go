@@ -8,4 +8,6 @@ type GetPathByIDResponse struct {
 	DistanceKM            float64   `json:"distance_km"`
 	RouteCode             string    `json:"route_code"`
 	VehicleType           string    `json:"vehicle_type"`
+	SourceTerminal        *Terminal `json:"source_terminal"`
+	DestinationTerminal   *Terminal `json:"destination_terminal"`
 }

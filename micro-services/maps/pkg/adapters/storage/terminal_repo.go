@@ -2,10 +2,11 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"gholi-fly-maps/internal/terminals/domain"
+	"gholi-fly-maps/internal/terminals/port"
 	"gholi-fly-maps/pkg/adapters/storage/mapper"
 	"gholi-fly-maps/pkg/adapters/storage/types"
-	"gholi-fly-maps/internal/terminals/port"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -35,10 +36,14 @@ func (r *TerminalRepo) GetAll(ctx context.Context) ([]domain.Terminal, error) {
 	return domainTerminals, nil
 }
 
-// Create adds a new terminal to the database.
 func (r *TerminalRepo) Create(ctx context.Context, terminal *domain.Terminal) error {
 	dbTerminal := mapper.DomainToTerminal(terminal)
-	return r.db.Create(dbTerminal).Error
+
+	if dbTerminal.Location == "" {
+		return fmt.Errorf("location is empty in repository")
+	}
+
+	return r.db.WithContext(ctx).Create(dbTerminal).Error
 }
 
 // GetByID retrieves a terminal by its ID.
@@ -63,33 +68,31 @@ func (r *TerminalRepo) Delete(ctx context.Context, id uuid.UUID) error {
 }
 
 func (r *TerminalRepo) Search(ctx context.Context, filter port.TerminalFilter) ([]domain.Terminal, error) {
-	var dbTerminals []types.Terminal
-	query := r.db.Model(&types.Terminal{})
+    var dbTerminals []types.Terminal
+    query := r.db.Model(&types.Terminal{})
 
-	// Apply filters dynamically
-	if filter.ID != "" {
-		query = query.Where("id = ?", filter.ID)
-	}
-	if filter.Name != "" {
-		query = query.Where("name ILIKE ?", "%"+filter.Name+"%")
-	}
-	if filter.City != "" {
-		query = query.Where("location ILIKE ?", "%"+filter.City+"%")
-	}
-	if filter.Type != "" {
-		query = query.Where("type = ?", filter.Type)
-	}
+    // Apply filters dynamically
+    if filter.ID != "" {
+        query = query.Where("id = ?", filter.ID)
+    }
+    if filter.Name != "" {
+        query = query.Where("name ILIKE ?", "%"+filter.Name+"%")
+    }
+    if filter.City != "" {
+        query = query.Where("city ILIKE ?", "%"+filter.City+"%")
+    }
+    if filter.Type != "" {
+        query = query.Where("type = ?", filter.Type)
+    }
 
-	// Execute the query
-	if err := query.Find(&dbTerminals).Error; err != nil {
-		return nil, err
-	}
+    if err := query.Find(&dbTerminals).Error; err != nil {
+        return nil, err
+    }
 
-	// Map database models to domain models
-	var domainTerminals []domain.Terminal
-	for _, t := range dbTerminals {
-		domainTerminals = append(domainTerminals, *mapper.TerminalToDomain(&t))
-	}
+    var domainTerminals []domain.Terminal
+    for _, t := range dbTerminals {
+        domainTerminals = append(domainTerminals, *mapper.TerminalToDomain(&t))
+    }
 
-	return domainTerminals, nil
+    return domainTerminals, nil
 }

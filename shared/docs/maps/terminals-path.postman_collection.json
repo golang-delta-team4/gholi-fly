@@ -1,0 +1,134 @@
+{
+	"info": {
+		"_postman_id": "5f5cb14a-fb9b-44a8-a85c-09fc4a93fa28",
+		"name": "terminals-path",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "24632383"
+	},
+	"item": [
+		{
+			"name": "terminals-endpoints",
+			"item": [
+				{
+					"name": "create-terminal-1",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"firoozi\",\n    \"locations\": \"Amol\",\n    \"type\": \"bus\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:8082/api/v1/terminals/new"
+					},
+					"response": []
+				},
+				{
+					"name": "get-all-terminals",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8082/api/v1/terminals/search?city=NewYork",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"api",
+								"v1",
+								"terminals",
+								"search"
+							],
+							"query": [
+								{
+									"key": "city",
+									"value": "NewYork"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-terminal-2",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"tehran-shargh\",\n    \"locations\": \"tehran\",\n    \"type\": \"bus\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:8082/api/v1/terminals/new"
+					},
+					"response": []
+				},
+				{
+					"name": "get-terminals-by-id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://127.0.0.1:8082/api/v1/terminals/22113cf6-d865-4360-8c37-607b710387e0"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "paths",
+			"item": [
+				{
+					"name": "new-path",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"source_terminal_id\": \"b54b92b2-6a20-4337-99a7-5ec5cf44be82\",\n    \"destination_terminal_id\":\"02289410-41aa-4298-9151-25c73c10eb91\",\n    \"distance_km\": 100,\n    \"route_code\": \"shargh-to-gharb\",\n    \"vehicle_type\": \"bus\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:8082/api/v1/paths/new"
+					},
+					"response": []
+				},
+				{
+					"name": "get-all-path",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

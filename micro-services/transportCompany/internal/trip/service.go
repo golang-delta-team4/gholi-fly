@@ -8,11 +8,13 @@ import (
 	"math"
 	"time"
 
+	userPB "github.com/golang-delta-team4/gholi-fly-shared/pkg/protobuf/user"
 	companyPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company/port"
 	technicalTeamPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/technicalTeam/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/domain"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/port"
 	tripRepo "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/port"
+	grpcPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc/port"
 	httpPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/http/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/http/presenter"
 	"github.com/google/uuid"
@@ -24,6 +26,7 @@ var (
 	ErrCanNotUpdate           = errors.New("can not update")
 	ErrTripCreationValidation = errors.New("validation failed")
 	ErrTripNotFound           = errors.New("error trip not found")
+	ErrConnectingUserService  = errors.New("error on connecting to user service")
 )
 
 type service struct {
@@ -33,6 +36,7 @@ type service struct {
 	mapClient         httpPort.HttpPathClient
 	vehicleClient     httpPort.HttpVehicleClient
 	companyService    companyPort.Service
+	userClient        grpcPort.GRPCUserClient
 }
 
 func NewService(repo port.Repo,
@@ -40,7 +44,8 @@ func NewService(repo port.Repo,
 	tripRepo tripRepo.Repo,
 	mapClient httpPort.HttpPathClient,
 	vehicleClient httpPort.HttpVehicleClient,
-	companyService companyPort.Service) port.Service {
+	companyService companyPort.Service,
+	userClient grpcPort.GRPCUserClient) port.Service {
 	return &service{
 		repo:              repo,
 		technicalTeamRepo: technicalTeamRepo,
@@ -48,6 +53,7 @@ func NewService(repo port.Repo,
 		mapClient:         mapClient,
 		vehicleClient:     vehicleClient,
 		companyService:    companyService,
+		userClient:        userClient,
 	}
 }
 
@@ -64,6 +70,8 @@ func (s *service) CreateTrip(ctx context.Context, trip domain.Trip) (uuid.UUID, 
 		log.Println("error on getting path detail: ", err.Error())
 		return uuid.Nil, err
 	}
+	trip.FromTerminalName = pathDetail.SourceTerminal.Location
+	trip.ToTerminalName = pathDetail.DestinationTerminal.Location
 	companyId, err := s.repo.CreateTrip(ctx, trip)
 	if err != nil {
 		log.Println("error on creating company: ", err.Error())
@@ -223,7 +231,11 @@ func (s *service) DeleteTrip(ctx context.Context, id uuid.UUID) error {
 }
 
 func (s *service) GetTrips(ctx context.Context, pageSize int, pageNumber int) ([]domain.Trip, error) {
-	trips, err := s.repo.GetTrips(ctx, pageSize, pageNumber)
+	resp, err := s.userClient.GetBlockedUser(&userPB.Empty{})
+	if err != nil {
+		return nil, ErrConnectingUserService
+	}
+	trips, err := s.repo.GetTrips(ctx, pageSize, pageNumber, resp.Uuids)
 	if err != nil {
 		log.Println("error on getting trips: ", err.Error())
 		return nil, err
