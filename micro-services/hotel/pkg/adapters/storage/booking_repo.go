@@ -35,7 +35,7 @@ func (r *bookingRepo) CreateByHotelID(ctx context.Context, bookingDomain domain.
 
 	var existingBooking types.Booking
 	err = r.db.Table("bookings").WithContext(ctx).
-		Where("room_id = ? AND check_in < ? AND check_out > ?", booking.RoomID, booking.CheckOut, booking.CheckIn).
+		Where("room_id = ? AND check_in < ? AND check_out > ? AND status != 3", booking.RoomID, booking.CheckOut, booking.CheckIn).
 		First(&existingBooking).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return domain.BookingUUID{}, 0, errors.New("booking already exists in these days")
