@@ -9,6 +9,10 @@ import (
 
 type ReservationID uuid.UUID
 
+func (id ReservationID) String() string {
+	return uuid.UUID(id).String()
+}
+
 type Reservation struct {
 	ID         ReservationID
 	CustomerID uuid.UUID
