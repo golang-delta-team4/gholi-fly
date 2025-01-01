@@ -70,8 +70,8 @@ func (s *service) CreateTrip(ctx context.Context, trip domain.Trip) (uuid.UUID, 
 		log.Println("error on getting path detail: ", err.Error())
 		return uuid.Nil, err
 	}
-	trip.FromTerminalName = pathDetail.SourceTerminal.Name
-	trip.ToTerminalName = pathDetail.DestinationTerminal.Name
+	trip.FromTerminalName = pathDetail.SourceTerminal.Location
+	trip.ToTerminalName = pathDetail.DestinationTerminal.Location
 	companyId, err := s.repo.CreateTrip(ctx, trip)
 	if err != nil {
 		log.Println("error on creating company: ", err.Error())
