@@ -82,6 +82,18 @@ func (t *Trip) Validate() error {
 	if t.StartDate.Before(time.Now()) {
 		return errors.New("start date can't be before now")
 	}
+	if t.EndDate.Before(*t.StartDate) {
+		return errors.New("end date can't be before start date")
+	}
+	if t.VehicleYearOfManufacture == 0 {
+		return errors.New("vehicle year of manufacture can't be zero")
+	}
+	if t.AgencyPrice <= 0 {
+		return errors.New("agency price can't be zero or negative")
+	}
+	if t.UserPrice <= 0 {
+		return errors.New("user price can't be zero or negative")
+	}
 	return nil
 }
 

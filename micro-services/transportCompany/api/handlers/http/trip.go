@@ -2,11 +2,14 @@ package http
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/api/pb"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/api/service"
+	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company"
+	tripService "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip"
 	clientPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/http"
 	mapHttpPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/http"
@@ -27,13 +30,16 @@ func CreateTrip(svcGetter ServiceGetter[*service.TripService], userGRPCService c
 		response, err := svc.CreateTrip(c.UserContext(), &req)
 
 		if err != nil {
-			if errors.Is(err, service.ErrCompanyCreationValidation) {
+			if errors.Is(err, service.ErrTripCreationValidation) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())
 			}
 			if errors.Is(err, mapHttpPort.ErrVehicleNotFound) {
 				return fiber.NewError(fiber.StatusNotFound, err.Error())
 			}
 			if errors.Is(err, http.ErrPathNotFound) {
+				return fiber.NewError(fiber.StatusNotFound, err.Error())
+			}
+			if errors.Is(err, company.ErrCompanyNotFound) {
 				return fiber.NewError(fiber.StatusNotFound, err.Error())
 			}
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
@@ -126,7 +132,17 @@ func UpdateTrip(svcGetter ServiceGetter[*service.TripService], userGRPCService c
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
-		err := authorization(userGRPCService, c.Path(), c.Method(), req.CompanyId, c.Locals("UserUUID").(uuid.UUID))
+		trip, err := svc.GetTripById(c.UserContext(), tripId)
+		if err != nil {
+			if errors.Is(err, service.ErrTripCreationValidation) {
+				return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("invalid uuid %v", err.Error()))
+			}
+			if errors.Is(err, tripService.ErrTripNotFound) {
+				return fiber.NewError(fiber.StatusNotFound, err.Error())
+			}
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		err = authorization(userGRPCService, c.Path(), c.Method(), trip.CompanyId, c.Locals("UserUUID").(uuid.UUID))
 		if err != nil {
 			return fiber.NewError(fiber.StatusForbidden, err.Error())
 		}
@@ -140,15 +156,29 @@ func UpdateTrip(svcGetter ServiceGetter[*service.TripService], userGRPCService c
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 
-		return nil
+		return c.JSON("updated successfully")
 	}
 }
 
-func DeleteTrip(svcGetter ServiceGetter[*service.TripService]) fiber.Handler { //add authorization
+func DeleteTrip(svcGetter ServiceGetter[*service.TripService],userGRPCService clientPort.GRPCUserClient) fiber.Handler { //add authorization
 	return func(c *fiber.Ctx) error {
 		svc := svcGetter(c.UserContext())
 		tripId := c.Params("id")
-		err := svc.DeleteTrip(c.UserContext(), tripId)
+		trip, err := svc.GetTripById(c.UserContext(), tripId)
+		if err != nil {
+			if errors.Is(err, service.ErrTripCreationValidation) {
+				return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("invalid uuid %v", err.Error()))
+			}
+			if errors.Is(err, tripService.ErrTripNotFound) {
+				return fiber.NewError(fiber.StatusNotFound, err.Error())
+			}
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		err = authorization(userGRPCService, c.Path(), c.Method(), trip.CompanyId, c.Locals("UserUUID").(uuid.UUID))
+		if err != nil {
+			return fiber.NewError(fiber.StatusForbidden, err.Error())
+		}
+		err = svc.DeleteTrip(c.UserContext(), tripId)
 
 		if err != nil {
 			if errors.Is(err, service.ErrCompanyCreationValidation) {

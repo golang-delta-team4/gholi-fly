@@ -242,19 +242,10 @@ func (s *TripService) GetAgencyTrips(ctx context.Context, pageSize int, pageNumb
 }
 
 func (s *TripService) UpdateTrip(ctx context.Context, tripId string, req *pb.UpdateTripRequest) error {
+	
 	tripUId, err := uuid.Parse(tripId)
 	if err != nil {
 		return fmt.Errorf("%w %w", ErrCompanyCreationValidation, err)
-	}
-
-	companyId, err := uuid.Parse(req.CompanyId)
-	if err != nil {
-		return fmt.Errorf("%w %w", ErrTripCreationValidation, err)
-	}
-
-	pathId, err := uuid.Parse(req.PathId)
-	if err != nil {
-		return fmt.Errorf("%w %w", ErrTripCreationValidation, err)
 	}
 
 	userReleaseDate, err := time.Parse("2006-01-02 15:04:05.999999-07:00", req.UserReleaseDate)
@@ -310,13 +301,11 @@ func (s *TripService) UpdateTrip(ctx context.Context, tripId string, req *pb.Upd
 
 	err = s.svc.UpdateTrip(ctx, domain.Trip{
 		Id:               tripUId,
-		CompanyID:        companyId,
 		TripType:         req.TripType,
 		UserReleaseDate:  userReleaseDate,
 		TourReleaseDate:  tourReleaseDate,
 		UserPrice:        float64(req.UserPrice),
 		AgencyPrice:      float64(req.AgencyPrice),
-		PathID:           pathId,
 		MinPassengers:    uint(req.MinPassengers),
 		TechnicalTeamID:  technicalTeamId,
 		VehicleRequestID: vehicleRequestID,
