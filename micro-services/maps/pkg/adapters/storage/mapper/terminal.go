@@ -28,4 +28,5 @@ func DomainToTerminal(d *domain.Terminal) *types.Terminal {
 		UpdatedAt: d.UpdatedAt,
 	}
 }
+
 // batch

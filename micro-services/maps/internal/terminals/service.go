@@ -71,12 +71,12 @@ func (s *service) DeleteTerminal(ctx context.Context, id uuid.UUID) error {
 
 // filter
 func (s *service) SearchTerminals(ctx context.Context, filter port.TerminalFilter) ([]domain.Terminal, error) {
-	// Validation
-	if filter.ID == "" && filter.Name == "" && filter.City == "" && filter.Type == "" {
-		return nil, fmt.Errorf("at least one filter parameter must be provided")
-	}
+    // Validation
+    if filter.ID == "" && filter.Name == "" && filter.City == "" && filter.Type == "" {
+        return nil, fmt.Errorf("at least one filter parameter must be provided")
+    }
 
-	// Delegate to the repository
-	return s.repo.Search(ctx, filter)
+    // Delegate to the repository
+    return s.repo.Search(ctx, filter)
 }
 
