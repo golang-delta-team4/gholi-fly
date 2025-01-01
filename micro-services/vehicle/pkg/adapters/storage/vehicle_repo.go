@@ -54,6 +54,7 @@ func (r *VehicleRepo) ProcessTripRequest(ctx context.Context) (*domain.TripReque
 
 func (r *VehicleRepo) GetMatchedVehicle(ctx context.Context, vehicleMatchRequest *domain.MatchMakerRequest) (types.Vehicle, error) {
 	var vehicle types.Vehicle
+	// err := r.db.Model(&types.Vehicle{}).First(&vehicle).Error
 	subQuery := r.db.Model(&types.VehicleReserve{}).
 		Table("vehicle_reserves as vr2").
 		Select("count(*)").

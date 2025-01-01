@@ -37,9 +37,11 @@ func (r *PathRepo) GetAll(ctx context.Context) ([]domain.Path, error) {
 }
 
 // Create adds a new path to the database.
-func (r *PathRepo) Create(ctx context.Context, path *domain.Path) error {
+func (r *PathRepo) Create(ctx context.Context, path *domain.Path) (*domain.Path, error) {
 	dbPath := mapper.DomainToPath(path)
-	return r.db.Create(dbPath).Error
+	err := r.db.Create(&dbPath).Error
+	newPath := mapper.PathToDomain(dbPath)
+	return newPath, err
 }
 
 // GetByID retrieves a path by its ID.

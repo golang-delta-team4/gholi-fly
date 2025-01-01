@@ -8,11 +8,11 @@ import (
 )
 
 type TourEvent struct {
-	ID                  uuid.UUID          `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	ReservationID       uuid.UUID          `gorm:"type:uuid;index"` // References a Reservation
-	EventType           domain.EventType   `gorm:"type:varchar(50);index"`
-	Payload             domain.JSONB       `gorm:"type:jsonb"` // JSON payload for event data
-	CompensationPayload domain.JSONB       `gorm:"type:jsonb"` // JSON payload for compensation data
+	ID                  uuid.UUID        `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	ReservationID       uuid.UUID        `gorm:"type:uuid;index"` // References a Reservation
+	EventType           domain.EventType `gorm:"type:varchar(50);index"`
+	Payload             string
+	CompensationPayload string
 	Status              domain.EventStatus `gorm:"type:varchar(50);index"`
 	RetryCount          int                `gorm:"default:0"`
 	CreatedAt           time.Time

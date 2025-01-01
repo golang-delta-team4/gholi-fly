@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -18,8 +19,12 @@ func (j JSONB) Value() (driver.Value, error) {
 }
 
 func (j *JSONB) Scan(value interface{}) error {
-	if err := json.Unmarshal(value.([]byte), &j); err != nil {
-		return err
+	bytes, ok := value.([]byte)
+	if !ok {
+		return fmt.Errorf("expected []byte but got %T", value)
+	}
+	if err := json.Unmarshal(bytes, j); err != nil {
+		return fmt.Errorf("failed to unmarshal JSONB: %w", err)
 	}
 	return nil
 }
@@ -50,8 +55,8 @@ type TourEvent struct {
 	ID                  uuid.UUID   `json:"id"`
 	ReservationID       uuid.UUID   `json:"reservation_id"`
 	EventType           EventType   `json:"event_type"`
-	Payload             JSONB       `json:"payload"`
-	CompensationPayload JSONB       `json:"compensation_payload"`
+	Payload             string      `json:"payload"`
+	CompensationPayload string      `json:"compensation_payload"`
 	Status              EventStatus `json:"status"`
 	RetryCount          int         `json:"retry_count"`
 	CreatedAt           time.Time   `json:"created_at"`

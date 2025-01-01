@@ -1,10 +1,13 @@
 package tour_event
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"gholi-fly-agancy/internal/tour_event/domain"
@@ -162,8 +165,25 @@ func (s *service) RegisterSagaRunner(scheduler gocron.Scheduler) {
 func (s *service) compensate(event domain.TourEvent) error {
 	switch event.EventType {
 	case domain.EventTypeHotelReservation:
-		// Logic to compensate hotel reservation
-		log.Printf("Compensating hotel reservation for event %s\n", event.ID)
+		fmt.Println(event.ReservationID)
+		type JSONN struct {
+			TripReservationId string `json:"tripReservationId"`
+		}
+
+		transportURL := fmt.Sprintf("http://%s:%d/api/v1/hotel/booking/cancel/%s", "localhost", 8081, event.CompensationPayload)
+
+		var transportResponse struct {
+			TicketId   string `json:"ticketId"`
+			TotalPrice int    `json:"totalPrice"`
+		}
+		var transportRequest struct {
+			TicketId   string `json:"ticketId"`
+			TotalPrice int    `json:"totalPrice"`
+		}
+		err := makePostRequest(context.Background(), transportURL, transportRequest, &transportResponse, "PATCH")
+		if err != nil {
+			return fmt.Errorf("failed to buy transport ticket: %w", err)
+		}
 	case domain.EventTypeTripReservation:
 		// Logic to compensate trip reservation
 		log.Printf("Compensating trip reservation for event %s\n", event.ID)
@@ -183,4 +203,29 @@ func filterSuccessfulEvents(events []domain.TourEvent) []domain.TourEvent {
 		}
 	}
 	return successfulEvents
+}
+func makePostRequest(ctx context.Context, url string, requestBody interface{}, responseBody interface{}, method string) error {
+	reqBytes, err := json.Marshal(requestBody)
+	if err != nil {
+		return fmt.Errorf("failed to marshal request body: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, method, url, bytes.NewBuffer(reqBytes))
+	if err != nil {
+		return fmt.Errorf("failed to create HTTP request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to execute HTTP request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("HTTP request failed with status: %d", resp.StatusCode)
+	}
+
+	return json.NewDecoder(resp.Body).Decode(responseBody)
 }
