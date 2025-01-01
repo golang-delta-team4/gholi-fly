@@ -33,6 +33,9 @@ func Run(appContainer app.App, cfg config.Config) error {
 	// Register Tour API
 	registerTourAPI(appContainer, cfg, api)
 
+	// Register Reservation API
+	registerReservationAPI(appContainer, cfg, api)
+
 	// Start the server
 	return router.Listen(fmt.Sprintf(":%d", cfg.Server.HttpPort))
 }
@@ -69,4 +72,10 @@ func registerTourAPI(appContainer app.App, cfg config.Config, router fiber.Route
 
 	// List tours by agency (non-transactional)
 	router.Get("/agency/:agencyID/tours", ListToursByAgency(tourServiceGetter))
+}
+func registerReservationAPI(appContainer app.App, cfg config.Config, router fiber.Router) {
+	reservationServiceGetter := reservationServiceGetter(appContainer)
+
+	// Create reservation (transactional) with agency ID
+	router.Post("/reservation/:agencyID", setTransaction(appContainer.DB()), CreateReservation(reservationServiceGetter, cfg))
 }

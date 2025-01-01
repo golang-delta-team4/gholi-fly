@@ -94,6 +94,9 @@ func GetTrips(svcGetter ServiceGetter[*service.TripService]) fiber.Handler {
 		response, err := svc.GetTrips(c.UserContext(), pageSize, pageNumber)
 
 		if err != nil {
+			if errors.Is(err, tripService.ErrConnectingUserService) {
+				return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+			}
 			if errors.Is(err, service.ErrCompanyCreationValidation) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())
 			}

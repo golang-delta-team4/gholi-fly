@@ -53,9 +53,13 @@ func (r *tripRepo) UpdateTrip(ctx context.Context, id uuid.UUID, updates map[str
 	return nil
 }
 
-func (r *tripRepo) GetTrips(ctx context.Context, pageSize int, page int) ([]domain.Trip, error) {
+func (r *tripRepo) GetTrips(ctx context.Context, pageSize int, page int, blockedUser []string) ([]domain.Trip, error) {
 	var trips []types.Trip
-	err := r.db.Table("trips").WithContext(ctx).Limit(pageSize).Offset(page - 1*pageSize).Find(&trips).Error
+	query := r.db.Table("trips").Joins("left join companies c on c.id = trips.company_id").WithContext(ctx).Limit(pageSize).Offset(page - 1*pageSize)
+	if len(blockedUser) > 0 {
+		query = query.Where("c.owner_id not in ?", blockedUser)
+	}
+	err := query.Find(&trips).Error
 	if err != nil {
 		return nil, err
 	}

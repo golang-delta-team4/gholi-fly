@@ -18,8 +18,8 @@ type TerminalRepository interface {
 }
 
 type TerminalFilter struct {
-	ID   string
-	Name string
-	City string
-	Type string
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	City string `json:"city"`
+	Type string `json:"type"`
 }
