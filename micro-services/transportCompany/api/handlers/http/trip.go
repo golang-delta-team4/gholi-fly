@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/api/pb"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/api/service"
+	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company"
 	clientPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/http"
 	mapHttpPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/http"
@@ -27,13 +28,16 @@ func CreateTrip(svcGetter ServiceGetter[*service.TripService], userGRPCService c
 		response, err := svc.CreateTrip(c.UserContext(), &req)
 
 		if err != nil {
-			if errors.Is(err, service.ErrCompanyCreationValidation) {
+			if errors.Is(err, service.ErrTripCreationValidation) {
 				return fiber.NewError(fiber.StatusBadRequest, err.Error())
 			}
 			if errors.Is(err, mapHttpPort.ErrVehicleNotFound) {
 				return fiber.NewError(fiber.StatusNotFound, err.Error())
 			}
 			if errors.Is(err, http.ErrPathNotFound) {
+				return fiber.NewError(fiber.StatusNotFound, err.Error())
+			}
+			if errors.Is(err, company.ErrCompanyNotFound) {
 				return fiber.NewError(fiber.StatusNotFound, err.Error())
 			}
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
