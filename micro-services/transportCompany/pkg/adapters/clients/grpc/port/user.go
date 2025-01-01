@@ -6,4 +6,5 @@ import (
 
 type GRPCUserClient interface {
 	CheckUserAuthorization(rq *userPB.UserAuthorizationRequest) (*userPB.UserAuthorizationResponse, error)
+	GetBlockedUser(req *userPB.Empty) (*userPB.GetBlockedUsersResponse, error)
 }
