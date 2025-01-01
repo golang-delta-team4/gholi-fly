@@ -160,11 +160,25 @@ func UpdateTrip(svcGetter ServiceGetter[*service.TripService], userGRPCService c
 	}
 }
 
-func DeleteTrip(svcGetter ServiceGetter[*service.TripService]) fiber.Handler { //add authorization
+func DeleteTrip(svcGetter ServiceGetter[*service.TripService],userGRPCService clientPort.GRPCUserClient) fiber.Handler { //add authorization
 	return func(c *fiber.Ctx) error {
 		svc := svcGetter(c.UserContext())
 		tripId := c.Params("id")
-		err := svc.DeleteTrip(c.UserContext(), tripId)
+		trip, err := svc.GetTripById(c.UserContext(), tripId)
+		if err != nil {
+			if errors.Is(err, service.ErrTripCreationValidation) {
+				return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("invalid uuid %v", err.Error()))
+			}
+			if errors.Is(err, tripService.ErrTripNotFound) {
+				return fiber.NewError(fiber.StatusNotFound, err.Error())
+			}
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		err = authorization(userGRPCService, c.Path(), c.Method(), trip.CompanyId, c.Locals("UserUUID").(uuid.UUID))
+		if err != nil {
+			return fiber.NewError(fiber.StatusForbidden, err.Error())
+		}
+		err = svc.DeleteTrip(c.UserContext(), tripId)
 
 		if err != nil {
 			if errors.Is(err, service.ErrCompanyCreationValidation) {
