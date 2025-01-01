@@ -26,7 +26,7 @@ func (s *service) GetAllPaths(ctx context.Context) ([]domain.Path, error) {
 	return s.repo.GetAll(ctx)
 }
 
-func (s *service) CreatePath(ctx context.Context, path *domain.Path) error {
+func (s *service) CreatePath(ctx context.Context, path *domain.Path) (*domain.Path, error) {
 	return s.repo.Create(ctx, path)
 }
 
