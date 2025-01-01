@@ -1,0 +1,770 @@
+{
+	"info": {
+		"_postman_id": "72991e9b-724a-4127-8f81-0cf4b4ce162d",
+		"name": "gholi-fly",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40124082"
+	},
+	"item": [
+		{
+			"name": "http://127.0.0.1:8084/api/v1/company",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"firt-transport\",\r\n    \"description\": \"first transport company in gholi fly\",\r\n    \"ownerId\": \"17f72ebf-a356-49a1-b2d1-537320035939\",\r\n    \"address\": \"iran\",\r\n    \"phone\": \"02199635479\",\r\n    \"email\": \"testmail@mail.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/company",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"company"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/company/get-by-ownerid/17f72ebf-a356-49a1-b2d1-537320035939",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/get-company-by-ownerid/:id",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"get-company-by-ownerid",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "17f72ebf-a356-49a1-b2d1-537320035939"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/company/:id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"address\": \"iran updated\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/company/:id",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"company",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "5044fe29-8432-4c2c-bc2b-15bfd96e638f"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/company/:id",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"address\": \"iran updated\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/company/:id",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"company",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "5044fe29-8432-4c2c-bc2b-15bfd96e638f"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/transport-company/trip",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"companyId\": \"01e03137-9655-4539-af27-7631308da878\",\r\n  \"tripType\": \"fly-trip\",\r\n  \"userReleaseDate\": \"2024-12-21 22:35:44.308338+03:30\",\r\n  \"tourReleaseDate\": \"2024-12-21 22:35:44.308338+03:30\",\r\n  \"userPrice\": 1000,\r\n  \"agencyPrice\": 800,\r\n  \"pathId\": \"987e6543-e21b-34d3-b987-426614174111\",\r\n  \"minPassengers\": 5,\r\n  \"soldTickets\": 50,\r\n  \"maxTickets\": 100,\r\n  \"startDate\": \"2024-12-29 22:35:44.308338+03:30\",\r\n  \"endDate\": \"2024-12-21 22:35:44.308338+03:30\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/trip",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"trip"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/transport-company/trip:id",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "12",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/trip/:id",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"trip",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "a648da57-68d9-48e3-9e84-55f88fc7dedb"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/transport-company/trip/:id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/agency-trip/:id",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"agency-trip",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "a648da57-68d9-48e3-9e84-55f88fc7dedb"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/transport-company/trip/?page-size=10&page-number=1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/trip/?page-size=10&page-number=1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"trip",
+						""
+					],
+					"query": [
+						{
+							"key": "page-size",
+							"value": "10"
+						},
+						{
+							"key": "page-number",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/transport-company/agency-trip/?page-size=10&page-number=1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/agency-trip/?page-size=10&page-number=1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"agency-trip",
+						""
+					],
+					"query": [
+						{
+							"key": "page-size",
+							"value": "10"
+						},
+						{
+							"key": "page-number",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/transport-company/trip/:id",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"companyId\": \"5044fe29-8432-4c2c-bc2b-15bfd96e638f\",\r\n  \"userReleaseDate\": \"2024-12-21 22:35:44.308338+03:30\",\r\n  \"tourReleaseDate\": \"2024-12-20 22:35:44.308338+03:30\",\r\n  \"userPrice\": 1000,\r\n  \"agencyPrice\": 800,\r\n  \"pathId\": \"987e6543-e21b-34d3-b987-426614174111\",\r\n  \"minPassengers\": 5,\r\n  \"soldTickets\": 50,\r\n  \"maxTickets\": 100,\r\n  \"endDate\": \"2024-12-21 22:35:44.308338+03:30\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/trip/:id",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"trip",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "a648da57-68d9-48e3-9e84-55f88fc7dedb"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/transport-company/trip/:id",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/trip/:id",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"trip",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "a648da57-68d9-48e3-9e84-55f88fc7dedb"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/transport-company/ticket/buy",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU2NzAyNjUsIlVzZXJVVUlEIjoiZTIxYmQ3YjQtODI2YS00ZTVlLTk0MmQtM2IwYTNhMDNmMzg0In0.1gjeah6D7DS_BF0eThcnYHvuzybyccOLxznxXOLbT_uJOqQolYfgb-MD5MgtNprpDYAK-FvUybfdWGlzV1k6Fg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tripId\":\"51e2260d-01d5-4865-84b5-74957b5b6ba7\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/ticket/buy",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"ticket",
+						"buy"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/transport-company/ticket/agency-buy",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tripId\": \"51e2260d-01d5-4865-84b5-74957b5b6ba7\",\r\n    \"agencyId\": \"5d010dad-3a1d-475f-867a-db1f9481e5f9\",\r\n    \"ownerOfAgencyId\":\"e21bd7b4-826a-4e5e-942d-3b0a3a03f384\",\r\n    \"ticketCount\": 3\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/ticket/agency-buy",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"ticket",
+						"agency-buy"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/transport-company/technical-team",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU1ODc0MDIsIlVzZXJVVUlEIjoiZTIxYmQ3YjQtODI2YS00ZTVlLTk0MmQtM2IwYTNhMDNmMzg0In0.qYo71QSrQ4sGlp_22y3NbDrA_GBaAgNtKAd_9zIedQOg9j9bCnJUPhtFkfbE4lvmHPY6lbi2BGrT-Z8Hbtnt_g",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"first-team\",\r\n    \"description\":\"description\",\r\n    \"companyId\": \"17e60c66-a59b-4b8d-8f9d-1dcd5a53248f\",\r\n    \"tripType\": \"air-trip\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/technical-team",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"technical-team"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/transport-company/technical-team-member",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU1ODg0ODIsIlVzZXJVVUlEIjoiZTIxYmQ3YjQtODI2YS00ZTVlLTk0MmQtM2IwYTNhMDNmMzg0In0.yzwJcjHp3XJCRpE7RJeD9yVrjt0NP0bm5NnGdqGej5C2v8aOO_MSQi6mOAcQn-BxkGuMUNd0YrN-fMmrT6V1bg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\":\"e21bd7b4-826a-4e5e-942d-3b0a3a03f384\",\r\n    \"position\":\"leader\",\r\n    \"technicalTeamId\":\"3bd09fdc-ab65-4a56-877a-01d50f92e2bc\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/technical-team-member",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"technical-team-member"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/transport-company/technical-team/:id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/technical-team/:id",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"technical-team",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "8f9af4a7-d5f9-4170-9f35-489548b815b4"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/transport-company/technical-team/?page-size=10&page-number=1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/technical-team/?page-size=10&page-number=1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"technical-team",
+						""
+					],
+					"query": [
+						{
+							"key": "page-size",
+							"value": "10"
+						},
+						{
+							"key": "page-number",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/transport-company/set-technical-team/",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU1ODc0MDIsIlVzZXJVVUlEIjoiZTIxYmQ3YjQtODI2YS00ZTVlLTk0MmQtM2IwYTNhMDNmMzg0In0.qYo71QSrQ4sGlp_22y3NbDrA_GBaAgNtKAd_9zIedQOg9j9bCnJUPhtFkfbE4lvmHPY6lbi2BGrT-Z8Hbtnt_g",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"technicalTeamId\":\"3bd09fdc-ab65-4a56-877a-01d50f92e2bc\",\r\n    \"tripId\":\"51e2260d-01d5-4865-84b5-74957b5b6ba7\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/set-technical-team/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"set-technical-team",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/transport-company/agency-ticket/cancel/:id",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/agency-ticket/cancel/:id",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"agency-ticket",
+						"cancel",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "cfbd3aeb-fd06-4ec2-810e-22d423b5a3c6"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8084/api/v1/transport-company/confirm-trip/:id",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU1ODg0ODIsIlVzZXJVVUlEIjoiZTIxYmQ3YjQtODI2YS00ZTVlLTk0MmQtM2IwYTNhMDNmMzg0In0.yzwJcjHp3XJCRpE7RJeD9yVrjt0NP0bm5NnGdqGej5C2v8aOO_MSQi6mOAcQn-BxkGuMUNd0YrN-fMmrT6V1bg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8084/api/v1/transport-company/confirm-trip/:id",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"v1",
+						"transport-company",
+						"confirm-trip",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "51e2260d-01d5-4865-84b5-74957b5b6ba7"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

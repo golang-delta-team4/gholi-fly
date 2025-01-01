@@ -20,7 +20,6 @@ type Service interface {
 	UpdateBookingStatus(ctx context.Context, bookingID bookingDomain.BookingUUID, status uint8) (*bookingDomain.Booking, error)
 	DeleteBooking(ctx context.Context, bookingID bookingDomain.BookingUUID) error
 	ApproveUserBooking(ctx context.Context, factorID uuid.UUID, userUUID uuid.UUID) error
-	ApproveBooking(ctx context.Context, factorID uuid.UUID) error
 	CancelUserBooking(ctx context.Context, factorID uuid.UUID, userUUID uuid.UUID) error
 	CancelBooking(ctx context.Context, factorID uuid.UUID) error
 }
