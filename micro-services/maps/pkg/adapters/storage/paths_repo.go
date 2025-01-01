@@ -23,7 +23,7 @@ func NewPathRepo(db *gorm.DB) *PathRepo {
 // GetAll retrieves all paths from the database.
 func (r *PathRepo) GetAll(ctx context.Context) ([]domain.Path, error) {
 	var dbPaths []types.Path
-	if err := r.db.Find(&dbPaths).Error; err != nil {
+	if err := r.db.Model(&types.Path{}).Preload("SourceTerminal").Preload("DestinationTerminal").Find(&dbPaths).Error; err != nil {
 		return nil, err
 	}
 
@@ -39,7 +39,7 @@ func (r *PathRepo) GetAll(ctx context.Context) ([]domain.Path, error) {
 // Create adds a new path to the database.
 func (r *PathRepo) Create(ctx context.Context, path *domain.Path) (*domain.Path, error) {
 	dbPath := mapper.DomainToPath(path)
-	err := r.db.Create(&dbPath).Error
+	err := r.db.Model(&types.Path{}).Create(&dbPath).Error
 	newPath := mapper.PathToDomain(dbPath)
 	return newPath, err
 }
@@ -65,7 +65,7 @@ func (r *PathRepo) Delete(ctx context.Context, id string) error {
 	return r.db.Delete(&types.Path{}, "id = ?", id).Error
 }
 func (r *PathRepo) FilterPaths(ctx context.Context, filters map[string]interface{}) ([]domain.Path, error) {
-	query := r.db.Model(&types.Path{})
+	query := r.db.Model(&types.Path{}).Preload("SourceTerminal").Preload("DestinationTerminal")
 
 	// Apply filters dynamically
 	for key, value := range filters {
