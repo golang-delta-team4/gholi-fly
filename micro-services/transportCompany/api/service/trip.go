@@ -68,20 +68,20 @@ func (s *TripService) CreateTrip(ctx context.Context, req *pb.CreateTripRequest)
 	}
 
 	tripId, err := s.svc.CreateTrip(ctx, domain.Trip{
-		CompanyID:        companyId,
-		TripType:         req.TripType,
-		UserReleaseDate:  userReleaseDate,
-		TourReleaseDate:  tourReleaseDate,
-		UserPrice:        float64(req.UserPrice),
-		AgencyPrice:      float64(req.AgencyPrice),
-		PathID:           pathId,
-		MinPassengers:    uint(req.MinPassengers),
-		TechnicalTeamID:  technicalTeamId,
+		CompanyID:                companyId,
+		TripType:                 req.TripType,
+		UserReleaseDate:          userReleaseDate,
+		TourReleaseDate:          tourReleaseDate,
+		UserPrice:                float64(req.UserPrice),
+		AgencyPrice:              float64(req.AgencyPrice),
+		PathID:                   pathId,
+		MinPassengers:            uint(req.MinPassengers),
+		TechnicalTeamID:          technicalTeamId,
 		VehicleYearOfManufacture: int(req.VehicleYearOfManufacture),
-		SoldTickets:      uint(req.SoldTickets),
-		MaxTickets:       uint(req.MaxTickets),
-		StartDate:        &startDate,
-		EndDate:          &endDate,
+		SoldTickets:              uint(req.SoldTickets),
+		MaxTickets:               uint(req.MaxTickets),
+		StartDate:                &startDate,
+		EndDate:                  &endDate,
 	})
 
 	if err != nil {
@@ -128,6 +128,8 @@ func (s *TripService) GetTripById(ctx context.Context, tripId string) (*pb.GetTr
 		Status:           trip.Status,
 		MinPassengers:    uint32(trip.MinPassengers),
 		TechnicalTeamId:  technicalTeamId,
+		StartDate:        trip.StartDate.String(),
+		EndDate:          trip.EndDate.String(),
 	}, nil
 }
 
@@ -164,6 +166,8 @@ func (s *TripService) GetAgencyTripById(ctx context.Context, tripId string) (*pb
 		Status:           trip.Status,
 		MinPassengers:    uint32(trip.MinPassengers),
 		TechnicalTeamId:  technicalTeamId,
+		StartDate:        trip.StartDate.String(),
+		EndDate:          trip.EndDate.String(),
 	}, nil
 }
 
@@ -197,6 +201,8 @@ func (s *TripService) GetTrips(ctx context.Context, pageSize int, pageNumber int
 			Status:           trip.Status,
 			MinPassengers:    uint32(trip.MinPassengers),
 			TechnicalTeamId:  technicalTeamId,
+			StartDate:        trip.StartDate.String(),
+			EndDate:          trip.EndDate.String(),
 		})
 	}
 	return &pb.GetTripsResponse{
@@ -234,6 +240,8 @@ func (s *TripService) GetAgencyTrips(ctx context.Context, pageSize int, pageNumb
 			Status:           trip.Status,
 			MinPassengers:    uint32(trip.MinPassengers),
 			TechnicalTeamId:  technicalTeamId,
+			StartDate:        trip.StartDate.String(),
+			EndDate:          trip.EndDate.String(),
 		})
 	}
 	return &pb.GetTripsResponse{
@@ -242,7 +250,7 @@ func (s *TripService) GetAgencyTrips(ctx context.Context, pageSize int, pageNumb
 }
 
 func (s *TripService) UpdateTrip(ctx context.Context, tripId string, req *pb.UpdateTripRequest) error {
-	
+
 	tripUId, err := uuid.Parse(tripId)
 	if err != nil {
 		return fmt.Errorf("%w %w", ErrCompanyCreationValidation, err)

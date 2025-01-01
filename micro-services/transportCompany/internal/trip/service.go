@@ -8,6 +8,7 @@ import (
 	"math"
 	"time"
 
+	userPB "github.com/golang-delta-team4/gholi-fly-shared/pkg/protobuf/user"
 	companyPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company/port"
 	technicalTeamPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/technicalTeam/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/domain"
@@ -15,7 +16,6 @@ import (
 	tripRepo "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/port"
 	grpcPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc/port"
 	httpPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/http/port"
-	userPB "github.com/golang-delta-team4/gholi-fly-shared/pkg/protobuf/user"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/http/presenter"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -26,7 +26,7 @@ var (
 	ErrCanNotUpdate           = errors.New("can not update")
 	ErrTripCreationValidation = errors.New("validation failed")
 	ErrTripNotFound           = errors.New("error trip not found")
-	ErrConnectingUserService   = errors.New("error on connecting to user service")
+	ErrConnectingUserService  = errors.New("error on connecting to user service")
 )
 
 type service struct {
@@ -53,7 +53,7 @@ func NewService(repo port.Repo,
 		mapClient:         mapClient,
 		vehicleClient:     vehicleClient,
 		companyService:    companyService,
-		userClient: userClient,
+		userClient:        userClient,
 	}
 }
 
@@ -70,6 +70,8 @@ func (s *service) CreateTrip(ctx context.Context, trip domain.Trip) (uuid.UUID, 
 		log.Println("error on getting path detail: ", err.Error())
 		return uuid.Nil, err
 	}
+	trip.FromTerminalName = pathDetail.SourceTerminal.Name
+	trip.ToTerminalName = pathDetail.DestinationTerminal.Name
 	companyId, err := s.repo.CreateTrip(ctx, trip)
 	if err != nil {
 		log.Println("error on creating company: ", err.Error())
