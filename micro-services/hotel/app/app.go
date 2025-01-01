@@ -95,7 +95,7 @@ func (a *app) BookingService(ctx context.Context) bookingPort.Service {
 }
 
 func (a *app) bookingServiceWithDB(db *gorm.DB) bookingPort.Service {
-	return booking.NewService(storage.NewBookingRepo(db), storage.NewHotelRepo(db), grpc.NewGRPCBankClient(a.cfg.Bank.Host, a.cfg.Bank.Port))
+	return booking.NewService(storage.NewBookingRepo(db), storage.NewHotelRepo(db), grpc.NewGRPCBankClient(a.cfg.Bank.Host, a.cfg.Bank.Port), grpc.NewGRPCNotificationClient(a.cfg.Notif.Host, a.cfg.Notif.Port))
 }
 
 func (a *app) Config() config.Config {
