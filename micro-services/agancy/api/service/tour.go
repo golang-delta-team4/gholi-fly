@@ -55,7 +55,7 @@ func (ts *TourService) CreateTour(ctx context.Context, agencyID string, hotelHos
 	}
 
 	// Parse trip ID
-	tripID, err := uuid.Parse(req.GetTripId())
+	tripID, err := uuid.Parse(req.GetForwardTripId())
 	if err != nil {
 		return nil, errors.New("invalid trip ID format")
 	}
@@ -68,12 +68,9 @@ func (ts *TourService) CreateTour(ctx context.Context, agencyID string, hotelHos
 	if err != nil {
 		return nil, err
 	}
-	// Step 1: Call transport company to buy tickets
-	compensationPayload := req.TripId
-	transportURL := fmt.Sprintf("http://%s:%d/api/v1/transport-company/ticket/agency-buy", transportCompanyHost, transportCompanyPort)
 
-	// Step 2: Call hotel service to book a hotel
-	compensationPayload = req.HotelId
+	// Step 1: Call hotel service to book a hotel
+	compensationPayload := req.HotelId
 	hotelURL := fmt.Sprintf("http://%s:%d/api/v1/hotel/booking/%s", hotelHost, hotelPort, req.GetHotelId())
 	hotelRequest := BookingCreateRequest{
 		CheckIn:  req.GetCheckIn(),
@@ -95,7 +92,7 @@ func (ts *TourService) CreateTour(ctx context.Context, agencyID string, hotelHos
 		CompensationPayload: hotelResponse.ReservationId,
 		Payload:             compensationPayload,
 	})
-
+	// Step 2: Call transport company to buy forward tickets
 	transportRequest := map[string]interface{}{
 		"tripId":          tripID.String(),
 		"agencyId":        parsedAgencyID.String(),
@@ -106,18 +103,54 @@ func (ts *TourService) CreateTour(ctx context.Context, agencyID string, hotelHos
 		TicketId   string `json:"ticketId"`
 		TotalPrice int    `json:"totalPrice"`
 	}
-	err = makePostRequest(ctx, transportURL, transportRequest, &transportResponse)
+	compensationPayloadtransport := req.ForwardTripId
+	transportURLtransport := fmt.Sprintf("http://%s:%d/api/v1/transport-company/ticket/agency-buy", transportCompanyHost, transportCompanyPort)
+	err = makePostRequest(ctx, transportURLtransport, transportRequest, &transportResponse)
 	if err != nil {
 		events = append(events, tourEventDomain.TourEvent{
 			ReservationID:       tracId,
 			EventType:           tourEventDomain.EventTypeTripReservation,
 			Status:              tourEventDomain.StatusFailed,
 			CompensationPayload: transportResponse.TicketId,
-			Payload:             compensationPayload,
+			Payload:             compensationPayloadtransport,
 		})
 		err2 := ts.tourEventSvc.CreateEvent(ctx, events)
 		return nil, fmt.Errorf("failed to buy transport ticket: %w", err2)
 	}
+	events = append(events, tourEventDomain.TourEvent{
+		ReservationID:       tracId,
+		EventType:           tourEventDomain.EventTypeTripReservation,
+		Status:              tourEventDomain.StatusSuccess,
+		CompensationPayload: transportResponse.TicketId,
+		Payload:             compensationPayloadtransport,
+	})
+	// step 3: Call transport company to buy backward tickets
+	tripID, err = uuid.Parse(req.GetBackwardTripId())
+	if err != nil {
+		return nil, errors.New("invalid trip ID format")
+	}
+	compensationPayloadtransport = req.BackwardTripId
+	transportRequest = map[string]interface{}{
+		"tripId":          tripID.String(),
+		"agencyId":        parsedAgencyID.String(),
+		"ticketCount":     req.GetTicketCount(),
+		"ownerOfAgencyId": agency.OwnerID.String(), // ownerid
+	}
+
+	transportURLtransport = fmt.Sprintf("http://%s:%d/api/v1/transport-company/ticket/agency-buy", transportCompanyHost, transportCompanyPort)
+	err = makePostRequest(ctx, transportURLtransport, transportRequest, &transportResponse)
+	if err != nil {
+		events = append(events, tourEventDomain.TourEvent{
+			ReservationID:       tracId,
+			EventType:           tourEventDomain.EventTypeTripReservation,
+			Status:              tourEventDomain.StatusFailed,
+			CompensationPayload: transportResponse.TicketId,
+			Payload:             compensationPayloadtransport,
+		})
+		err2 := ts.tourEventSvc.CreateEvent(ctx, events)
+		return nil, fmt.Errorf("failed to buy transport ticket: %w", err2)
+	}
+	// step 3 ended
 
 	startDate, err := time.Parse(time.RFC3339, req.GetStartDate())
 	if err != nil {
