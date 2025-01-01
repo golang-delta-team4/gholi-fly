@@ -9,11 +9,6 @@ services:
       - ./micro-services/hotel:/gholi-fly
     ports:
       - "8081:8080"
-    depends_on:
-      gholi-db:
-        condition: service_healthy
-      gholi-redis:
-        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/hotel/health"]
       interval: 10s
@@ -31,16 +26,6 @@ services:
       - ./micro-services/bank:/gholi-fly
     ports:
       - "8080:8080"
-    depends_on:
-      gholi-db:
-        condition: service_healthy
-      gholi-redis:
-        condition: service_healthy
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/hotel/health"]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
     restart: always
 
   gholi-users-api:
@@ -54,16 +39,11 @@ services:
     ports:
       - "8083:8080"
       - "50053:50051"
-    depends_on:
-      gholi-db:
-        condition: service_healthy
-      gholi-redis:
-        condition: service_healthy
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/health/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: always
 
   gholi-maps-api:
@@ -76,16 +56,6 @@ services:
       - ./micro-services/maps:/gholi-fly
     ports:
       - "8082:8080"
-    depends_on:
-      gholi-db:
-        condition: service_healthy
-      gholi-redis:
-        condition: service_healthy
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
     restart: always
 
   gholi-transportation-api:
@@ -98,16 +68,6 @@ services:
       - ./micro-services/transportCompany:/gholi-fly
     ports:
       - "8084:8080"
-    depends_on:
-      gholi-db:
-        condition: service_healthy
-      gholi-redis:
-        condition: service_healthy
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
     restart: always
 
   gholi-vehicle-api:
@@ -120,16 +80,6 @@ services:
       - ./micro-services/vehicle:/gholi-fly
     ports:
       - "8085:8080"
-    depends_on:
-      gholi-db:
-        condition: service_healthy
-      gholi-redis:
-        condition: service_healthy
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
     restart: always
 
   gholi-agency-api:
@@ -143,52 +93,44 @@ services:
       - ./Logs:/gholi-fly/Logs
     ports:
       - "8086:8080"
-    depends_on:
-      gholi-db:
-        condition: service_healthy
-      gholi-redis:
-        condition: service_healthy
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
     restart: always
 
-
-  gholi-db:
-    image: postgres:14.8
-    container_name: gholi-db-dev
-    restart: always
-    environment:
-      POSTGRES_USER: ${PG_USERNAME}        
-      POSTGRES_PASSWORD: ${PG_PASSWORD}    
-      POSTGRES_MULTIPLE_DATABASES: ${PG_MULTIPLE_DATABASES}  
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${PG_USERNAME}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  gholi-notification-api:
+    # image: outbox-nats
+    container_name: gholi-notification-api-dev
+    restart: on-failure
+    build:
+      context: ./micro-services/notification
+      dockerfile: build/Dockerfile
     volumes:
-      - gholi-db-volume:/var/lib/postgresql/data:rw
-      - ./scripts/create-multiple-postgresql-databases.sh:/docker-entrypoint-initdb.d/create-multiple-postgresql-databases.sh:ro
+      - ./micro-services/notification/config.json:/app/config.json:ro 
+    ports:
+      - "8089:8080"
+      - "50059:50051"
+    command: ["./app", "--config", "/app/config.json"]
 
-  gholi-redis:
-      image: redis/redis-stack:7.2.0-v3
-      container_name: gholi-redis-dev
-      volumes:
-        - gholi-redis-volume:/data
-      ports:
-        - "6380:6379"
-        - "8020:8001"
-      healthcheck:
-        test: ["CMD", "redis-cli", "ping"]
-        interval: 5s
-        timeout: 3s
-        retries: 5
-      restart: always
+  gholi-notification-relay:
+    # image: outbox-nats
+    container_name: gholi-notification-relay-dev
+    restart: on-failure
+    build:
+      context: ./micro-services/notification
+      dockerfile: build/Dockerfile
+    volumes:
+      - ./micro-services/notification/config.json:/app/config.json
+    command: [ "./relay", "--config", "/app/config.json"]
+
+  gholi-notification-worker:
+    # image: outbox-nats
+    container_name: gholi-notification-worker-dev
+    restart: on-failure
+    build:
+      context: ./micro-services/notification
+      dockerfile: build/Dockerfile
+    volumes:
+      - ./micro-services/notification/config.json:/app/config.json:ro 
+      - ./micro-services/notification/internal/email/template:/app/template
+    command: [ "./worker", "--config", "/app/config.json"]
 
   gholi-nginx:
     image: nginx:1.25.2
@@ -199,68 +141,18 @@ services:
     volumes:
       - ./nginx-config-dev.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
-      gholi-hotels-api:
-        condition: service_healthy
       gholi-users-api:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/api/v1/hotel/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8083/api/v1/users/health"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  gholi-nats:
-    image: nats:2.9-alpine
-    container_name: gholi-nats-server
-    command: [
-      "-js",          
-      "--store_dir",  
-      "/data"
-    ]
-    ports:
-      - "4222:4222"   
-    volumes:
-      - gholi-nats_data:/data
-
-  gholi-outbox-grpc:
-    image: outbox-nats
-    container_name: gholi-outbox-grpc
-    restart: on-failure
-    build:
-      context: ./micro-services/notification
-      dockerfile: build/Dockerfile
-    volumes:
-      - ./micro-services/notification/config.json:/app/config.json:ro 
-    ports:
-      - "8089:8080"
-      - "50051:50051"
-    command: ["./app", "--config", "/app/config.json"]
-
-  gholi-outbox-relay:
-    image: outbox-nats
-    container_name: gholi-outbox-relay
-    restart: on-failure
-    build:
-      context: ./micro-services/notification
-      dockerfile: build/Dockerfile
-    volumes:
-      - ./micro-services/notification/config.json:/app/config.json
-    command: [ "./relay", "--config", "/app/config.json"]
-
-  gholi-outbox-worker:
-    image: outbox-nats
-    container_name: gholi-outbox-worker
-    restart: on-failure
-    build:
-      context: ./micro-services/notification
-      dockerfile: build/Dockerfile
-    volumes:
-      - ./micro-services/notification/config.json:/app/config.json:ro 
-      - ./micro-services/notification/internal/email/template:/app/template
-    command: [ "./worker", "--config", "/app/config.json"]
-    
-
 volumes:
-  gholi-db-volume:
-  gholi-redis-volume:
-  gholi-nats_data:
+  gholi_logs:
+    driver: local
+  gholi_notification_config:
+    driver: local
+  gholi_notification_template:
+    driver: local
