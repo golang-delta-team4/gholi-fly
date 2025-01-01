@@ -86,7 +86,9 @@ func (a *app) tripServiceWithDB(db *gorm.DB) tripPort.Service {
 		storage.NewTechnicalTeamRepo(db, false, a.redisProvider),
 		storage.NewTripRepo(db, false, a.redisProvider),
 		clientHttp.NewHttpPathClient(int(a.cfg.Map.Port)),
-		clientHttp.NewHttpVehicleClient(int(a.cfg.Vehicle.Port)))
+		clientHttp.NewHttpVehicleClient(int(a.cfg.Vehicle.Port)),
+		a.CompanyService(context.Background()),
+		grpc.NewGRPCUserClient(a.cfg.Role.Host, int(a.cfg.Role.Port)))
 }
 
 func (a *app) TicketService(ctx context.Context) ticketPort.Service {

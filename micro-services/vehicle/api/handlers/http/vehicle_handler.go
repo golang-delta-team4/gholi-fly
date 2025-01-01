@@ -2,7 +2,6 @@ package http
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"time"
 	"vehicle/api/presenter"
@@ -26,21 +25,22 @@ func NewVehicleHandler(service port.VehicleService) *VehicleHandler {
 func (h *VehicleHandler) MatchVehicle(c *fiber.Ctx) error {
 	var vehicleMatchRequest presenter.MatchMakerRequest
 	if err := c.BodyParser(&vehicleMatchRequest); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": fmt.Sprintf("Invalid request payload %v", err)})
+		
+		return fiber.NewError(fiber.StatusBadRequest, "invalid request payload", err.Error())
 	}
 	reserveStartDate, err := time.Parse(time.DateOnly, vehicleMatchRequest.ReserveStartDate)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err})
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 	reserveEndDate, err := time.Parse(time.DateOnly, vehicleMatchRequest.ReserveEndDate)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err})
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 	if reserveStartDate.Before(time.Now()) {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "start date can't be sooner than now"})
+		return fiber.NewError(fiber.StatusBadRequest, "start date can't be sooner than now")
 	}
 	if reserveEndDate.Before(reserveStartDate) {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "end date can't be sooner than start date"})
+		return fiber.NewError(fiber.StatusBadRequest, "end date can't be sooner than start date")
 	}
 	vehicleUUID, err := uuid.Parse(vehicleMatchRequest.TripID)
 	reservationID, vehicle, err := h.service.MatchVehicle(c.Context(), &domain.MatchMakerRequest{
@@ -55,9 +55,9 @@ func (h *VehicleHandler) MatchVehicle(c *fiber.Ctx) error {
 	})
 	if err != nil {
 		if errors.Is(err, vehicleService.ErrVehicleNotFound) {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})
+			return fiber.NewError(fiber.StatusNotFound, err.Error())
 		}
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})
+		return fiber.NewError(fiber.StatusInternalServerError,err.Error())
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"reservation_id": reservationID, "vehicle_detail": vehicle})

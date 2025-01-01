@@ -11,11 +11,13 @@ import (
 	port "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company/port"
 	grpcPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/grpc/port"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 var (
 	ErrCompanyOnCreate           = errors.New("error on creating new company")
 	ErrCompanyCreationValidation = errors.New("validation failed")
+	ErrCompanyNotFound = errors.New("company not found")
 )
 
 type service struct {
@@ -49,7 +51,10 @@ func (s *service) CreateCompany(ctx context.Context, company domain.Company) (uu
 func (s *service) GetCompanyById(ctx context.Context, companyId uuid.UUID) (*domain.Company, error) {
 	company, err := s.repo.GetCompanyById(ctx, companyId)
 	if err != nil {
-		log.Println("error on creating company: ", err.Error())
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrCompanyNotFound
+		}
+		log.Println("error on getting company: ", err.Error())
 		return nil, err
 	}
 	return company, nil
