@@ -1,0 +1,37 @@
+{
+    "db": {
+        "host": "localhost",
+        "port": 5432,
+        "database": "agency_db",
+        "schema": "public",
+        "user": "gholi-user",
+        "password": "password123"
+    },
+    "server": {
+        "httpPort": 8080,
+        "secret": "CDAF7ED902919F6F7330EA3F7A89612C98BCF0A1F5A20E4CF2981CE84552FBB2",
+        "authExpMin": 10,
+        "authExpRefreshMin": 120,
+        "grpcPort": 3000
+    },
+    "redis": {
+        "host": "gholi-redis",
+        "port": 8001
+    },
+    "hotelService": {
+        "host": "localhost",
+        "port": 8086
+    },
+    "transportService": {
+        "host": "localhost",
+        "port": 8084
+    },
+    "logger": {
+        "logFilePath": "./Logs/gholi-fly-agency.log",
+        "maxSize": 10,
+        "maxBackups": 5,
+        "maxAge": 30,
+        "compress": true,
+        "level": "info"
+    }
+}

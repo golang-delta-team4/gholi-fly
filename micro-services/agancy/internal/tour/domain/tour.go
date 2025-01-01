@@ -9,6 +9,10 @@ import (
 
 type TourID uuid.UUID
 
+func (id TourID) String() string {
+	return uuid.UUID(id).String()
+}
+
 type Tour struct {
 	ID                  TourID
 	Name                string
@@ -17,9 +21,12 @@ type Tour struct {
 	EndDate             time.Time
 	SourceLocation      string
 	DestinationLocation string
-	ForwardTicketID     uuid.UUID
-	ReturnTicketID      uuid.UUID
-	HotelBookingID      uuid.UUID
+	TripID              uuid.UUID
+	TripAgencyPrice     int
+	HotelID             uuid.UUID
+	HotelAgencyPrice    int
+	IsPublished         bool
+	Capacity            int
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
 }
@@ -30,6 +37,12 @@ func (t *Tour) Validate() error {
 	}
 	if t.SourceLocation == "" || t.DestinationLocation == "" {
 		return errors.New("source and destination locations are required")
+	}
+	if t.Capacity <= 0 {
+		return errors.New("capacity must be greater than zero")
+	}
+	if t.TripAgencyPrice < 0 || t.HotelAgencyPrice < 0 {
+		return errors.New("prices cannot be negative")
 	}
 	return nil
 }

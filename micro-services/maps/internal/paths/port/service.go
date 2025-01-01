@@ -9,7 +9,7 @@ import (
 
 type PathService interface {
 	GetAllPaths(ctx context.Context) ([]domain.Path, error)
-	CreatePath(ctx context.Context, path *domain.Path) error
+	CreatePath(ctx context.Context, path *domain.Path) (*domain.Path, error)
 	UpdatePath(ctx context.Context, path *domain.Path) error
 	DeletePath(ctx context.Context, id uuid.UUID) error
 	FilterPaths(ctx context.Context, filters map[string]interface{}) ([]domain.Path, error)

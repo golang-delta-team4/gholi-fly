@@ -14,9 +14,12 @@ type Tour struct {
 	EndDate             time.Time
 	SourceLocation      string
 	DestinationLocation string
-	ForwardTicketID     uuid.UUID     `gorm:"type:uuid;index"`
-	ReturnTicketID      uuid.UUID     `gorm:"type:uuid;index"`
-	HotelBookingID      uuid.UUID     `gorm:"type:uuid;index"`
+	TripID              uuid.UUID `gorm:"type:uuid;index"` // References a Trip
+	TripAgencyPrice     int
+	HotelID             uuid.UUID `gorm:"type:uuid;index"` // References a Hotel
+	HotelAgencyPrice    int
+	IsPublished         bool
+	Capacity            int
 	Reservations        []Reservation `gorm:"foreignKey:TourID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"` // One-to-many with Reservation
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
