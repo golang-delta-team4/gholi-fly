@@ -1,0 +1,19 @@
+{
+    "db": {
+        "host": "localhost",
+        "port": 5432,
+        "database": "hotel_db",
+        "user": "gholi-user",
+        "password": "password123"
+    },
+    "server": {
+        "httpPort": 8086,
+        "secret": "test1234",
+        "authExpMin": 10,
+        "authExpRefreshMin": 120
+    },
+    "reids": {
+        "host": "gholi-redis",
+        "port": 8001
+    }
+}

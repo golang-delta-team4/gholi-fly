@@ -1,0 +1,2 @@
+gen-proto:
+	protoc -I=./micro-services/hotel/api/pb -I=. --go_out=./micro-services/hotel/api/pb --go_opt=paths=source_relative --go-grpc_out=./micro-services/hotel/api/pb --go-grpc_opt=paths=source_relative ./micro-services/hotel/api/pb/*.proto

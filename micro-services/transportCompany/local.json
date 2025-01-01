@@ -1,0 +1,22 @@
+{
+    "db": {
+        "host": "localhost",
+        "port": 5432,
+        "database": "transportation_db",
+        "user": "gholi-user",
+        "password": "password123",
+        "schema": "public"
+    },
+    "server": {
+        "httpPort": 8084,
+        "secret": "1234"
+    },
+    "redis": {
+        "host": "localhost",
+        "port": 6379
+    },
+    "bank": {
+        "host": "127.0.0.1",
+        "port": 50052
+    }
+}

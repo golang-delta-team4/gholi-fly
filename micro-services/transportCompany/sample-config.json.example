@@ -1,0 +1,20 @@
+{
+    "db": {
+        "host": "localhost",
+        "port": 5432,
+        "database": "transport-company",
+        "user": "postgres",
+        "password": "1234",
+        "schema": "public"
+    },
+    "server": {
+        "httpPort": 8084,
+        "secret": "CDAF7ED902919F6F7330EA3F7A89612C98BCF0A1F5A20E4CF2981CE84552FBB2",
+        "authExpMin": 15,
+        "authExpRefreshMin": 45
+    },
+    "bankGRPC": {
+        "host": "127.0.0.1",
+        "port": 8084
+    }
+}

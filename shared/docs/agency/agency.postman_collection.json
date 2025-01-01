@@ -1,0 +1,294 @@
+{
+	"info": {
+		"_postman_id": "f0e146cc-f465-44f1-9f41-a9860d488b3b",
+		"name": "agency",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39376619"
+	},
+	"item": [
+		{
+			"name": "create-agency",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzUzMzkwNzcsIlVzZXJVVUlEIjoiNDcyYTAyZWUtMDg2YS00ZDMxLTkyODgtYzEwODE0OWI0MzhjIn0.UUU0HM3G_7HT-P8ptRGmExIqk-semI5phzM83VZxKVOalnkri1k2eUro61W4nrOifPM1PDn-BkRdLE-QQ9Rgrg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"agency\",\r\n    \"owner_id\":\"472a02ee-086a-4d31-9288-c108149b438c\",\r\n    \"wallet_id\":\"cafd6060-2ead-4da4-8b6f-7e872f330f1b\",\r\n    \"profit_percentage\": 12.5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/api/v1/agency/",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"agency",
+						""
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "create-agency",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"agency\",\r\n    \"owner_id\":\"472a02ee-086a-4d31-9288-c108149b438c\",\r\n    \"wallet_id\":\"cafd6060-2ead-4da4-8b6f-7e872f330f1b\",\r\n    \"profit_percentage\": 12.5\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "127.0.0.1:8080/api/v1/agency/",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"agency",
+								""
+							]
+						}
+					},
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "get-agency",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzUzNDAxMzksIlVzZXJVVUlEIjoiNDcyYTAyZWUtMDg2YS00ZDMxLTkyODgtYzEwODE0OWI0MzhjIn0.imqEdLJEBBhMdci4ssXlc3AyFwVnXSYSNLgK11ievLP4TESYd83FbL8UaZxgTrcwsNhZZDljPaHMpTEqy2Zk4w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:8080/api/v1/agency/cbed4c7a-36a9-4826-ac86-8cc4bd057d5b",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"agency",
+						"cbed4c7a-36a9-4826-ac86-8cc4bd057d5b"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "get-agency",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "127.0.0.1:8080/api/v1/agency/cbed4c7a-36a9-4826-ac86-8cc4bd057d5b",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"agency",
+								"cbed4c7a-36a9-4826-ac86-8cc4bd057d5b"
+							]
+						}
+					},
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "patch-agency",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzUzNDAxMzksIlVzZXJVVUlEIjoiNDcyYTAyZWUtMDg2YS00ZDMxLTkyODgtYzEwODE0OWI0MzhjIn0.imqEdLJEBBhMdci4ssXlc3AyFwVnXSYSNLgK11ievLP4TESYd83FbL8UaZxgTrcwsNhZZDljPaHMpTEqy2Zk4w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"agency2\",\r\n    \"profit_percentage\": 45\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/api/v1/agency/cbed4c7a-36a9-4826-ac86-8cc4bd057d5b",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"agency",
+						"cbed4c7a-36a9-4826-ac86-8cc4bd057d5b"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "patch-agency",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"agency2\",\r\n    \"profit_percentage\": 45\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "127.0.0.1:8080/api/v1/agency/cbed4c7a-36a9-4826-ac86-8cc4bd057d5b",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"agency",
+								"cbed4c7a-36a9-4826-ac86-8cc4bd057d5b"
+							]
+						}
+					},
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "delete-agency",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzUzNDEwNjIsIlVzZXJVVUlEIjoiNDcyYTAyZWUtMDg2YS00ZDMxLTkyODgtYzEwODE0OWI0MzhjIn0.S5i43ddTN9u9c3vIOHqFiTMYlUP2D0NWUpGmfvEEI7YcPN0e_bDve2EBiMujxqzJuQPrsodt6Pn7ufHjdb621g",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:8080/api/v1/agency/cbed4c7a-36a9-4826-ac86-8cc4bd057d5b",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"agency",
+						"cbed4c7a-36a9-4826-ac86-8cc4bd057d5b"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "delete-agency",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "127.0.0.1:8080/api/v1/agency/cbed4c7a-36a9-4826-ac86-8cc4bd057d5b",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"agency",
+								"cbed4c7a-36a9-4826-ac86-8cc4bd057d5b"
+							]
+						}
+					},
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": null
+				}
+			]
+		}
+	]
+}

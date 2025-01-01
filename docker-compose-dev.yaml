@@ -1,0 +1,158 @@
+services:
+  gholi-hotels-api:
+    container_name: gholi-hotels-api-dev
+    build:
+      context: ./micro-services/hotel
+      dockerfile: build/Dockerfile
+      target: dev
+    volumes:
+      - ./micro-services/hotel:/gholi-fly
+    ports:
+      - "8081:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/hotel/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  gholi-banks-api:
+    container_name: gholi-banks-api-dev
+    build:
+      context: ./micro-services/bank
+      dockerfile: build/Dockerfile
+      target: dev
+    volumes:
+      - ./micro-services/bank:/gholi-fly
+    ports:
+      - "8080:8080"
+    restart: always
+
+  gholi-users-api:
+    container_name: gholi-users-api-dev
+    build:
+      context: ./micro-services/user
+      dockerfile: build/Dockerfile
+      target: dev
+    volumes:
+      - ./micro-services/user:/gholi-fly
+    ports:
+      - "8083:8080"
+      - "50053:50051"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/health/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  gholi-maps-api:
+    container_name: gholi-maps-api-dev
+    build:
+      context: ./micro-services/maps
+      dockerfile: build/Dockerfile
+      target: dev
+    volumes:
+      - ./micro-services/maps:/gholi-fly
+    ports:
+      - "8082:8080"
+    restart: always
+
+  gholi-transportation-api:
+    container_name: gholi-transportation-api-dev
+    build:
+      context: ./micro-services/transportCompany
+      dockerfile: build/Dockerfile
+      target: dev
+    volumes:
+      - ./micro-services/transportCompany:/gholi-fly
+    ports:
+      - "8084:8080"
+    restart: always
+
+  gholi-vehicle-api:
+    container_name: gholi-vehicle-api-dev
+    build:
+      context: ./micro-services/vehicle
+      dockerfile: build/Dockerfile
+      target: dev
+    volumes:
+      - ./micro-services/vehicle:/gholi-fly
+    ports:
+      - "8085:8080"
+    restart: always
+
+  gholi-agency-api:
+    container_name: gholi-agency-api-dev
+    build:
+      context: ./micro-services/agancy
+      dockerfile: build/Dockerfile
+      target: dev
+    volumes:
+      - ./micro-services/agancy:/gholi-fly
+      - ./Logs:/gholi-fly/Logs
+    ports:
+      - "8086:8080"
+    restart: always
+
+  gholi-notification-api:
+    # image: outbox-nats
+    container_name: gholi-notification-api-dev
+    restart: on-failure
+    build:
+      context: ./micro-services/notification
+      dockerfile: build/Dockerfile
+    volumes:
+      - ./micro-services/notification/config.json:/app/config.json:ro 
+    ports:
+      - "8089:8080"
+      - "50059:50051"
+    command: ["./app", "--config", "/app/config.json"]
+
+  gholi-notification-relay:
+    # image: outbox-nats
+    container_name: gholi-notification-relay-dev
+    restart: on-failure
+    build:
+      context: ./micro-services/notification
+      dockerfile: build/Dockerfile
+    volumes:
+      - ./micro-services/notification/config.json:/app/config.json
+    command: [ "./relay", "--config", "/app/config.json"]
+
+  gholi-notification-worker:
+    # image: outbox-nats
+    container_name: gholi-notification-worker-dev
+    restart: on-failure
+    build:
+      context: ./micro-services/notification
+      dockerfile: build/Dockerfile
+    volumes:
+      - ./micro-services/notification/config.json:/app/config.json:ro 
+      - ./micro-services/notification/internal/email/template:/app/template
+    command: [ "./worker", "--config", "/app/config.json"]
+
+  gholi-nginx:
+    image: nginx:1.25.2
+    container_name: gholi-nginx-dev
+    restart: always
+    ports:
+      - "8888:80"
+    volumes:
+      - ./nginx-config-dev.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      gholi-users-api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/api/v1/users/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  gholi_logs:
+    driver: local
+  gholi_notification_config:
+    driver: local
+  gholi_notification_template:
+    driver: local
