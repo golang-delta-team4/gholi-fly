@@ -1,0 +1,20 @@
+{
+    "db": {
+        "host": "127.0.0.1",
+        "port": 5432,
+        "database": "bank_db",
+        "user": "gholi-user",
+        "password": "password123"
+    },
+    "server": {
+        "httpPort": 8080,
+        "secret": "test1234",
+        "authExpMin": 10,
+        "authExpRefreshMin": 120,
+        "grpcPort" : 3000
+    },
+    "reids": {
+        "host": "gholi-redis-dev",
+        "port": 8001
+    }
+}

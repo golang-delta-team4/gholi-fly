@@ -1,0 +1,22 @@
+{
+    "db": {
+        "host": "localhost",
+        "port": 5432,
+        "database": "user_db",
+        "user": "gholi-user",
+        "password": "password123",
+        "schema":"public"
+    },
+    "server": {
+        "HttpHost":"127.0.0.1",
+        "HttpPort": 8083,
+        "grpcPort": 50051,
+        "secret":"CDAF7ED902919F6F7330EA3F7A89612C98BCF0A1F5A20E4CF2981CE84552FBB2",
+        "authExpMin": 15,
+        "authExpRefreshMin": 1440
+    },
+    "bankGRPC": {
+        "host": "127.0.0.1",
+        "port": 3000
+    }
+}

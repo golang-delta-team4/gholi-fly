@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package pathservice;
+
+option go_package = "gholi-fly-maps/api/handlers/grpc;pathservice";
+
+// Request for getting a path by ID
+message GetPathRequest {
+  string id = 1; // Path ID
+}
+
+// Response for returning path details
+message GetPathResponse {
+  string id = 1;
+  string source_terminal_id = 2;
+  string destination_terminal_id = 3;
+  float distance_km = 4;
+  string route_code = 5;
+  string vehicle_type = 6;
+}
+
+// gRPC Service definition
+service PathService {
+  rpc GetPath(GetPathRequest) returns (GetPathResponse);
+}

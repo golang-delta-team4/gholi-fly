@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+import "room.proto";
+
+option go_package = "gholi-fly-hotel/api/pb";
+
+message HotelCreateRequest {
+    string name = 1 [json_name = "name"];
+    string city = 2 [json_name = "city"];
+}
+
+message HotelCreateResponse {
+    string hotelId = 1 [json_name = "hotelId"];
+}
+
+message GetAllHotelsResponse {
+    repeated Hotel hotels = 1 [json_name = "hotels"];
+}
+
+message GetAllHotelsByOwnerIDRequest {
+    string ownerId = 1 [json_name = "ownerId"];
+}
+
+message GetHotelByIDRequest {
+    string hotelId = 1 [json_name = "hotelId"];
+}
+
+message UpdateHotelRequest {
+    string hotelId = 1 [json_name = "hotelId"];
+    string name = 2 [json_name = "name"];
+    string city = 3 [json_name = "city"];
+}
+
+message UpdateHotelResponse {}
+
+message DeleteHotelRequest {
+    string hotelId = 1 [json_name = "hotelId"];
+}
+
+message DeleteHotelResponse {}
+
+message Hotel {
+    string id = 1 [json_name = "id"];
+    string name = 2 [json_name = "name"];
+    string city = 3 [json_name = "city"];
+    repeated Room rooms = 4 [json_name = "rooms"];
+}
+

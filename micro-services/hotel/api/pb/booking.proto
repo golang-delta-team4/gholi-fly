@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option go_package = "gholi-fly-hotel/api/pb";
+
+
+enum BookingStatus {
+    BOOKING_UNKNOWN = 0;
+    BOOKING_PENDING = 1;
+    BOOKING_CONFIRMED = 2;
+    BOOKING_CANCELLED = 3;
+}
+
+message BookingCreateRequest {
+    string checkIn = 1 [json_name = "checkIn"];
+    string checkOut = 2 [json_name = "checkOut"];
+    string hotelId = 3 [json_name = "hotelId"];
+    repeated string roomIds = 4 [json_name = "roomIds"];  // Add room IDs field
+    string userId = 5 [json_name = "userId"];             // Optional user ID
+}
+
+message BookingCreateResponse {
+    string reservationId = 1 [json_name = "reservationId"];
+    int64 totalPrice = 2 [json_name = "totalPrice"];
+}
+
+message GetAllBookingResponse {
+    repeated Booking bookings = 1 [json_name = "bookings"];
+}
+
+message Booking {
+    string id = 1 [json_name = "id"];
+    string hotelId = 2 [json_name = "hotelId"];
+    string userId = 3 [json_name = "userId"];
+    string checkIn = 4 [json_name = "checkIn"];
+    string checkOut = 5 [json_name = "checkOut"];
+    string factorId = 6 [json_name = "factorId"];
+    BookingStatus bookingStatus = 7 [json_name = "bookingStatus"];
+    repeated string roomIds = 8 [json_name = "roomIds"];  // Add room IDs field
+}

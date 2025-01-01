@@ -1,0 +1,157 @@
+syntax = "proto3";
+
+option go_package = "github.com/golang-delta-team4/gholi-fly/transportCompany/api/pb";
+
+
+message CreateCompanyRequest {
+    string name = 1 [json_name = "name"];
+    string description = 2 [json_name = "description"];
+    string address =4 [json_name = "address"];
+	string phone =5 [json_name = "phone"];
+	string email =6 [json_name = "email"];
+}	
+
+message CreateCompanyResponse {
+    string id = 1 [json_name = "id"];
+    string message = 2 [json_name = "message"];
+}
+
+message GetCompanyResponse { 
+    string id = 1 [json_name = "id"];
+    string name = 2 [json_name = "name"];
+    string description = 3 [json_name = "description"];
+    string address = 4 [json_name = "address"];
+    string phone = 5 [json_name = "phone"];
+    string email = 6 [json_name = "email"];
+    string ownerId = 7 [json_name = "ownerId"];
+}	
+
+message UpdateCompanyRequest {
+    string name = 1 [json_name = "name"];
+    string description = 2 [json_name = "description"];
+    string address =4 [json_name = "address"];
+	string phone =5 [json_name = "phone"];
+	string email =6 [json_name = "email"];
+}	
+
+message CreateTripRequest {
+    string companyId = 1 [json_name = "companyId"];
+    string tripType = 2 [json_name = "tripType"];
+    string userReleaseDate = 3 [json_name = "userReleaseDate"];
+    string tourReleaseDate =4 [json_name = "tourReleaseDate"];
+	uint64 userPrice =5 [json_name = "userPrice"];
+    uint64 agencyPrice =6 [json_name = "agencyPrice"];
+	string pathId =7 [json_name = "pathId"];
+    uint64 minPassengers =8 [json_name = "minPassengers"];
+    string technicalTeamId =9 [json_name = "technicalTeamId"];
+    uint64 vehicleYearOfManufacture =10 [json_name = "vehicleYearOfManufacture"];
+    uint64 soldTickets =11 [json_name = "soldTickets"];
+    uint64 maxTickets =12 [json_name = "maxTickets"];
+    string startDate =13 [json_name = "startDate"];
+    string endDate =14 [json_name = "endDate"];
+}	
+
+message CreateTripResponse {
+    string id = 1 [json_name = "id"];
+    string message = 2 [json_name = "message"];
+}
+
+message GetTripResponse {
+  string id = 1;
+  string company_id = 2;
+  string trip_type = 3;
+  string release_date = 4;
+  double price = 6;
+  string path_id = 8;
+  string from_country = 9;
+  string to_country = 10;
+  string origin = 11;
+  string from_terminal_name = 12;
+  string to_terminal_name = 13;
+  string destination = 14;
+  string path_name = 15;
+  double path_distance_km = 16;
+  string status = 17;
+  uint32 min_passengers = 18;
+  string technical_team_id = 19;
+  string startDate = 20;
+  string endDate = 21;
+}
+
+message UpdateTripRequest {
+    string companyId = 1 [json_name = "companyId"];
+    string tripType = 2 [json_name = "tripType"];
+    string userReleaseDate = 3 [json_name = "userReleaseDate"];
+    string tourReleaseDate =4 [json_name = "tourReleaseDate"];
+	uint64 userPrice =5 [json_name = "userPrice"];
+    uint64 agencyPrice =6 [json_name = "agencyPrice"];
+	string pathId =7 [json_name = "pathId"];
+    uint64 minPassengers =8 [json_name = "minPassengers"];
+    string technicalTeamId =9 [json_name = "technicalTeamId"];
+    string vehicleRequestId =10 [json_name = "vehicleRequestId"];
+    uint64 soldTickets =11 [json_name = "soldTickets"];
+    uint64 maxTickets =12 [json_name = "maxTickets"];
+    string startDate =13 [json_name = "startDate"];
+    string endDate =14 [json_name = "endDate"];
+}	
+
+message GetTripsResponse {
+    repeated GetTripResponse trips = 1 [json_name = "trips"];
+}
+
+message BuyTicketRequest {
+    string tripId = 1 [json_name = "tripId"];
+}
+
+message BuyAgencyTicketRequest {
+    string tripId = 1 [json_name = "tripId"];
+    string agencyId = 2 [json_name = "agencyId"];
+    uint64 ticketCount = 3 [json_name = "ticketCount"];
+    string ownerOfAgencyId = 4 [json_name = "ownerOfAgencyId"];
+}
+
+message BuyTicketResponse {
+    string ticketId = 1 [json_name = "ticketId"];
+    string message = 2 [json_name = "message"];
+    uint64 totalPrice = 3 [json_name = "totalPrice"];
+}
+
+message CancelTicketResponse {
+    string message = 1 [json_name = "message"];
+}
+
+message CreateTechnicalTeamRequest {
+    string name = 1 [json_name = "name"];
+    string description = 2 [json_name = "description"];
+    string companyId = 3 [json_name = "companyId"];
+    string tripType = 4 [json_name = "tripType"];
+}
+
+message CreateTechnicalTeamResponse {
+    string id = 1 [json_name = "id"];
+    string message = 2 [json_name = "message"];
+}
+
+message SetTechnicalTeamToTripRequest {
+    string technicalTeamId = 1 [json_name = "technicalTeamId"];
+    string tripId = 2 [json_name = "tripId"];
+}
+
+message AddTechnicalTeamMemberRequest {
+    string userId = 1 [json_name = "userId"];
+    string position = 2 [json_name = "position"];
+    string technicalTeamId = 3 [json_name = "technicalTeamId"];
+}
+
+message GetTechnicalTeamResponse {
+    string id = 1 [json_name = "id"];
+    string name = 2 [json_name = "name"];
+    string description = 3 [json_name = "description"];
+    string companyId = 4 [json_name = "companyId"];
+    string tripType = 5 [json_name = "tripType"];
+    repeated string membersId = 6  [json_name = "membersId"];
+}
+
+message GetTechnicalTeamsResponse {
+    repeated GetTechnicalTeamResponse teams = 1 [json_name = "teams"];
+}
