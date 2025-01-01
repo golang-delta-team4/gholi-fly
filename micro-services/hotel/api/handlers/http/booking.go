@@ -184,20 +184,6 @@ func ApproveUserBookingByID(svcGetter ServiceGetter[*service.BookingService]) fi
 	}
 }
 
-func ApproveBookingByID(svcGetter ServiceGetter[*service.BookingService]) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		svc := svcGetter(c.UserContext())
-		factorID := c.Params("factor_id")
-
-		err := svc.ApproveBooking(c.UserContext(), factorID)
-		if err != nil {
-			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
-		}
-
-		return c.SendStatus(fiber.StatusNoContent)
-	}
-}
-
 func DeleteBookingByID(svcGetter ServiceGetter[*service.BookingService]) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		svc := svcGetter(c.UserContext())

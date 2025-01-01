@@ -94,15 +94,15 @@ func (s *service) CreateBookingFactor(ctx context.Context, userId uuid.UUID, hot
 }
 
 func (s *service) ApproveUserBooking(ctx context.Context, factorID uuid.UUID, userUUID uuid.UUID) error {
-	err := s.repo.ApproveUserBooking(ctx, factorID, userUUID)
-	if err != nil {
+
+	resp, err := s.bankClient.ApplyFactor(&bankPb.ApplyFactorRequest{
+		FactorId: factorID.String(),
+	})
+	if err != nil || resp.Status != bankPb.ResponseStatus_SUCCESS {
 		return ErrBookingApprovalFailed
 	}
-	return nil
-}
 
-func (s *service) ApproveBooking(ctx context.Context, factorID uuid.UUID) error {
-	err := s.repo.ApproveBooking(ctx, factorID)
+	err = s.repo.ApproveUserBooking(ctx, factorID, userUUID)
 	if err != nil {
 		return ErrBookingApprovalFailed
 	}
@@ -110,7 +110,13 @@ func (s *service) ApproveBooking(ctx context.Context, factorID uuid.UUID) error 
 }
 
 func (s *service) CancelUserBooking(ctx context.Context, factorID uuid.UUID, userUUID uuid.UUID) error {
-	err := s.repo.CancelUserBooking(ctx, factorID, userUUID)
+	resp, err := s.bankClient.CancelFactor(&bankPb.CancelFactorRequest{
+		FactorId: factorID.String(),
+	})
+	if err != nil || resp.Status != bankPb.ResponseStatus_SUCCESS {
+		return ErrBookingApprovalFailed
+	}
+	err = s.repo.CancelUserBooking(ctx, factorID, userUUID)
 	if err != nil {
 		return ErrBookingCancellationFailed
 	}
@@ -118,7 +124,13 @@ func (s *service) CancelUserBooking(ctx context.Context, factorID uuid.UUID, use
 }
 
 func (s *service) CancelBooking(ctx context.Context, factorID uuid.UUID) error {
-	err := s.repo.CancelBooking(ctx, factorID)
+	resp, err := s.bankClient.CancelFactor(&bankPb.CancelFactorRequest{
+		FactorId: factorID.String(),
+	})
+	if err != nil || resp.Status != bankPb.ResponseStatus_SUCCESS {
+		return ErrBookingApprovalFailed
+	}
+	err = s.repo.CancelBooking(ctx, factorID)
 	if err != nil {
 		return ErrBookingCancellationFailed
 	}
