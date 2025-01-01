@@ -12,17 +12,18 @@ type MatchMakerRequest struct {
 	ReserveEndDate     string   `json:"reserve_end_date"`
 	TripDistance       int      `json:"trip_distance"`
 	NumberOfPassengers int      `json:"number_of_passengers"`
-	TripType           TripType `json:"trip_type"`
+	TripType           VehicleType `json:"trip_type"`
 	MaxPrice           int      `json:"max_price"`
 	YearOfManufacture  int      `json:"year_of_manufacture"`
 }
 
-type TripType string
+type VehicleType string
 
 var (
-	GroundTrip TripType = "ground"
-	AirTrip    TripType = "air"
-	SeaTrip    TripType = "sea"
+	Bus      VehicleType = "bus"
+	Train    VehicleType = "train"
+	Ship     VehicleType = "ship"
+	Airplane VehicleType = "airplane"
 )
 
 type MatchMakerResponse struct {
