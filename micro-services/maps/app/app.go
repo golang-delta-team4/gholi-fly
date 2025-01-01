@@ -4,12 +4,11 @@ import (
 	"fmt"
 	"gholi-fly-maps/config"
 	"gholi-fly-maps/internal/paths"
-	path_domain "gholi-fly-maps/internal/paths/domain"
 	port_p "gholi-fly-maps/internal/paths/port"
 	"gholi-fly-maps/internal/terminals"
-	terminal_domain "gholi-fly-maps/internal/terminals/domain"
 	port_t "gholi-fly-maps/internal/terminals/port"
 	"gholi-fly-maps/pkg/adapters/storage"
+	"gholi-fly-maps/pkg/adapters/storage/types"
 	"gholi-fly-maps/pkg/postgres"
 
 	"gorm.io/gorm"
@@ -55,7 +54,7 @@ func (a *app) setDB() error {
 	}
 
 	// Run migrations for Terminal and Path models
-	err = postgres.AutoMigrate(db, &terminal_domain.Terminal{}, &path_domain.Path{})
+	err = postgres.AutoMigrate(db, &types.Path{}, &types.Terminal{})
 	if err != nil {
 		return err
 	}
