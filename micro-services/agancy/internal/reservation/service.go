@@ -74,7 +74,7 @@ func (s *service) DeleteReservation(ctx context.Context, id domain.ReservationID
 }
 
 func (s *service) ListReservationsBytour(ctx context.Context, tourID uuid.UUID) ([]domain.Reservation, error) {
-	reservations, err := s.repo.ListBytourID(ctx, tourID)
+	reservations, err := s.repo.ListByTourID(ctx, tourID)
 	if err != nil {
 		return nil, err
 	}
