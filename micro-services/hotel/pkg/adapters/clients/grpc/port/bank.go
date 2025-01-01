@@ -8,4 +8,5 @@ type GRPCBankClient interface {
 	GetUserWallets(req *bankPB.GetWalletsRequest) (*bankPB.GetWalletsResponse, error)
 	CreateFactor(req *bankPB.CreateFactorRequest) (*bankPB.CreateFactorResponse, error)
 	ApplyFactor(req *bankPB.ApplyFactorRequest) (*bankPB.ApplyFactorResponse, error)
+	CancelFactor(req *bankPB.CancelFactorRequest) (*bankPB.CancelFactorResponse, error)
 }
