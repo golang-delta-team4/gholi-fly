@@ -16,12 +16,14 @@ import (
 	httpPort "github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/http/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/pkg/adapters/clients/http/presenter"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 var (
 	ErrTripOnCreate           = errors.New("error on creating new trip")
 	ErrCanNotUpdate           = errors.New("can not update")
 	ErrTripCreationValidation = errors.New("validation failed")
+	ErrTripNotFound           = errors.New("error trip not found")
 )
 
 type service struct {
@@ -97,6 +99,9 @@ func (s *service) GetTripById(ctx context.Context, id uuid.UUID) (*domain.Trip, 
 	trip, err := s.repo.GetTripById(ctx, id)
 	if err != nil {
 		log.Println("error on getting trip by id: ", err.Error())
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrTripNotFound
+		}
 		return nil, err
 	}
 
