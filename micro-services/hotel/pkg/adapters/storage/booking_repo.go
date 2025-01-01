@@ -54,7 +54,7 @@ func (r *bookingRepo) CreateByHotelID(ctx context.Context, bookingDomain domain.
 func (r *bookingRepo) GetByID(ctx context.Context, bookingID domain.BookingUUID) (*domain.Booking, error) {
 	var booking types.Booking
 
-	err := r.db.Table("bookings").WithContext(ctx).Where("uuid = ?", bookingID).First(&booking).Error
+	err := r.db.Table("bookings").WithContext(ctx).Where("reservation_id = ?", bookingID).First(&booking).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -107,14 +107,6 @@ func (r *bookingRepo) Delete(ctx context.Context, bookingID domain.BookingUUID) 
 
 func (r *bookingRepo) ApproveUserBooking(ctx context.Context, factorID uuid.UUID, userUUID uuid.UUID) error {
 	return r.db.Table("bookings").WithContext(ctx).Where("factor_id = ? AND user_id = ?", factorID, userUUID).Updates(map[string]interface{}{
-		"status":    2,
-		"is_paid":   true,
-		"paid_date": gorm.Expr("NOW()"),
-	}).Error
-}
-
-func (r *bookingRepo) ApproveBooking(ctx context.Context, factorID uuid.UUID) error {
-	return r.db.Table("bookings").WithContext(ctx).Where("factor_id = ?", factorID).Updates(map[string]interface{}{
 		"status":    2,
 		"is_paid":   true,
 		"paid_date": gorm.Expr("NOW()"),
