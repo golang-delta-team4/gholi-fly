@@ -22,7 +22,7 @@ func PathToDomain(p *types.Path) *domain.Path {
 // DomainToPath converts a domain model to a database model.
 func DomainToPath(d *domain.Path) *types.Path {
 	return &types.Path{
-		// ID:                    d.ID,
+		ID:                    d.ID,
 		SourceTerminalID:      d.SourceTerminalID,
 		DestinationTerminalID: d.DestinationTerminalID,
 		DistanceKM:            d.DistanceKM,
