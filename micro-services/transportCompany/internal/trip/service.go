@@ -8,6 +8,7 @@ import (
 	"math"
 	"time"
 
+	companyPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/company/port"
 	technicalTeamPort "github.com/golang-delta-team4/gholi-fly/transportCompany/internal/technicalTeam/port"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/domain"
 	"github.com/golang-delta-team4/gholi-fly/transportCompany/internal/trip/port"
@@ -29,21 +30,32 @@ type service struct {
 	tripRepo          tripRepo.Repo
 	mapClient         httpPort.HttpPathClient
 	vehicleClient     httpPort.HttpVehicleClient
+	companyService    companyPort.Service
 }
 
-func NewService(repo port.Repo, technicalTeamRepo technicalTeamPort.Repo, tripRepo tripRepo.Repo, mapClient httpPort.HttpPathClient, vehicleClient httpPort.HttpVehicleClient) port.Service {
+func NewService(repo port.Repo,
+	technicalTeamRepo technicalTeamPort.Repo,
+	tripRepo tripRepo.Repo,
+	mapClient httpPort.HttpPathClient,
+	vehicleClient httpPort.HttpVehicleClient,
+	companyService companyPort.Service) port.Service {
 	return &service{
 		repo:              repo,
 		technicalTeamRepo: technicalTeamRepo,
 		tripRepo:          tripRepo,
 		mapClient:         mapClient,
 		vehicleClient:     vehicleClient,
+		companyService:    companyService,
 	}
 }
 
 func (s *service) CreateTrip(ctx context.Context, trip domain.Trip) (uuid.UUID, error) {
 	if err := trip.Validate(); err != nil {
 		return uuid.Nil, fmt.Errorf("%w %w", ErrTripCreationValidation, err)
+	}
+	_, err := s.companyService.GetCompanyById(ctx, trip.CompanyID)
+	if err != nil {
+		return uuid.Nil, err
 	}
 	pathDetail, err := s.mapClient.GetPathDetail(trip.PathID)
 	if err != nil {
@@ -61,7 +73,7 @@ func (s *service) CreateTrip(ctx context.Context, trip domain.Trip) (uuid.UUID, 
 		ReserveEndDate:     trip.EndDate.Format(time.DateOnly),
 		TripDistance:       int(pathDetail.DistanceKM), //float64
 		NumberOfPassengers: int(trip.MinPassengers),
-		TripType:           presenter.TripType(trip.TripType),
+		TripType:           presenter.VehicleType(trip.TripType),
 		MaxPrice:           int(math.Ceil(trip.AgencyPrice*float64(trip.MinPassengers)) * 0.3),
 		YearOfManufacture:  trip.VehicleYearOfManufacture,
 	})
