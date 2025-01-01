@@ -26,16 +26,18 @@ var (
 )
 
 type service struct {
-	repo       port.Repo
-	hotelRepo  hotelPort.Repo
-	bankClient bankClientPort.GRPCBankClient
+	repo        port.Repo
+	hotelRepo   hotelPort.Repo
+	bankClient  bankClientPort.GRPCBankClient
+	notifClient bankClientPort.GRPCNotificationClient
 }
 
-func NewService(repo port.Repo, hotelRepo hotelPort.Repo, bankClient bankClientPort.GRPCBankClient) port.Service {
+func NewService(repo port.Repo, hotelRepo hotelPort.Repo, bankClient bankClientPort.GRPCBankClient, notifClient bankClientPort.GRPCNotificationClient) port.Service {
 	return &service{
-		repo:       repo,
-		hotelRepo:  hotelRepo,
-		bankClient: bankClient,
+		repo:        repo,
+		hotelRepo:   hotelRepo,
+		bankClient:  bankClient,
+		notifClient: notifClient,
 	}
 }
 
@@ -67,7 +69,7 @@ func (s *service) CreateBookingFactor(ctx context.Context, userId uuid.UUID, hot
 		OwnerId: ownerId.String(),
 	})
 	if walletResponse == nil || err != nil {
-		return "", err
+		return "", ErrBookingCreation
 	}
 
 	response, err := s.bankClient.CreateFactor(&bankPb.CreateFactorRequest{
@@ -90,6 +92,16 @@ func (s *service) CreateBookingFactor(ctx context.Context, userId uuid.UUID, hot
 		return "", err
 	}
 	s.repo.AddBookingFactor(ctx, bookingId, response.Factor.Id)
+
+	notifResponse, err := s.notifClient.AddNotification(&bankPb.AddNotificationRequest{
+		EventName: "BookingCreated",
+		UserId:    userId.String(),
+		Message:   "Booking created successfully",
+	})
+	if notifResponse == nil || err != nil {
+		return "", ErrBookingCreation
+	}
+
 	return response.Factor.Id, nil
 }
 
@@ -106,6 +118,16 @@ func (s *service) ApproveUserBooking(ctx context.Context, factorID uuid.UUID, us
 	if err != nil {
 		return ErrBookingApprovalFailed
 	}
+
+	notifResponse, err := s.notifClient.AddNotification(&bankPb.AddNotificationRequest{
+		EventName: "BookingApprove",
+		UserId:    userUUID.String(),
+		Message:   "Booking payed successfully",
+	})
+	if notifResponse == nil || err != nil {
+		return ErrBookingCreation
+	}
+
 	return nil
 }
 
@@ -119,6 +141,15 @@ func (s *service) CancelUserBooking(ctx context.Context, factorID uuid.UUID, use
 	err = s.repo.CancelUserBooking(ctx, factorID, userUUID)
 	if err != nil {
 		return ErrBookingCancellationFailed
+	}
+
+	notifResponse, err := s.notifClient.AddNotification(&bankPb.AddNotificationRequest{
+		EventName: "BookingCancel",
+		UserId:    userUUID.String(),
+		Message:   "Booking cancelled",
+	})
+	if notifResponse == nil || err != nil {
+		return ErrBookingCreation
 	}
 	return nil
 }
