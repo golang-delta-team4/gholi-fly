@@ -74,6 +74,8 @@ message GetTripResponse {
   string status = 17;
   uint32 min_passengers = 18;
   string technical_team_id = 19;
+  string startDate = 20;
+  string endDate = 21;
 }
 
 message UpdateTripRequest {
