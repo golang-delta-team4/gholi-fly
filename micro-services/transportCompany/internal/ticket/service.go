@@ -161,9 +161,9 @@ func (s *service) BuyAgencyTicket(ctx context.Context, ticket domain.Ticket) (uu
 	if err != nil {
 		return uuid.Nil, 0, fmt.Errorf("%w %s", ErrBuyTicket, err)
 	}
-	s.bankGrpc.ApplyFactor(&adaptersPb.ApplyFactorRequest{
-		FactorId: response.Factor.Id,
-	})
+	// s.bankGrpc.ApplyFactor(&adaptersPb.ApplyFactorRequest{
+	// 	FactorId: response.Factor.Id,
+	// })
 
 	return ticketId, totalPrice, nil
 }
