@@ -32,7 +32,19 @@ type BookingCreateResponse struct {
 	ReservationId string `json:"reservationId"`
 	TotalPrice    int64  `json:"totalPrice"`
 }
-
+type GetTripResponse struct {
+	Id               string `json:"id,omitempty"`
+	CompanyId        string `json:"company_id,omitempty"`
+	TripType         string `json:"trip_type,omitempty"`
+	ReleaseDate      string `json:"release_date,omitempty"`
+	FromCountry      string `json:"from_country,omitempty"`
+	ToCountry        string `json:"to_country,omitempty"`
+	Origin           string `json:"origin,omitempty"`
+	Destination      string `json:"destination,omitempty"`
+	FromTerminalName string `json:"from_terminal_name,omitempty"`
+	ToTerminalName   string `json:"to_terminal_name,omitempty"`
+	Status           string `json:"status,omitempty"`
+}
 type TourService struct {
 	staffSvc       port.TourService
 	tourEventSvc   tourEventSvc.TourEventService
@@ -48,18 +60,29 @@ func NewTourService(staffSvc port.TourService, tourEventSvc tourEventSvc.TourEve
 }
 func (ts *TourService) CreateTour(ctx context.Context, agencyID string, hotelHost string, hotelPort uint, transportCompanyHost string, transportCompanyPort uint, req *pb.CreateTourRequest) (*pb.CreateTourResponse, error) {
 	tracId := uuid.MustParse(uuid.NewString())
+
 	// Parse agency ID
 	parsedAgencyID, err := uuid.Parse(agencyID)
 	if err != nil {
 		return nil, errors.New("invalid agency ID format")
 	}
 
-	// Parse trip ID
-	tripID, err := uuid.Parse(req.GetForwardTripId())
+	// Parse trip IDs
+	forwardTripID, err := uuid.Parse(req.GetForwardTripId())
 	if err != nil {
-		return nil, errors.New("invalid trip ID format")
+		return nil, errors.New("invalid forward trip ID format")
 	}
-	var events = make([]tourEventDomain.TourEvent, 0)
+	backwardTripID, err := uuid.Parse(req.GetBackwardTripId())
+	if err != nil {
+		return nil, errors.New("invalid backward trip ID format")
+	}
+
+	// Step 1: Validate forward and backward trips
+	if err := ts.validateTrips(ctx, forwardTripID, backwardTripID, transportCompanyHost, transportCompanyPort); err != nil {
+		return nil, fmt.Errorf("trip validation failed: %w", err)
+	}
+
+	// Parse agency ID for later use
 	agUUID, err := uuid.Parse(agencyID)
 	if err != nil {
 		return nil, errors.New("invalid agency ID format")
@@ -69,8 +92,9 @@ func (ts *TourService) CreateTour(ctx context.Context, agencyID string, hotelHos
 		return nil, err
 	}
 
-	// Step 1: Call hotel service to book a hotel
-	compensationPayload := req.HotelId
+	var events = make([]tourEventDomain.TourEvent, 0)
+
+	// Step 2: Call hotel service to book a hotel
 	hotelURL := fmt.Sprintf("http://%s:%d/api/v1/hotel/booking/%s", hotelHost, hotelPort, req.GetHotelId())
 	hotelRequest := BookingCreateRequest{
 		CheckIn:  req.GetCheckIn(),
@@ -80,9 +104,8 @@ func (ts *TourService) CreateTour(ctx context.Context, agencyID string, hotelHos
 		UserId:   agency.OwnerID.String(),
 	}
 	var hotelResponse BookingCreateResponse
-	err = makePostRequest(ctx, hotelURL, hotelRequest, &hotelResponse)
+	err = makeRequest(ctx, hotelURL, hotelRequest, &hotelResponse, "POST")
 	if err != nil {
-
 		return nil, fmt.Errorf("failed to book hotel: %w", err)
 	}
 	events = append(events, tourEventDomain.TourEvent{
@@ -90,79 +113,71 @@ func (ts *TourService) CreateTour(ctx context.Context, agencyID string, hotelHos
 		EventType:           tourEventDomain.EventTypeHotelReservation,
 		Status:              tourEventDomain.StatusSuccess,
 		CompensationPayload: hotelResponse.ReservationId,
-		Payload:             compensationPayload,
+		Payload:             req.HotelId,
 	})
-	// Step 2: Call transport company to buy forward tickets
+
+	// Step 3: Call transport company to buy forward tickets
 	transportRequest := map[string]interface{}{
-		"tripId":          tripID.String(),
+		"tripId":          forwardTripID.String(),
 		"agencyId":        parsedAgencyID.String(),
 		"ticketCount":     req.GetTicketCount(),
-		"ownerOfAgencyId": agency.OwnerID.String(), // ownerid
+		"ownerOfAgencyId": agency.OwnerID.String(),
 	}
-	var transportResponse struct {
+	var forwardTransportResponse struct {
 		TicketId   string `json:"ticketId"`
 		TotalPrice int    `json:"totalPrice"`
 	}
-	compensationPayloadtransport := req.ForwardTripId
-	transportURLtransport := fmt.Sprintf("http://%s:%d/api/v1/transport-company/ticket/agency-buy", transportCompanyHost, transportCompanyPort)
-	err = makePostRequest(ctx, transportURLtransport, transportRequest, &transportResponse)
+	transportURL := fmt.Sprintf("http://%s:%d/api/v1/transport-company/ticket/agency-buy", transportCompanyHost, transportCompanyPort)
+	err = makeRequest(ctx, transportURL, transportRequest, &forwardTransportResponse, "POST")
 	if err != nil {
 		events = append(events, tourEventDomain.TourEvent{
 			ReservationID:       tracId,
 			EventType:           tourEventDomain.EventTypeTripReservation,
 			Status:              tourEventDomain.StatusFailed,
-			CompensationPayload: transportResponse.TicketId,
-			Payload:             compensationPayloadtransport,
+			CompensationPayload: forwardTransportResponse.TicketId,
+			Payload:             req.ForwardTripId,
 		})
 		err2 := ts.tourEventSvc.CreateEvent(ctx, events)
-		return nil, fmt.Errorf("failed to buy transport ticket: %w", err2)
+		return nil, fmt.Errorf("failed to buy forward transport ticket: %w", err2)
 	}
 	events = append(events, tourEventDomain.TourEvent{
 		ReservationID:       tracId,
 		EventType:           tourEventDomain.EventTypeTripReservation,
 		Status:              tourEventDomain.StatusSuccess,
-		CompensationPayload: transportResponse.TicketId,
-		Payload:             compensationPayloadtransport,
+		CompensationPayload: forwardTransportResponse.TicketId,
+		Payload:             req.ForwardTripId,
 	})
-	// step 3: Call transport company to buy backward tickets
-	tripID, err = uuid.Parse(req.GetBackwardTripId())
-	if err != nil {
-		return nil, errors.New("invalid trip ID format")
-	}
-	compensationPayloadtransport = req.BackwardTripId
-	transportRequest = map[string]interface{}{
-		"tripId":          tripID.String(),
-		"agencyId":        parsedAgencyID.String(),
-		"ticketCount":     req.GetTicketCount(),
-		"ownerOfAgencyId": agency.OwnerID.String(), // ownerid
-	}
 
-	transportURLtransport = fmt.Sprintf("http://%s:%d/api/v1/transport-company/ticket/agency-buy", transportCompanyHost, transportCompanyPort)
-	err = makePostRequest(ctx, transportURLtransport, transportRequest, &transportResponse)
+	// Step 4: Call transport company to buy backward tickets
+	var backwardTransportResponse struct {
+		TicketId   string `json:"ticketId"`
+		TotalPrice int    `json:"totalPrice"`
+	}
+	transportRequest["tripId"] = backwardTripID.String()
+	err = makeRequest(ctx, transportURL, transportRequest, &backwardTransportResponse, "POST")
 	if err != nil {
 		events = append(events, tourEventDomain.TourEvent{
 			ReservationID:       tracId,
 			EventType:           tourEventDomain.EventTypeTripReservation,
 			Status:              tourEventDomain.StatusFailed,
-			CompensationPayload: transportResponse.TicketId,
-			Payload:             compensationPayloadtransport,
+			CompensationPayload: backwardTransportResponse.TicketId,
+			Payload:             req.BackwardTripId,
 		})
 		err2 := ts.tourEventSvc.CreateEvent(ctx, events)
-		return nil, fmt.Errorf("failed to buy transport ticket: %w", err2)
+		return nil, fmt.Errorf("failed to buy backward transport ticket: %w", err2)
 	}
-	// step 3 ended
 
+	// Step 5: Parse dates
 	startDate, err := time.Parse(time.RFC3339, req.GetStartDate())
 	if err != nil {
 		return nil, fmt.Errorf("invalid start date format: %w", err)
 	}
-
 	endDate, err := time.Parse(time.RFC3339, req.GetEndDate())
 	if err != nil {
 		return nil, fmt.Errorf("invalid end date format: %w", err)
 	}
 
-	// Step 3: Create the tour entity
+	// Step 6: Create the tour entity
 	tour := domain.Tour{
 		Name:                req.GetName(),
 		Description:         req.GetDescription(),
@@ -170,15 +185,14 @@ func (ts *TourService) CreateTour(ctx context.Context, agencyID string, hotelHos
 		EndDate:             endDate,
 		SourceLocation:      req.GetSourceLocation(),
 		DestinationLocation: req.GetDestinationLocation(),
-		TripID:              tripID,
-		TripAgencyPrice:     transportResponse.TotalPrice,
+		ForwardTripID:       forwardTripID,
+		BackwardTripID:      backwardTripID,
+		TripAgencyPrice:     forwardTransportResponse.TotalPrice + backwardTransportResponse.TotalPrice,
 		HotelID:             uuid.MustParse(req.GetHotelId()),
 		HotelAgencyPrice:    int(hotelResponse.TotalPrice),
 		IsPublished:         req.GetIsPublished(),
 		Capacity:            int(req.GetCapacity()),
 	}
-
-	// Save to the database
 	tourID, err := ts.staffSvc.CreateTour(ctx, tour)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create tour: %w", err)
@@ -237,12 +251,19 @@ func (ts *TourService) UpdateTour(ctx context.Context, id string, req *pb.Update
 		existingTour.DestinationLocation = req.GetDestinationLocation()
 	}
 
-	if req.GetTripId() != "" {
-		tripID, err := uuid.Parse(req.GetTripId())
+	if req.GetForwardTripId() != "" {
+		tripID, err := uuid.Parse(req.GetForwardTripId())
 		if err != nil {
 			return nil, errors.New("invalid trip ID format")
 		}
-		existingTour.TripID = tripID
+		existingTour.ForwardTripID = tripID
+	}
+	if req.GetBackwardTripId() != "" {
+		tripID, err := uuid.Parse(req.GetBackwardTripId())
+		if err != nil {
+			return nil, errors.New("invalid trip ID format")
+		}
+		existingTour.BackwardTripID = tripID
 	}
 
 	if req.GetTicketCount() != 0 {
@@ -320,7 +341,8 @@ func (ts *TourService) GetTourByID(ctx context.Context, id string) (*pb.GetTourB
 		EndDate:             tour.EndDate.Format(time.RFC3339),
 		SourceLocation:      tour.SourceLocation,
 		DestinationLocation: tour.DestinationLocation,
-		TripId:              tour.TripID.String(),
+		ForwardTripId:       tour.ForwardTripID.String(),
+		BackwardTripId:      tour.BackwardTripID.String(),
 		TripAgencyPrice:     uint64(tour.TripAgencyPrice),
 		HotelId:             tour.HotelID.String(),
 		HotelAgencyPrice:    uint64(tour.HotelAgencyPrice),
@@ -355,7 +377,7 @@ func (ts *TourService) ListToursByAgency(ctx context.Context, agencyID string) (
 			EndDate:             tour.EndDate.Format(time.RFC3339),
 			SourceLocation:      tour.SourceLocation,
 			DestinationLocation: tour.DestinationLocation,
-			TripId:              tour.TripID.String(),
+			ForwardTripId:       tour.ForwardTripID.String(),
 			TripAgencyPrice:     uint64(tour.TripAgencyPrice),
 			HotelId:             tour.HotelID.String(),
 			HotelAgencyPrice:    uint64(tour.HotelAgencyPrice),
@@ -368,13 +390,13 @@ func (ts *TourService) ListToursByAgency(ctx context.Context, agencyID string) (
 
 	return response, nil
 }
-func makePostRequest(ctx context.Context, url string, requestBody interface{}, responseBody interface{}) error {
+func makeRequest(ctx context.Context, url string, requestBody interface{}, responseBody interface{}, method string) error {
 	reqBytes, err := json.Marshal(requestBody)
 	if err != nil {
 		return fmt.Errorf("failed to marshal request body: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(reqBytes))
+	req, err := http.NewRequestWithContext(ctx, method, url, bytes.NewBuffer(reqBytes))
 	if err != nil {
 		return fmt.Errorf("failed to create HTTP request: %w", err)
 	}
@@ -392,4 +414,29 @@ func makePostRequest(ctx context.Context, url string, requestBody interface{}, r
 	}
 
 	return json.NewDecoder(resp.Body).Decode(responseBody)
+}
+
+func (ts *TourService) validateTrips(ctx context.Context, forwardTripID, backwardTripID uuid.UUID, host string, port uint) error {
+	forwardTripURL := fmt.Sprintf("http://%s:%d/api/v1/transport-company/trip/%s", host, port, forwardTripID.String())
+	backwardTripURL := fmt.Sprintf("http://%s:%d/api/v1/transport-company/trip/%s", host, port, backwardTripID.String())
+
+	var forwardTrip GetTripResponse
+	var backwardTrip GetTripResponse
+
+	// Fetch forward trip
+	if err := makeRequest(ctx, forwardTripURL, nil, &forwardTrip, "GET"); err != nil {
+		return fmt.Errorf("failed to fetch forward trip: %w", err)
+	}
+
+	// Fetch backward trip
+	if err := makeRequest(ctx, backwardTripURL, nil, &backwardTrip, "GET"); err != nil {
+		return fmt.Errorf("failed to fetch backward trip: %w", err)
+	}
+
+	// Validation: Ensure FromCountry and ToCountry match appropriately
+	if forwardTrip.ToCountry != backwardTrip.FromCountry || forwardTrip.FromCountry != backwardTrip.ToCountry {
+		return errors.New("forward and backward trips do not match in FromCountry and ToCountry")
+	}
+
+	return nil
 }

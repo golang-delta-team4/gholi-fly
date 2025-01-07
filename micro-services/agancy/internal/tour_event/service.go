@@ -166,26 +166,23 @@ func (s *service) compensate(event domain.TourEvent) error {
 	switch event.EventType {
 	case domain.EventTypeHotelReservation:
 		fmt.Println(event.ReservationID)
-		type JSONN struct {
-			TripReservationId string `json:"tripReservationId"`
-		}
 
-		transportURL := fmt.Sprintf("http://%s:%d/api/v1/hotel/booking/cancel/%s", "localhost", 8081, event.CompensationPayload)
-
-		var transportResponse struct {
-			TicketId   string `json:"ticketId"`
-			TotalPrice int    `json:"totalPrice"`
-		}
-		var transportRequest struct {
-			TicketId   string `json:"ticketId"`
-			TotalPrice int    `json:"totalPrice"`
-		}
-		err := makePostRequest(context.Background(), transportURL, transportRequest, &transportResponse, "PATCH")
+		hotelURL := fmt.Sprintf("http://%s:%d/api/v1/hotel/booking/cancel/%s", "localhost", 8081, event.CompensationPayload)
+		err := makePostRequest(context.Background(), hotelURL, nil, nil, "PATCH")
 		if err != nil {
 			return fmt.Errorf("failed to buy transport ticket: %w", err)
 		}
+		event.Status = domain.StatusCompensated
+		s.repo.Update(context.Background(), event)
 	case domain.EventTypeTripReservation:
 		// Logic to compensate trip reservation
+		transportURL := fmt.Sprintf("http://%s:%d/api/v1/transport-company/agency-ticket/cancel/%s", "localhost", 8085, event.CompensationPayload)
+		err := makePostRequest(context.Background(), transportURL, nil, nil, "POST")
+		if err != nil {
+			return fmt.Errorf("failed to buy transport ticket: %w", err)
+		}
+		event.Status = domain.StatusCompensated
+		s.repo.Update(context.Background(), event)
 		log.Printf("Compensating trip reservation for event %s\n", event.ID)
 	default:
 		return fmt.Errorf("unknown event type: %s", event.EventType)
@@ -227,5 +224,5 @@ func makePostRequest(ctx context.Context, url string, requestBody interface{}, r
 		return fmt.Errorf("HTTP request failed with status: %d", resp.StatusCode)
 	}
 
-	return json.NewDecoder(resp.Body).Decode(responseBody)
+	return nil
 }

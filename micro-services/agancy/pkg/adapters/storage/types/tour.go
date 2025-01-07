@@ -14,7 +14,8 @@ type Tour struct {
 	EndDate             time.Time
 	SourceLocation      string
 	DestinationLocation string
-	TripID              uuid.UUID `gorm:"type:uuid;index"` // References a Trip
+	ForwardTripID       uuid.UUID `gorm:"type:uuid;index"` // References a Trip
+	BackwardTripID      uuid.UUID `gorm:"type:uuid;index"` // References a Trip
 	TripAgencyPrice     int
 	HotelID             uuid.UUID `gorm:"type:uuid;index"` // References a Hotel
 	HotelAgencyPrice    int
