@@ -40,7 +40,7 @@ func registerCompanyAPI(appContainer app.App, cfg config.ServerConfig, router fi
 func registerTripApi(appContainer app.App, cfg config.ServerConfig, router fiber.Router) {
 	tripServiceGetter := tripServiceGetter(appContainer, cfg)
 	router.Post("/trip", newAuthMiddleware([]byte(cfg.Secret)), setTransaction(appContainer.DB()), CreateTrip(tripServiceGetter, appContainer.UserGRPCService()))
-	router.Get("/trip/:id", newAuthMiddleware([]byte(cfg.Secret)), setTransaction(appContainer.DB()), GetTripById(tripServiceGetter))
+	router.Get("/trip/:id", setTransaction(appContainer.DB()), GetTripById(tripServiceGetter))
 	router.Get("/agency-trip/:id", setTransaction(appContainer.DB()), GetAgencyTripById(tripServiceGetter))
 	router.Get("/trip", newAuthMiddleware([]byte(cfg.Secret)), setTransaction(appContainer.DB()), GetTrips(tripServiceGetter))
 	router.Get("/agency-trip", newAuthMiddleware([]byte(cfg.Secret)), setTransaction(appContainer.DB()), GetAgencyTrips(tripServiceGetter))

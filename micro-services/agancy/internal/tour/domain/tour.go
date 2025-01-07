@@ -21,7 +21,8 @@ type Tour struct {
 	EndDate             time.Time
 	SourceLocation      string
 	DestinationLocation string
-	TripID              uuid.UUID
+	ForwardTripID       uuid.UUID
+	BackwardTripID      uuid.UUID
 	TripAgencyPrice     int
 	HotelID             uuid.UUID
 	HotelAgencyPrice    int

@@ -93,14 +93,14 @@ func (s *service) CreateBookingFactor(ctx context.Context, userId uuid.UUID, hot
 	}
 	s.repo.AddBookingFactor(ctx, bookingId, response.Factor.Id)
 
-	notifResponse, err := s.notifClient.AddNotification(&bankPb.AddNotificationRequest{
-		EventName: "BookingCreated",
-		UserId:    userId.String(),
-		Message:   "Booking created successfully",
-	})
-	if notifResponse == nil || err != nil {
-		return "", ErrBookingCreation
-	}
+	// notifResponse, err := s.notifClient.AddNotification(&bankPb.AddNotificationRequest{
+	// 	EventName: "BookingCreated",
+	// 	UserId:    userId.String(),
+	// 	Message:   "Booking created successfully",
+	// })
+	// if notifResponse == nil || err != nil {
+	// 	return "", ErrBookingCreation
+	// }
 
 	return response.Factor.Id, nil
 }
@@ -119,14 +119,14 @@ func (s *service) ApproveUserBooking(ctx context.Context, factorID uuid.UUID, us
 		return ErrBookingApprovalFailed
 	}
 
-	notifResponse, err := s.notifClient.AddNotification(&bankPb.AddNotificationRequest{
-		EventName: "BookingApprove",
-		UserId:    userUUID.String(),
-		Message:   "Booking payed successfully",
-	})
-	if notifResponse == nil || err != nil {
-		return ErrBookingCreation
-	}
+	// notifResponse, err := s.notifClient.AddNotification(&bankPb.AddNotificationRequest{
+	// 	EventName: "BookingApprove",
+	// 	UserId:    userUUID.String(),
+	// 	Message:   "Booking payed successfully",
+	// })
+	// if notifResponse == nil || err != nil {
+	// 	return ErrBookingCreation
+	// }
 
 	return nil
 }
@@ -143,14 +143,14 @@ func (s *service) CancelUserBooking(ctx context.Context, factorID uuid.UUID, use
 		return ErrBookingCancellationFailed
 	}
 
-	notifResponse, err := s.notifClient.AddNotification(&bankPb.AddNotificationRequest{
-		EventName: "BookingCancel",
-		UserId:    userUUID.String(),
-		Message:   "Booking cancelled",
-	})
-	if notifResponse == nil || err != nil {
-		return ErrBookingCreation
-	}
+	// notifResponse, err := s.notifClient.AddNotification(&bankPb.AddNotificationRequest{
+	// 	EventName: "BookingCancel",
+	// 	UserId:    userUUID.String(),
+	// 	Message:   "Booking cancelled",
+	// })
+	// if notifResponse == nil || err != nil {
+	// 	return ErrBookingCreation
+	// }
 	return nil
 }
 
